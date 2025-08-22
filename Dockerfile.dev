@@ -1,0 +1,20 @@
+FROM node:20-alpine
+
+# set working directory
+WORKDIR /work
+
+# copy manifests first to leverage Docker layer caching
+COPY package.json /work/package.json
+COPY packages/tsconfig/package.json /work/packages/tsconfig/package.json
+COPY packages/eslint-config-custom/package.json /work/packages/eslint-config-custom/package.json
+
+# copy the rest of it
+COPY packages /work/packages
+COPY apps /work/apps
+COPY . .
+
+# install once for the whole monorepo
+RUN npm ci
+
+EXPOSE 4000 5173 5174 5175
+CMD [ "sh", "-lc", "npm run dev" ]
