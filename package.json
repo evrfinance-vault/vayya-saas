@@ -46,6 +46,16 @@
     "eslint": "^9",
     "eslint-plugin-react-hooks": "^5",
     "@typescript-eslint/parser": "^8",
-    "@typescript-eslint/eslint-plugin": "^8"
+    "@typescript-eslint/eslint-plugin": "^8",
+    "esbuild": "^0.25.0",
+    "vite": {
+      "esbuild": "^0.25.0"
+    },
+    "vite-node": {
+      "esbuild": "^0.25.0"
+    },
+    "@vitest/mocker": {
+      "esbuild": "^0.25.0"
+    }
   }
 }
