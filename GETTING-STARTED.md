@@ -1,8 +1,8 @@
-# Getting Started with Vault SAAS
+# Getting Started with Vault SaaS
 
 ## Tech Stack
 
-Vault SAAS is a modular monolith:
+Vault SaaS is a modular monolith:
 
 - **Back-end:** Node.js + Express + TypeScript + Postgres
 - **Front-ends:** React (Vite) for Small Business Owners, Borrowers, and Admins
