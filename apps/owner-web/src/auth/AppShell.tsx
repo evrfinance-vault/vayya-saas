@@ -1,4 +1,4 @@
-import React from "react"
+import React from "react";
 import App from "../App";
 import { RequireAuth, RoleGate } from "@packages/ui-auth";
 
@@ -9,5 +9,5 @@ export default function AppShell() {
         <App />
       </RoleGate>
     </RequireAuth>
-  )
-};
+  );
+}

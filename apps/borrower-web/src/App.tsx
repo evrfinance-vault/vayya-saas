@@ -14,11 +14,9 @@ export default function App() {
 
       const data = await api("/api/ping");
       setPong(data);
-    }
-    catch (e: any) {
+    } catch (e: any) {
       setErr(String(e?.message || e));
-    }
-    finally {
+    } finally {
       setBusy(false);
     }
   }
@@ -27,17 +25,23 @@ export default function App() {
     <div>
       <Header
         title="Vault"
-        navLinks={[
-          { label: "Overview", href: "http://localhost:5174" }
-        ]}
+        navLinks={[{ label: "Overview", href: "http://localhost:5174" }]}
       />
       <div style={{ padding: 24, display: "grid", gap: 12 }}>
         <h1>Vault Borrower Dashboard</h1>
         <div style={{ display: "flex", gap: 8 }}>
-          <button onClick={ping} disabled={busy}>{busy ? "Pinging…" : "Ping API"}</button>
+          <button onClick={ping} disabled={busy}>
+            {busy ? "Pinging…" : "Ping API"}
+          </button>
         </div>
-        {err && <pre style={{ color: "crimson", whiteSpace: "pre-wrap" }}>{err}</pre>}
-        {pong && <pre style={{ background: "#f6f6f6", padding: 12, borderRadius: 8 }}>{JSON.stringify(pong, null, 2)}</pre>}
+        {err && (
+          <pre style={{ color: "crimson", whiteSpace: "pre-wrap" }}>{err}</pre>
+        )}
+        {pong && (
+          <pre style={{ background: "#f6f6f6", padding: 12, borderRadius: 8 }}>
+            {JSON.stringify(pong, null, 2)}
+          </pre>
+        )}
       </div>
     </div>
   );

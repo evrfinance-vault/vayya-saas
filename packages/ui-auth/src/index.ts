@@ -7,3 +7,4 @@ export * from "./UserBadge";
 export * from "./LogoutButton";
 export * from "./useRole";
 export * from "./Header";
+export * from "./timeOfDay";

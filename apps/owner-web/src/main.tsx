@@ -9,5 +9,5 @@ const root = createRoot(document.getElementById("root")!);
 root.render(
   <Auth0ProviderWithConfig>
     <AppShell />
-  </Auth0ProviderWithConfig>
+  </Auth0ProviderWithConfig>,
 );

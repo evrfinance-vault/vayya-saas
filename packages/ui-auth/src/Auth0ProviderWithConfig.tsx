@@ -1,7 +1,7 @@
 import React from "react";
 import { Auth0Provider } from "@auth0/auth0-react";
 
-type Props = { children: React.ReactNode }
+type Props = { children: React.ReactNode };
 
 export function Auth0ProviderWithConfig({ children }: Props) {
   const domain = import.meta.env.VITE_AUTH0_DOMAIN as string;
@@ -19,7 +19,7 @@ export function Auth0ProviderWithConfig({ children }: Props) {
       authorizationParams={{
         audience,
         redirect_uri: window.location.origin,
-        scope: "openid profile email"
+        scope: "openid profile email",
       }}
       cacheLocation="localstorage"
       useRefreshTokens={true}

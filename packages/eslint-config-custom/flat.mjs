@@ -74,11 +74,19 @@ export default [
     },
     rules: {
       "no-empty": ["error", { allowEmptyCatch: true }],
+      "no-unused-vars": "off",
       "@typescript-eslint/no-unused-vars": [
-        "warn",
-        { argsIgnorePattern: "^_" },
+        "error",
+        {
+          argsIgnorePattern: "^_",
+          varsIgnorePattern: "^_",
+          caughtErrorsIgnorePattern: "^_",
+        },
       ],
       "react/react-in-jsx-scope": "off",
+      quotes: ["error", "double", { avoidEscape: true }],
+      "jsx-quotes": ["error", "prefer-double"],
+      semi: ["error", "always"],
     },
   },
 

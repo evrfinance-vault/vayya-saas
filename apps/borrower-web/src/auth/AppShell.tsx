@@ -9,5 +9,5 @@ export default function AppShell() {
         <App />
       </RoleGate>
     </RequireAuth>
-  )
-};
+  );
+}
