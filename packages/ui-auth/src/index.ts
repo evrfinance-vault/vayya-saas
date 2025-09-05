@@ -2,3 +2,8 @@ export * from "./Auth0ProviderWithConfig";
 export * from "./RequireAuth";
 export * from "./RoleGate";
 export * from "./ability";
+export * from "./useApi";
+export * from "./UserBadge";
+export * from "./LogoutButton";
+export * from "./useRole";
+export * from "./Header";
