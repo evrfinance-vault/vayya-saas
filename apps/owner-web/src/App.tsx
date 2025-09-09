@@ -6,6 +6,16 @@ import {
   UserBadge,
 } from "@packages/ui-auth";
 
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { library } from '@fortawesome/fontawesome-svg-core'
+
+/* import all the icons in Free Solid, Free Regular, and Brands styles */
+import { fas } from '@fortawesome/free-solid-svg-icons'
+import { far } from '@fortawesome/free-regular-svg-icons'
+import { fab } from '@fortawesome/free-brands-svg-icons'
+
+library.add(fas, far, fab)
+
 const preheading: React.CSSProperties = {
   display: "flex",
   alignItems: "center",
@@ -19,7 +29,8 @@ const heading: React.CSSProperties = {
   marginTop: 0,
 };
 const tinydot: React.CSSProperties = {
-  fontSize: "xx-small"
+  fontSize: "xx-small",
+  color: "lightgreen"
 };
 
 export default function App() {
@@ -58,7 +69,7 @@ export default function App() {
       />
       <div style={{ padding: 24, marginLeft: 12, display: "grid", gap: 0 }}>
         <div style={preheading}>
-          <span style={tinydot}>🟢</span>
+          <span style={tinydot}><FontAwesomeIcon icon="fa-solid fa-dog" /></span>
           Live Dashboard • {today}
         </div>
         <h1 style={heading}>
