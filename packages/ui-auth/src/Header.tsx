@@ -1,7 +1,6 @@
 import React from "react";
 import "./Header.css";
-import { UserBadge } from "./UserBadge";
-import { LogoutButton } from "./LogoutButton";
+import { UserMenu } from "./UserMenu";
 
 type Link = { label: string; href: string };
 type Props = { title?: string; navLinks?: Link[] };
@@ -70,8 +69,7 @@ export function Header({ title = "Vault", navLinks }: Props) {
         )}
       </div>
       <div style={right}>
-        <UserBadge />
-        <LogoutButton />
+        <UserMenu />
       </div>
     </header>
   );
