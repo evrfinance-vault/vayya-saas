@@ -48,8 +48,7 @@ export function UserMenu(): React.ReactElement {
         aria-expanded={open}
         onClick={() => setOpen((v) => !v)}
       >
-        <span className="vu-avatar">{initialsFrom(user?.name || user?.email)}</span>
-        <Gravatar email={(user?.email as string)} />
+        <Gravatar className="gravatar" email={(user?.email as string)} />
       </button>
 
       {open && (
