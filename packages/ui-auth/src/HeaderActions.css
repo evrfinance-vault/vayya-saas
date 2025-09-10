@@ -1,0 +1,68 @@
+/* ======= Tweak these to match your header ======= */
+:root {
+  --vu-icon-btn-bg: rgba(255, 255, 255, 0.4);
+  --vu-icon-btn-border: rgba(255, 255, 255, 0.55);
+  --vu-icon-btn-hover-bg: rgba(255, 255, 255, 0.6);
+  --vu-icon-btn-icon: #ffffff;
+
+  --vu-badge-bg: #1d4ed8;  /* bright blue */
+  --vu-badge-color: #ffffff;
+  --vu-badge-border: #ffffff; /* ring around badge */
+}
+/* ================================================ */
+
+.vu-icon-group {
+  display: flex;
+  gap: 12px;
+  position: relative; /* popover anchors here (top-right) */
+}
+
+.vu-icon-btn {
+  position: relative;
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  border: 1px solid var(--vu-icon-btn-border);
+  background: var(--vu-icon-btn-bg);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 120ms ease, border-color 120ms ease, transform 80ms ease;
+  color: var(--vu-icon-btn-icon);
+}
+
+.vu-icon-btn:hover {
+  background: var(--vu-icon-btn-hover-bg);
+}
+
+.vu-icon-btn:active {
+  transform: translateY(1px);
+}
+
+.vu-icon-btn:focus-visible {
+  outline: 2px solid #93c5fd;
+  outline-offset: 2px;
+  border-color: #93c5fd;
+}
+
+/* Badge (absolute-positioned, works regardless of Font Awesome "layers") */
+.vu-badge {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  min-width: 20px;
+  height: 20px;
+  padding: 0 6px;
+  border-radius: 999px;
+  background: var(--vu-badge-bg);
+  color: var(--vu-badge-color);
+  border: 2px solid var(--vu-badge-border);
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}

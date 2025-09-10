@@ -2,7 +2,7 @@
   background-color: #ffffff;
   color: #434952;
   text-decoration: none;
-  padding: 10px 24px;
+  padding: 8px 20px;
   margin: 6px 8px 6px auto;
   border-radius: 12px;
 }
@@ -10,9 +10,10 @@
 .header-link {
   color: #ffffff;
   text-decoration: none;
-  padding: 10px 24px;
+  padding: 8px 20px;
   margin: 6px auto;
   border-radius: 12px;
+  transition: background 120ms ease, border-color 120ms ease, transform 80ms ease;
 }
 
 .header-link:hover {

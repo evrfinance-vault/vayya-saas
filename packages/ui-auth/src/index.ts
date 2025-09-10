@@ -9,3 +9,5 @@ export * from "./useRole";
 export * from "./Header";
 export * from "./timeOfDay";
 export * from "./UserMenu";
+export * from "./HeaderActions";
+export * from "./NotificationsPopover";

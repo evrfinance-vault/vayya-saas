@@ -1,9 +1,19 @@
 import React from "react";
 import "./Header.css";
+import { HeaderActions } from "./HeaderActions";
 import { UserMenu } from "./UserMenu";
 
 type Link = { label: string; href: string };
-type Props = { title?: string; navLinks?: Link[] };
+type Props = {
+  title?: string;
+  navLinks?: Link[];
+  notifications?: NotificationItem[];
+  notificationsCount?: number;
+  onSearch?: () => void;
+  onNotifications?: () => void;
+  showSearch?: boolean;
+  showNotifications?: boolean;
+};
 
 const bar: React.CSSProperties = {
   display: "flex",
@@ -53,7 +63,17 @@ const nav: React.CSSProperties = {
   borderRadius: "12px",
 };
 
-export function Header({ title = "Vault", navLinks }: Props) {
+export function Header({
+  title = "Vault",
+  navLinks,
+  notificationsCount = 0,
+  showSearch = true,
+  showNotifications = true,
+  onSearch,
+  onNotifications,
+  notifications
+}: Props) {
+
   return (
     <header style={bar}>
       <div style={left}>{<h2 style={brand}>{title}</h2>}</div>
@@ -69,6 +89,13 @@ export function Header({ title = "Vault", navLinks }: Props) {
         )}
       </div>
       <div style={right}>
+        <HeaderActions
+          notifications={notifications}
+          onSearch={onSearch}
+          onNotifications={onNotifications}
+          showSearch={showSearch}
+          showNotifications={showNotifications}
+        />
         <UserMenu />
       </div>
     </header>

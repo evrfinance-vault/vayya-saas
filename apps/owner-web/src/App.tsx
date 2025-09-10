@@ -16,6 +16,12 @@ import { fab } from '@fortawesome/free-brands-svg-icons'
 
 library.add(fas, far, fab)
 
+const demoNotifications = [
+  { id: "n1", title: "New loan application", body: "Acme Bikes", unread: true, createdAt: "2h ago", href: "#" },
+  { id: "n2", title: "Payment received", body: "Invoice #1042", unread: false, createdAt: "Yesterday", href: "#" },
+  { id: "n3", title: "Profile updated", body: "Katherine Meyer", unread: false, createdAt: "Mon", href: "#" }
+];
+
 const preheading: React.CSSProperties = {
   display: "flex",
   alignItems: "center",
@@ -41,6 +47,9 @@ export default function App() {
     <div>
       <Header
         title="vault"
+        notifications={demoNotifications}
+        onViewAllNotifications={() => console.log("View all")}
+        onSearch={() => console.log("Search")}
         navLinks={[
           {
             label: "Overview",
@@ -69,7 +78,7 @@ export default function App() {
       />
       <div style={{ padding: 24, marginLeft: 12, display: "grid", gap: 0 }}>
         <div style={preheading}>
-          <span style={tinydot}><FontAwesomeIcon icon="fa-solid fa-dog" /></span>
+          <span style={tinydot}><FontAwesomeIcon icon="fa-solid fa-circle" /></span>
           Live Dashboard • {today}
         </div>
         <h1 style={heading}>
