@@ -9,7 +9,7 @@
   border: 1px solid #e5e7eb;
   background: #fff;
   padding: 6px 10px;
-  border-radius: 999px;
+  border-radius: 12px;
   cursor: pointer;
   transition: background 120ms ease, border-color 120ms ease;
 }
@@ -75,6 +75,7 @@
 
 .vu-menu-header {
   padding: 8px 10px;
+  color: #434952;
 }
 
 .vu-menu-name {

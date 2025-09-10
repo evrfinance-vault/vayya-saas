@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import "./UserMenu.css";
 import { useAuth0 } from "@auth0/auth0-react";
 import { useRole } from "./useRole";
+import Gravatar from "react-gravatar";
 
 function initialsFrom(nameOrEmail: string | undefined): string {
   if (!nameOrEmail) return "U";
@@ -14,7 +15,7 @@ function initialsFrom(nameOrEmail: string | undefined): string {
   return (first + second).toUpperCase();
 }
 
-export function UserMenu(): JSX.Element {
+export function UserMenu(): React.ReactElement {
   const { user, logout } = useAuth0();
   const role = useRole();
   const name = (user?.name as string) || (user?.email as string) || "User";
@@ -48,19 +49,7 @@ export function UserMenu(): JSX.Element {
         onClick={() => setOpen((v) => !v)}
       >
         <span className="vu-avatar">{initialsFrom(user?.name || user?.email)}</span>
-        <span className="vu-user-label">
-          <span className="vu-user-name">{name}</span>
-          <span className="vu-user-role">{role || "—"}</span>
-        </span>
-        <svg
-          className={`vu-caret${open ? " open" : ""}`}
-          width="16"
-          height="16"
-          viewBox="0 0 20 20"
-          aria-hidden="true"
-        >
-          <path d="M5.25 7.75L10 12.5l4.75-4.75" fill="none" stroke="currentColor" strokeWidth="1.5" />
-        </svg>
+        <Gravatar email={(user?.email as string)} />
       </button>
 
       {open && (
