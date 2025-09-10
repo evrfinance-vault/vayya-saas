@@ -2,13 +2,13 @@ import React from "react";
 import "./Header.css";
 import { HeaderActions } from "./HeaderActions";
 import { UserMenu } from "./UserMenu";
+import { NotificationItem } from "./NotificationsPopover";
 
 type Link = { label: string; href: string };
 type Props = {
   title?: string;
   navLinks?: Link[];
   notifications?: NotificationItem[];
-  notificationsCount?: number;
   onSearch?: () => void;
   onNotifications?: () => void;
   showSearch?: boolean;
@@ -66,7 +66,6 @@ const nav: React.CSSProperties = {
 export function Header({
   title = "Vault",
   navLinks,
-  notificationsCount = 0,
   showSearch = true,
   showNotifications = true,
   onSearch,
