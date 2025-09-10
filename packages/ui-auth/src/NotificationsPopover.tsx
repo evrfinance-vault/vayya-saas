@@ -15,16 +15,19 @@ type Props = {
   items: NotificationItem[];
   onClose: () => void;
   onViewAll?: () => void;
+  anchorRef?: React.RefObject<HTMLElement>; // 👈 NEW
 };
 
 export function NotificationsPopover(props: Props): React.ReactElement | null {
-  const { open, items, onClose, onViewAll } = props;
+  const { open, items, onClose, onViewAll, anchorRef } = props;
   const ref = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     function onDocClick(e: MouseEvent): void {
-      if (!ref.current) return;
-      if (!ref.current.contains(e.target as Node)) onClose();
+      const target = e.target as Node;
+      const insidePanel = !!ref.current && ref.current.contains(target);
+      const insideAnchor = !!anchorRef?.current && anchorRef.current.contains(target);
+      if (!insidePanel && !insideAnchor) onClose();
     }
     function onEsc(e: KeyboardEvent): void {
       if (e.key === "Escape") onClose();
@@ -37,7 +40,7 @@ export function NotificationsPopover(props: Props): React.ReactElement | null {
       document.removeEventListener("mousedown", onDocClick);
       document.removeEventListener("keydown", onEsc);
     };
-  }, [open, onClose]);
+  }, [open, onClose, anchorRef]);
 
   if (!open) return null;
 

@@ -13,7 +13,7 @@
   padding: 8px 20px;
   margin: 6px auto;
   border-radius: 12px;
-  transition: background 120ms ease, border-color 120ms ease, transform 80ms ease;
+  transition: background 120ms ease, transform 80ms ease;
 }
 
 .header-link:hover {

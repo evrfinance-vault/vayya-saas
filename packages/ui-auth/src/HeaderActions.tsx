@@ -1,20 +1,19 @@
-import React, { useState } from "react";
+import React, { useRef, useState } from "react";
 import "./HeaderActions.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faMagnifyingGlass, faBell } from "@fortawesome/free-solid-svg-icons";
+import { faMagnifyingGlass } from "@fortawesome/free-solid-svg-icons";
+import { faBell } from "@fortawesome/free-regular-svg-icons";
 import { NotificationsPopover, NotificationItem } from "./NotificationsPopover";
 
-type Props = {
+export function HeaderActions(props: {
   onSearch?: () => void;
-  onNotifications?: () => void;               // click handler (optional)
-  notificationsCount?: number;                // if omitted, we’ll derive from items
-  notifications?: NotificationItem[];         // items to show in popover
-  onViewAllNotifications?: () => void;        // footer action (optional)
+  onNotifications?: () => void;
+  notificationsCount?: number;
+  notifications?: NotificationItem[];
+  onViewAllNotifications?: () => void;
   showSearch?: boolean;
   showNotifications?: boolean;
-};
-
-export function HeaderActions(props: Props): React.ReactElement {
+}): React.ReactElement {
   const {
     onSearch,
     onNotifications,
@@ -26,13 +25,11 @@ export function HeaderActions(props: Props): React.ReactElement {
   } = props;
 
   const unread = notifications.filter((n) => n.unread).length;
-  const badgeCount = typeof notificationsCount === "number" ? notificationsCount : unread;
+  const badgeCount =
+    typeof notificationsCount === "number" ? notificationsCount : unread;
 
   const [open, setOpen] = useState(false);
-
-  function toggle(): void {
-    setOpen((v) => !v);
-  }
+  const anchorRef = useRef<HTMLDivElement | null>(null);
 
   return (
     <div className="vu-icon-group">
@@ -43,26 +40,28 @@ export function HeaderActions(props: Props): React.ReactElement {
           aria-label="Search"
           onClick={onSearch}
         >
-          <FontAwesomeIcon icon={faMagnifyingGlass} />
+          <FontAwesomeIcon icon={faMagnifyingGlass} size="2x" />
         </button>
       )}
 
       {showNotifications && (
-        <>
+        <div className="vu-note-anchor" ref={anchorRef}>
           <button
             type="button"
             className="vu-icon-btn"
             aria-label={
-              badgeCount > 0 ? `${badgeCount} unread notifications` : "Notifications"
+              badgeCount > 0
+                ? `${badgeCount} unread notifications`
+                : "Notifications"
             }
             aria-haspopup="dialog"
             aria-expanded={open}
             onClick={() => {
               if (onNotifications) onNotifications();
-              toggle();
+              setOpen((v) => !v); // toggle
             }}
           >
-            <FontAwesomeIcon icon={faBell} />
+            <FontAwesomeIcon icon={faBell} size="2x" />
             {badgeCount > 0 && (
               <span className="vu-badge" aria-hidden="true">
                 {badgeCount}
@@ -75,8 +74,9 @@ export function HeaderActions(props: Props): React.ReactElement {
             items={notifications}
             onClose={() => setOpen(false)}
             onViewAll={onViewAllNotifications}
+            anchorRef={anchorRef}  // 👈 tells the popover this button is “inside”
           />
-        </>
+        </div>
       )}
     </div>
   );
