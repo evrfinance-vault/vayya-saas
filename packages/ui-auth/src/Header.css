@@ -1,22 +1,28 @@
-.active-header-link {
-  background-color: #ffffff;
-  color: #434952;
-  text-decoration: none;
-  padding: 8px 20px;
-  margin: 6px 8px 6px auto;
-  border-radius: 12px;
-}
-
 .header-link {
   color: #ffffff;
   text-decoration: none;
-  padding: 8px 20px;
-  margin: 6px auto;
+  padding: 8px 18px;
+  margin: 6px 4px;
   border-radius: 12px;
   transition: background 120ms ease, transform 80ms ease;
 }
 
 .header-link:hover {
   background-color: rgba(255,255,255,0.75);
+  color: #434952;
+}
+
+header nav > a.header-link:first-of-type {
+  margin-left: 8px;
+}
+
+header nav > a.header-link:last-of-type {
+  margin-right: 8px;
+}
+
+header nav > a.header-link:first-of-type[aria-current="page"],
+header nav > a.header-link:last-of-type[aria-current="page"],
+.header-link[aria-current="page"] {
+  background-color: #ffffff;
   color: #434952;
 }

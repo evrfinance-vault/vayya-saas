@@ -4,10 +4,11 @@ import { HeaderActions } from "./HeaderActions";
 import { UserMenu } from "./UserMenu";
 import { NotificationItem } from "./NotificationsPopover";
 
-type Link = { label: string; href: string };
+type Link = { label: string; href: string; key?: string; active?: boolean };
 type Props = {
   title?: string;
   navLinks?: Link[];
+  renderLink?: (link: Link) => React.ReactElement;
   notifications?: NotificationItem[];
   onSearch?: () => void;
   onNotifications?: () => void;
@@ -55,46 +56,32 @@ const nav: React.CSSProperties = {
   justifyContent: "center",
   flexFlow: "row wrap",
   gap: 0,
-  marginLeft: 8,
-  marginRight: 8,
-  paddingLeft: 8,
-  paddingRight: 8,
   backgroundColor: "rgba(255,255,255,0.25)",
   borderRadius: "12px",
 };
 
-export function Header({
-  title = "Vault",
-  navLinks,
-  showSearch = true,
-  showNotifications = true,
-  onSearch,
-  onNotifications,
-  notifications
-}: Props) {
+export function Header(props: Props): React.ReactElement {
+  const {
+    title = "Vault",
+    navLinks,
+    renderLink,
+    ...actions
+  } = props;
 
   return (
     <header style={bar}>
       <div style={left}>{<h2 style={brand}>{title}</h2>}</div>
+
       <div style={center}>
         {navLinks && navLinks.length > 0 && (
           <nav style={nav}>
-            {navLinks.map((l) => (
-              <a key={l.key} href={l.href} className={l.active ? "active-header-link" : "header-link"}>
-                <small>{l.label}</small>
-              </a>
-            ))}
+            {navLinks.map((l) => renderLink(l) )}
           </nav>
         )}
       </div>
+
       <div style={right}>
-        <HeaderActions
-          notifications={notifications}
-          onSearch={onSearch}
-          onNotifications={onNotifications}
-          showSearch={showSearch}
-          showNotifications={showNotifications}
-        />
+        <HeaderActions {...actions} />
         <UserMenu />
       </div>
     </header>

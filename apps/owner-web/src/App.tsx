@@ -1,90 +1,57 @@
 import React from "react";
-import {
-  useGreeting,
-  useDateStamp,
-  Header,
-  UserBadge,
-} from "@packages/ui-auth";
+import { BrowserRouter, Routes, Route, Navigate, NavLink } from "react-router-dom";
+import { Header } from "@packages/ui-auth";
 
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { library } from '@fortawesome/fontawesome-svg-core'
-
-/* import all the icons in Free Solid, Free Regular, and Brands styles */
-import { fas } from '@fortawesome/free-solid-svg-icons'
-import { far } from '@fortawesome/free-regular-svg-icons'
-import { fab } from '@fortawesome/free-brands-svg-icons'
-
-library.add(fas, far, fab)
+import OverviewPage from "./pages/OverviewPage";
+import CalendarPage from "./pages/CalendarPage";
+import PaymentPlansPage from "./pages/PaymentPlansPage";
+import CustomersPage from "./pages/CustomersPage";
+import ApplicationsPage from "./pages/ApplicationsPage";
+import ReportsPage from "./pages/ReportsPage";
 
 const demoNotifications = [
-  { id: "n1", title: "New loan application", body: "Acme Bikes", unread: true, createdAt: "2h ago", href: "#" },
+  { id: "n1", title: "New loan application", body: "Alexander Toothman", unread: true, createdAt: "2h ago", href: "#" },
   { id: "n2", title: "Payment received", body: "Invoice #1042", unread: false, createdAt: "Yesterday", href: "#" },
-  { id: "n3", title: "Profile updated", body: "Katherine Meyer", unread: false, createdAt: "Mon", href: "#" }
+  { id: "n3", title: "Profile updated", body: "Katherine Meyers", unread: false, createdAt: "Last week", href: "#" }
 ];
 
-const preheading: React.CSSProperties = {
-  display: "flex",
-  alignItems: "center",
-  fontWeight: 500,
-  marginBottom: 0,
-  gap: 4,
-  fontSize: "small"
-};
-const heading: React.CSSProperties = {
-  fontWeight: 300,
-  marginTop: 0,
-};
-const tinydot: React.CSSProperties = {
-  fontSize: "xx-small",
-  color: "lightgreen"
-};
-
-export default function App() {
-  const greeting = useGreeting();
-  const today = useDateStamp();
+export default function App(): React.ReactElement {
+  const navLinks = [
+    { label: "Overview",      key: "overview",     href: "/" },
+    { label: "Calendar",      key: "calendar",     href: "/calendar" },
+    { label: "Payment Plans", key: "plans",        href: "/payment-plans" },
+    { label: "Customers",     key: "customers",    href: "/customers" },
+    { label: "Applications",  key: "applications", href: "/applications" },
+    { label: "Reports",       key: "reports",      href: "/reports" }
+  ];
 
   return (
-    <div>
+    <BrowserRouter>
       <Header
         title="vault"
+        navLinks={navLinks}
+        renderLink={(l) => (
+          <NavLink
+            key={l.key}
+            to={l.href}
+            end={l.href === "/"}
+            className="header-link"
+          >
+            <small>{l.label}</small>
+          </NavLink>
+        )}
         notifications={demoNotifications}
-        onViewAllNotifications={() => console.log("View all")}
-        onSearch={() => console.log("Search")}
-        navLinks={[
-          {
-            label: "Overview",
-            key: "overview",
-            href: "http://localhost:5173",
-            active: true,
-          },
-          { label: "Calendar", key: "calendar", href: "http://localhost:5173" },
-          {
-            label: "Payment Plans",
-            key: "plans",
-            href: "http://localhost:5173",
-          },
-          {
-            label: "Customers",
-            key: "customers",
-            href: "http://localhost:5173",
-          },
-          {
-            label: "Applications",
-            key: "applications",
-            href: "http://localhost:5173",
-          },
-          { label: "Reports", key: "reports", href: "http://localhost:5173" },
-        ]}
       />
-      <div style={{ padding: 24, marginLeft: 12, display: "grid", gap: 0 }}>
-        <div style={preheading}>
-          <span style={tinydot}><FontAwesomeIcon icon="fa-solid fa-circle" /></span>
-          Live Dashboard • {today}
-        </div>
-        <h1 style={heading}>
-          {greeting}, <UserBadge />
-        </h1>
-      </div>
-    </div>
+
+      <Routes>
+        <Route path="/" element={<OverviewPage />} />
+        <Route path="/calendar" element={<CalendarPage />} />
+        <Route path="/payment-plans" element={<PaymentPlansPage />} />
+        <Route path="/customers" element={<CustomersPage />} />
+        <Route path="/applications" element={<ApplicationsPage />} />
+        <Route path="/reports" element={<ReportsPage />} />
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+    </BrowserRouter>
   );
 }
