@@ -1,0 +1,12 @@
+.preheading {
+  display: "flex";
+  align-items: "center";
+  font-weight: 500;
+  margin-bottom: 0;
+  gap: 4;
+}
+
+.heading {
+  font-weight: 300;
+  margin-top: 0;
+}

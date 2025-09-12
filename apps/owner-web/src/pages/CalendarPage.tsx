@@ -2,8 +2,13 @@ import React from "react";
 
 export default function CalendarPage(): React.ReactElement {
   return (
-    <div style={{ padding: 24 }}>
-      <h2>Calendar</h2>
+    <div style={{ padding: 24, marginLeft: 12, marginTop: 24, display: "grid", gap: 0 }}>
+      <div className="preheading" style={{ fontSize: "small" }}>
+        Coming soon!
+      </div>
+      <h1 className="heading">
+        Calendar
+      </h1>
     </div>
   );
 }

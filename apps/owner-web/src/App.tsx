@@ -1,6 +1,7 @@
 import React from "react";
 import { BrowserRouter, Routes, Route, NavLink, useLocation } from "react-router-dom";
 import { Header, useDocumentTitle } from "@packages/ui-auth";
+import "./styles/global.css";
 
 import OverviewPage from "./pages/OverviewPage";
 import CalendarPage from "./pages/CalendarPage";
