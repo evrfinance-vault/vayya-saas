@@ -70,7 +70,7 @@ export function Header(props: Props): React.ReactElement {
 
   return (
     <header style={bar}>
-      <div style={left}>{<h2 style={brand}>{title}</h2>}</div>
+      <div style={left}>{<h2 className="site-title" style={brand}>{title}</h2>}</div>
 
       <div style={center}>
         {navLinks && navLinks.length > 0 && (
