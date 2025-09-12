@@ -47,7 +47,7 @@ export function NotificationsPopover(props: Props): React.ReactElement | null {
   return (
     <div className="vu-popover" role="dialog" aria-label="Notifications" ref={ref}>
       <div className="vu-popover-head">
-        <div className="vu-popover-title">Notifications</div>
+        <div className="vu-popover-title">Notifications (Demo-only)</div>
         {onViewAll && (
           <button type="button" className="vu-link-btn" onClick={onViewAll}>
             View all
