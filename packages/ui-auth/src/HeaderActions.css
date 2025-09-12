@@ -1,0 +1,71 @@
+/* ======= Tweak these to match your header ======= */
+:root {
+  --vu-icon-btn-bg: rgba(255,255,255,0.25);
+  --vu-icon-btn-border: rgba(255, 255, 255, 0.55);
+  --vu-icon-btn-hover-bg: rgba(255,255,255,0.75);
+  --vu-icon-btn-icon: #ffffff;
+  --vu-icon-btn-hover-icon: #434952;
+
+  --vu-badge-bg: #1d4ed8;  /* bright blue */
+  --vu-badge-color: #ffffff;
+  --vu-badge-border: #ffffff; /* ring around badge */
+}
+/* ================================================ */
+
+.vu-icon-group {
+  display: flex;
+  gap: 12px;
+  position: relative; /* popover anchors here (top-right) */
+}
+
+.vu-note-anchor {
+  position: relative;
+  display: inline-block;
+} /* anchor for popover */
+
+.vu-icon-btn {
+  position: relative;
+  width: 52px;
+  height: 52px;
+  border-radius: 12px;
+  border: 0 solid var(--vu-icon-btn-border);
+  background: var(--vu-icon-btn-bg);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background 120ms ease, border-color 120ms ease, transform 80ms ease;
+  color: var(--vu-icon-btn-icon);
+}
+
+.vu-icon-btn:hover {
+  background: var(--vu-icon-btn-hover-bg);
+  color: var(--vu-icon-btn-hover-icon);
+}
+
+.vu-icon-btn:focus-visible {
+  outline: 2px solid #93c5fd;
+  outline-offset: 2px;
+  border-color: #93c5fd;
+}
+
+/* Badge (absolute-positioned, works regardless of Font Awesome "layers") */
+.vu-badge {
+  position: absolute;
+  top: 12.5%;
+  right: 12.5%;
+  min-width: 20px;
+  height: 20px;
+  padding: 0;
+  border-radius: 999px;
+  background: var(--vu-badge-bg);
+  color: var(--vu-badge-color);
+  border: 0 solid var(--vu-badge-border);
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  pointer-events: none;
+}

@@ -1,0 +1,78 @@
+{
+  "name": "evrfinance-vault-saas",
+  "private": true,
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
+  "scripts": {
+    "dev": "concurrently -k -n backend,owner,borrower,admin \"npm -w ./apps/backend run dev\" \"npm -w ./apps/owner-web run dev\" \"npm -w ./apps/borrower-web run dev\" \"npm -w ./apps/admin-web run dev\"",
+    "dev:backend": "npm -w ./apps/backend run dev",
+    "dev:owner": "npm -w ./apps/owner-web run dev",
+    "dev:borrower": "npm -w ./apps/borrower-web run dev",
+    "dev:admin": "npm -w ./apps/admin-web run dev",
+    "build": "npm --workspaces run build",
+    "test": "npm --workspaces --if-present run test",
+    "test:backend": "npm -w ./apps/backend run test",
+    "test:owner": "npm -w ./apps/owner-web run test",
+    "test:borrower": "npm -w ./apps/borrower-web run test",
+    "test:admin": "npm -w ./apps/admin-web run test",
+    "lint": "npm --workspaces --if-present run lint",
+    "lint:fix": "npm --workspaces --if-present run lint:fix",
+    "prettier": "prettier . --check",
+    "prettier:write": "prettier . --write",
+    "clean": "rimraf --glob \"node_modules\" \"apps/*/node_modules\" \"packages/*/node_modules\" \"**/package-lock.json\"",
+    "typecheck": "npm --workspaces --if-present run typecheck"
+  },
+  "devDependencies": {
+    "@auth0/auth0-react": "^2.4.0",
+    "@casl/ability": "^6.7.3",
+    "@casl/react": "^5.0.0",
+    "@eslint/eslintrc": "^3.3.1",
+    "@eslint/js": "^9",
+    "@fontsource-variable/urbanist": "^5.2.6",
+    "@types/node": "^20.11.0",
+    "@typescript-eslint/eslint-plugin": "^8",
+    "@typescript-eslint/parser": "^8",
+    "@vitejs/plugin-react": "^5.0.1",
+    "concurrently": "^8.2.2",
+    "eslint": "^9",
+    "eslint-config-prettier": "^9",
+    "eslint-import-resolver-typescript": "^3",
+    "eslint-plugin-import": "^2",
+    "eslint-plugin-react": "^7",
+    "eslint-plugin-react-hooks": "^5",
+    "execa": "^9.6.0",
+    "express-oauth2-jwt-bearer": "^1.6.1",
+    "globals": "^16.3.0",
+    "prettier": "^3",
+    "rimraf": "^5.0.10",
+    "typescript": "^5.9.2",
+    "vite": "^7.1.3",
+    "vitest": "^3.2.4"
+  },
+  "overrides": {
+    "eslint": "^9",
+    "eslint-plugin-react-hooks": "^5",
+    "@typescript-eslint/parser": "^8",
+    "@typescript-eslint/eslint-plugin": "^8",
+    "esbuild": "^0.25.0",
+    "vite": {
+      "esbuild": "^0.25.0"
+    },
+    "vite-node": {
+      "esbuild": "^0.25.0"
+    },
+    "@vitest/mocker": {
+      "esbuild": "^0.25.0"
+    }
+  },
+  "dependencies": {
+    "@fortawesome/fontawesome-svg-core": "^7.0.1",
+    "@fortawesome/free-brands-svg-icons": "^7.0.1",
+    "@fortawesome/free-regular-svg-icons": "^7.0.1",
+    "@fortawesome/free-solid-svg-icons": "^7.0.1",
+    "@fortawesome/react-fontawesome": "^3.0.2",
+    "react-gravatar": "^2.6.3"
+  }
+}
