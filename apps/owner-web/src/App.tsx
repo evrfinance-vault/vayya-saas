@@ -8,6 +8,7 @@ import PaymentPlansPage from "./pages/PaymentPlansPage";
 import CustomersPage from "./pages/CustomersPage";
 import ApplicationsPage from "./pages/ApplicationsPage";
 import ReportsPage from "./pages/ReportsPage";
+import NotFoundPage from "./pages/NotFoundPage";
 
 const demoNotifications = [
   { id: "n1", title: "New loan application", body: "Alexander Toothman", unread: true, createdAt: "2h ago", href: "#" },
@@ -29,7 +30,7 @@ function TitleSetter({
     l.href === "/" ? pathname === "/" : pathname.startsWith(l.href)
   );
 
-  useDocumentTitle(match ? `${brand} » ${match.label}` : brand);
+  useDocumentTitle(match ? `${brand} » ${match.label}` : `${brand} » Page Not Found`);
   return null;
 }
 
@@ -70,7 +71,7 @@ export default function App(): React.ReactElement {
         <Route path="/customers" element={<CustomersPage />} />
         <Route path="/applications" element={<ApplicationsPage />} />
         <Route path="/reports" element={<ReportsPage />} />
-        <Route path="*" element={<Navigate to="/" replace />} />
+        <Route path="*" element={<NotFoundPage />} />
       </Routes>
     </BrowserRouter>
   );
