@@ -58,15 +58,21 @@ export function UserMenu(): React.ReactElement {
             {role && <div className="vu-menu-role">{role}</div>}
           </div>
           <div className="vu-sep" />
+          <button type="button" className="vu-item" disabled="true">
+            Discovery Profile
+          </button>
+          <button type="button" className="vu-item" disabled="true">
+            Settings
+          </button>
+          <div className="vu-sep" />
           <button
             type="button"
             className="vu-item"
-            role="menuitem"
             onClick={() =>
               logout({ logoutParams: { returnTo: window.location.origin } })
             }
           >
-            Log out
+            Log Out
           </button>
         </div>
       )}
