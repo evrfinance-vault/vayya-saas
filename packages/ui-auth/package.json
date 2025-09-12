@@ -8,8 +8,12 @@
     "@auth0/auth0-react": "^2",
     "@casl/ability": "^6",
     "@casl/react": "^5",
-    "react": "^18",
-    "react-dom": "^18"
+    "react": "^18 || ^19",
+    "react-dom": "^18 || ^19"
+  },
+  "devDependencies": {
+    "react": "19.1.1",
+    "react-dom": "19.1.1"
   },
   "scripts": {
     "lint": "eslint . --ext .ts,.tsx",
