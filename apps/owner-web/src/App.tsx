@@ -46,7 +46,7 @@ export default function App(): React.ReactElement {
   ];
 
   return (
-    <BrowserRouter>
+    <BrowserRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
       <TitleSetter brand="Vault" navLinks={navLinks} />
 
       <Header
