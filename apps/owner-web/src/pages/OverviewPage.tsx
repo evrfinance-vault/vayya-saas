@@ -9,8 +9,9 @@ import { library } from '@fortawesome/fontawesome-svg-core'
 library.add(fas, far, fab)
 
 const tinydot: React.CSSProperties = {
-  fontSize: "xx-small",
-  color: "lightgreen"
+  fontSize: "x-small",
+  color: "lightgreen",
+  marginRight: 3
 };
 
 export default function OverviewPage(): React.ReactElement {
