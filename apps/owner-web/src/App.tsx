@@ -1,6 +1,6 @@
 import React from "react";
-import { BrowserRouter, Routes, Route, Navigate, NavLink } from "react-router-dom";
-import { Header } from "@packages/ui-auth";
+import { BrowserRouter, Routes, Route, NavLink, useLocation } from "react-router-dom";
+import { Header, useDocumentTitle } from "@packages/ui-auth";
 
 import OverviewPage from "./pages/OverviewPage";
 import CalendarPage from "./pages/CalendarPage";
@@ -15,6 +15,24 @@ const demoNotifications = [
   { id: "n3", title: "Profile updated", body: "Katherine Meyers", unread: false, createdAt: "Last week", href: "#" }
 ];
 
+type Nav = { label: string; key: string; href: string };
+
+function TitleSetter({
+  brand,
+  navLinks
+}: {
+  brand: string;
+  navLinks: Nav[];
+}): React.ReactElement {
+  const { pathname } = useLocation();
+  const match = navLinks.find((l) =>
+    l.href === "/" ? pathname === "/" : pathname.startsWith(l.href)
+  );
+
+  useDocumentTitle(match ? `${brand} » ${match.label}` : brand);
+  return null;
+}
+
 export default function App(): React.ReactElement {
   const navLinks = [
     { label: "Overview",      key: "overview",     href: "/" },
@@ -27,6 +45,8 @@ export default function App(): React.ReactElement {
 
   return (
     <BrowserRouter>
+      <TitleSetter brand="Vault" navLinks={navLinks} />
+
       <Header
         title="vault"
         navLinks={navLinks}

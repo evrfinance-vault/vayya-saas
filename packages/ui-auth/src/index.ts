@@ -11,3 +11,4 @@ export * from "./timeOfDay";
 export * from "./UserMenu";
 export * from "./HeaderActions";
 export * from "./NotificationsPopover";
+export * from "./useDocumentTitle";
