@@ -14,7 +14,7 @@
 
 .vu-popover {
   position: absolute;
-  top: 56px;          /* sits under the icon buttons */
+  top: calc(100% + 8px);
   right: 0;
   width: 360px;
   background: var(--vu-pop-bg);
