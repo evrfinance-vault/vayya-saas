@@ -9,7 +9,8 @@
     "@casl/ability": "^6",
     "@casl/react": "^5",
     "react": "^18 || ^19",
-    "react-dom": "^18 || ^19"
+    "react-dom": "^18 || ^19",
+    "react-router-dom": "^6 || ^7"
   },
   "devDependencies": {
     "react": "19.1.1",
