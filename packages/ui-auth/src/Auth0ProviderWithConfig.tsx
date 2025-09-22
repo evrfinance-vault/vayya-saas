@@ -1,12 +1,13 @@
 import React from "react";
 import { Auth0Provider } from "@auth0/auth0-react";
+import { ENV } from "./env";
 
 type Props = { children: React.ReactNode };
 
 export function Auth0ProviderWithConfig({ children }: Props) {
-  const domain = import.meta.env.VITE_AUTH0_DOMAIN as string;
-  const clientId = import.meta.env.VITE_AUTH0_CLIENT_ID as string;
-  const audience = import.meta.env.VITE_AUTH0_AUDIENCE as string | undefined;
+  const domain = ENV.VITE_AUTH0_DOMAIN as string;
+  const clientId = ENV.VITE_AUTH0_CLIENT_ID as string;
+  const audience = ENV.VITE_AUTH0_AUDIENCE as string | undefined;
 
   if (!domain || !clientId) {
     console.warn("[Auth0] Missing VITE_AUTH0_DOMAIN or VITE_AUTH0_CLIENT_ID");
