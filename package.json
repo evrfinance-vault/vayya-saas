@@ -1,5 +1,5 @@
 {
-  "name": "evrfinance-vault-saas",
+  "name": "evrfinance-vayya-saas",
   "private": true,
   "workspaces": [
     "apps/*",

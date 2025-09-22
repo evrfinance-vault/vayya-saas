@@ -62,7 +62,7 @@ const nav: React.CSSProperties = {
 
 export function Header(props: Props): React.ReactElement {
   const {
-    title = "Vault",
+    title = "Vayya",
     navLinks,
     renderLink,
     ...actions

@@ -24,11 +24,11 @@ export default function App() {
   return (
     <div>
       <Header
-        title="Vault"
+        title="Vayya"
         navLinks={[{ label: "Overview", href: "http://localhost:5174" }]}
       />
       <div style={{ padding: 24, display: "grid", gap: 12 }}>
-        <h1>Vault Borrower Dashboard</h1>
+        <h1>Vayya Borrower Dashboard</h1>
         <div style={{ display: "flex", gap: 8 }}>
           <button onClick={ping} disabled={busy}>
             {busy ? "Pinging…" : "Ping API"}
