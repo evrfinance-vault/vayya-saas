@@ -32,7 +32,7 @@ function TitleSetter({
   );
 
   useDocumentTitle(match ? `${brand} » ${match.label}` : `${brand} » Page Not Found`);
-  return null;
+  return <></>;
 }
 
 export default function App(): React.ReactElement {
