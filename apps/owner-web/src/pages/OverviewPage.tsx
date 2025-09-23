@@ -16,6 +16,7 @@ export default function OverviewPage(): React.ReactElement {
 
   return (
     <div
+      className="page-content"
       style={{
         padding: 24,
         marginLeft: 12,
