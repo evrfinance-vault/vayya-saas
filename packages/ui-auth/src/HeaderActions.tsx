@@ -21,7 +21,7 @@ export function HeaderActions(props: {
     notificationsCount,
     onViewAllNotifications,
     showSearch = true,
-    showNotifications = true
+    showNotifications = true,
   } = props;
 
   const unread = notifications.filter((n) => n.unread).length;
@@ -74,7 +74,7 @@ export function HeaderActions(props: {
             items={notifications}
             onClose={() => setOpen(false)}
             onViewAll={onViewAllNotifications}
-            anchorRef={anchorRef}  // 👈 tells the popover this button is “inside”
+            anchorRef={anchorRef} // 👈 tells the popover this button is “inside”
           />
         </div>
       )}

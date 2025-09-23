@@ -1,12 +1,12 @@
 /* ======= Tweak these to match your header ======= */
 :root {
-  --vu-icon-btn-bg: rgba(255,255,255,0.25);
+  --vu-icon-btn-bg: rgba(255, 255, 255, 0.25);
   --vu-icon-btn-border: rgba(255, 255, 255, 0.55);
-  --vu-icon-btn-hover-bg: rgba(255,255,255,0.75);
+  --vu-icon-btn-hover-bg: rgba(255, 255, 255, 0.75);
   --vu-icon-btn-icon: #ffffff;
   --vu-icon-btn-hover-icon: #434952;
 
-  --vu-badge-bg: #1d4ed8;  /* bright blue */
+  --vu-badge-bg: #1d4ed8; /* bright blue */
   --vu-badge-color: #ffffff;
   --vu-badge-border: #ffffff; /* ring around badge */
 }
@@ -34,7 +34,10 @@
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: background 120ms ease, border-color 120ms ease, transform 80ms ease;
+  transition:
+    background 120ms ease,
+    border-color 120ms ease,
+    transform 80ms ease;
   color: var(--vu-icon-btn-icon);
 }
 

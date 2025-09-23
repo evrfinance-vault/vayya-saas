@@ -16,7 +16,7 @@ jobs:
           cache: "npm"
           cache-dependency-path: package-lock.json
       - run: npm ci --workspaces --include-workspace-root
-      - run: npm run --workspaces --if-present lint
-      - run: npm run --workspaces --if-present typecheck
-      - run: npm run --workspaces build
-      - run: npm test --workspaces
+      - run: npm run lint --workspaces --if-present
+      - run: npm run typecheck --workspaces --if-present
+      - run: npm run build --workspaces --if-present
+      - run: npm run test --workspaces --if-present

@@ -9,9 +9,7 @@ export function RequireAuth({ children }: Props) {
 
   useEffect(() => {
     if (!isLoading && !isAuthenticated && !error) {
-      const connection = ENV.VITE_AUTH0_CONNECTION as
-        | string
-        | undefined;
+      const connection = ENV.VITE_AUTH0_CONNECTION as string | undefined;
       const roleHint = ENV.VITE_AUTH0_DEFAULT_ROLE as
         | "owner"
         | "borrower"

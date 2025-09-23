@@ -7,15 +7,17 @@
   align-items: center;
   gap: 8px;
   border: 0 solid #e5e7eb;
-  background: rgba(255,255,255,0.25);
+  background: rgba(255, 255, 255, 0.25);
   padding: 8px 10px;
   border-radius: 12px;
   cursor: pointer;
-  transition: background 120ms ease, border-color 120ms ease;
+  transition:
+    background 120ms ease,
+    border-color 120ms ease;
 }
 
 .vu-user-button:hover {
-  background: rgba(255,255,255,0.75);
+  background: rgba(255, 255, 255, 0.75);
   border-color: #d1d5db;
 }
 
@@ -67,8 +69,8 @@
   border: 1px solid #e5e7eb;
   border-radius: 12px;
   box-shadow:
-    0 10px 15px -3px rgba(0,0,0,0.1),
-    0 4px 6px -2px rgba(0,0,0,0.05);
+    0 10px 15px -3px rgba(0, 0, 0, 0.1),
+    0 4px 6px -2px rgba(0, 0, 0, 0.05);
   padding: 8px;
   z-index: 100;
 }

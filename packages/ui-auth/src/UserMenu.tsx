@@ -5,14 +5,14 @@ import { useRole } from "./useRole";
 import Gravatar from "react-gravatar";
 
 // function initialsFrom(nameOrEmail: string | undefined): string {
-  // if (!nameOrEmail) return "U";
-  // const s = nameOrEmail.trim();
-  // const at = s.indexOf("@");
-  // const base = at > 0 ? s.slice(0, at) : s;
-  // const parts = base.split(/[.\s_-]+/).filter(Boolean);
-  // const first = parts[0]?.[0] ?? "U";
-  // const second = parts[1]?.[0] ?? "";
-  // return (first + second).toUpperCase();
+// if (!nameOrEmail) return "U";
+// const s = nameOrEmail.trim();
+// const at = s.indexOf("@");
+// const base = at > 0 ? s.slice(0, at) : s;
+// const parts = base.split(/[.\s_-]+/).filter(Boolean);
+// const first = parts[0]?.[0] ?? "U";
+// const second = parts[1]?.[0] ?? "";
+// return (first + second).toUpperCase();
 // }
 
 export function UserMenu(): React.ReactElement {
@@ -48,7 +48,7 @@ export function UserMenu(): React.ReactElement {
         aria-expanded={open}
         onClick={() => setOpen((v) => !v)}
       >
-        <Gravatar className="gravatar" email={(user?.email as string)} />
+        <Gravatar className="gravatar" email={user?.email as string} />
       </button>
 
       {open && (

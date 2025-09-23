@@ -3,12 +3,17 @@ import { Ability, AbilityBuilder, AbilityClass } from "@casl/ability";
 import { createContextualCan } from "@casl/react";
 
 export type Actions = "manage" | "read" | "create" | "update" | "delete";
-export type Subjects = "all" | "application" | "customer" | "paymentPlan" | "report";
+export type Subjects =
+  | "all"
+  | "application"
+  | "customer"
+  | "paymentPlan"
+  | "report";
 export type AppAbility = Ability<[Actions, Subjects]>;
 
 export function abilityForRole(role: string) {
   const { can, cannot, build } = new AbilityBuilder<AppAbility>(
-    Ability as AbilityClass<AppAbility>
+    Ability as AbilityClass<AppAbility>,
   );
 
   if (role === "admin") {
@@ -27,11 +32,14 @@ export function abilityForRole(role: string) {
   });
 }
 
-export const AbilityContext = React.createContext<AppAbility>(abilityForRole("guest"));
+export const AbilityContext = React.createContext<AppAbility>(
+  abilityForRole("guest"),
+);
 
-export const AbilityProvider: React.FC<
-  { ability: AppAbility; children: React.ReactNode }
-> = ({ ability, children }) => (
+export const AbilityProvider: React.FC<{
+  ability: AppAbility;
+  children: React.ReactNode;
+}> = ({ ability, children }) => (
   <AbilityContext.Provider value={ability}>{children}</AbilityContext.Provider>
 );
 
