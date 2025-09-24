@@ -23,6 +23,14 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
+.page-content {
+  background-image: url("radial-logo.png");
+  background-repeat: no-repeat;
+  background-position: top center;
+  background-size: auto;
+  background-size: clamp(100px, 35vw, 1000px);
+}
+
 /* <weight>: Use a value from 100 to 900 */
 /* <uniquifier>: Use a unique and descriptive class name */
 

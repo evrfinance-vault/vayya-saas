@@ -1,5 +1,6 @@
 import React, { useEffect } from "react";
 import { useAuth0 } from "@auth0/auth0-react";
+import { ENV } from "./env";
 
 type Props = { children: React.ReactNode };
 
@@ -8,10 +9,8 @@ export function RequireAuth({ children }: Props) {
 
   useEffect(() => {
     if (!isLoading && !isAuthenticated && !error) {
-      const connection = import.meta.env.VITE_AUTH0_CONNECTION as
-        | string
-        | undefined;
-      const roleHint = import.meta.env.VITE_AUTH0_DEFAULT_ROLE as
+      const connection = ENV.VITE_AUTH0_CONNECTION as string | undefined;
+      const roleHint = ENV.VITE_AUTH0_DEFAULT_ROLE as
         | "owner"
         | "borrower"
         | "admin"

@@ -4,8 +4,7 @@
   --vu-pop-fg: #434952;
   --vu-pop-border: #e5e7eb;
   --vu-pop-shadow:
-    0 10px 15px -3px rgba(0,0,0,0.1),
-    0 4px 6px -2px rgba(0,0,0,0.05);
+    0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
   --vu-note-hover: #f8fafc;
   --vu-unread-dot: #1d4ed8;
   --vu-link: #2563eb;
@@ -45,7 +44,9 @@
   padding: 6px;
   border-radius: 8px;
 }
-.vu-link-btn:hover { background: #f1f5f9; }
+.vu-link-btn:hover {
+  background: #f1f5f9;
+}
 
 .vu-popover-list {
   display: grid;
@@ -68,7 +69,9 @@
   padding: 10px 12px;
   border-radius: 10px;
 }
-.vu-note:hover { background: var(--vu-note-hover); }
+.vu-note:hover {
+  background: var(--vu-note-hover);
+}
 
 .vu-dot {
   width: 8px;
@@ -77,12 +80,26 @@
   background: transparent;
   margin-top: 7px;
 }
-.vu-note.unread .vu-dot { background: var(--vu-unread-dot); }
+.vu-note.unread .vu-dot {
+  background: var(--vu-unread-dot);
+}
 
-.vu-note-content { min-width: 0; }
-.vu-note-title { font-weight: 600; font-size: 14px; }
-.vu-note-body { font-size: 13px; opacity: 0.85; }
-.vu-note-meta { font-size: 11px; opacity: 0.6; margin-top: 3px; }
+.vu-note-content {
+  min-width: 0;
+}
+.vu-note-title {
+  font-weight: 600;
+  font-size: 14px;
+}
+.vu-note-body {
+  font-size: 13px;
+  opacity: 0.85;
+}
+.vu-note-meta {
+  font-size: 11px;
+  opacity: 0.6;
+  margin-top: 3px;
+}
 
 /* Make whole item clickable when href is provided */
 .vu-note-cover {

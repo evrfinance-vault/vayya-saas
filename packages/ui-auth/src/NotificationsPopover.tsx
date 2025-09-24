@@ -26,7 +26,8 @@ export function NotificationsPopover(props: Props): React.ReactElement | null {
     function onDocClick(e: MouseEvent): void {
       const target = e.target as Node;
       const insidePanel = !!ref.current && ref.current.contains(target);
-      const insideAnchor = !!anchorRef?.current && anchorRef.current.contains(target);
+      const insideAnchor =
+        !!anchorRef?.current && anchorRef.current.contains(target);
       if (!insidePanel && !insideAnchor) onClose();
     }
     function onEsc(e: KeyboardEvent): void {
@@ -45,7 +46,12 @@ export function NotificationsPopover(props: Props): React.ReactElement | null {
   if (!open) return null;
 
   return (
-    <div className="vu-popover" role="dialog" aria-label="Notifications" ref={ref}>
+    <div
+      className="vu-popover"
+      role="dialog"
+      aria-label="Notifications"
+      ref={ref}
+    >
       <div className="vu-popover-head">
         <div className="vu-popover-title">Notifications (Demo-only)</div>
         {onViewAll && (
@@ -74,7 +80,11 @@ export function NotificationsPopover(props: Props): React.ReactElement | null {
                 )}
               </div>
               {n.href && (
-                <a className="vu-note-cover" href={n.href} aria-label="Open notification" />
+                <a
+                  className="vu-note-cover"
+                  href={n.href}
+                  aria-label="Open notification"
+                />
               )}
             </div>
           ))

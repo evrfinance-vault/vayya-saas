@@ -3,6 +3,7 @@ import "./Header.css";
 import { HeaderActions } from "./HeaderActions";
 import { UserMenu } from "./UserMenu";
 import { NotificationItem } from "./NotificationsPopover";
+import { NavLink } from "react-router-dom";
 
 type Link = { label: string; href: string; key?: string; active?: boolean };
 type Props = {
@@ -61,21 +62,34 @@ const nav: React.CSSProperties = {
 };
 
 export function Header(props: Props): React.ReactElement {
-  const {
-    title = "Vault",
-    navLinks,
-    renderLink,
-    ...actions
-  } = props;
+  const { title = "Vayya", navLinks, renderLink, ...actions } = props;
 
   return (
     <header style={bar}>
-      <div style={left}>{<h2 className="site-title" style={brand}>{title}</h2>}</div>
+      <div style={left}>
+        {
+          <h2 className="site-title" style={brand}>
+            {title}
+          </h2>
+        }
+      </div>
 
       <div style={center}>
         {navLinks && navLinks.length > 0 && (
           <nav style={nav}>
-            {navLinks.map((l) => renderLink(l) )}
+            {navLinks.map(
+              (l) =>
+                renderLink?.(l) ?? (
+                  <NavLink
+                    key={l.key}
+                    to={l.href}
+                    end={l.href === "/"}
+                    className="header-link"
+                  >
+                    <small>{l.label}</small>
+                  </NavLink>
+                ),
+            )}
           </nav>
         )}
       </div>

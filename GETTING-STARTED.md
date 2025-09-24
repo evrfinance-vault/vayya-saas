@@ -1,8 +1,8 @@
-# Getting Started with Vault SaaS
+# Getting Started with Vayya SaaS
 
 ## Tech Stack
 
-Vault SaaS is a modular monolith:
+Vayya SaaS is a modular monolith:
 
 - **Back-end:** Node.js + Express + TypeScript + Postgres
 - **Front-ends:** React (Vite) for Small Business Owners, Borrowers, and Admins
