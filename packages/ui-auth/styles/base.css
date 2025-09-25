@@ -1,19 +1,24 @@
 :root {
-  --font-sans:
+  --font-family:
     "Urbanist", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue",
     Arial, "Noto Sans", "Liberation Sans", sans-serif;
+
+      --theme-color: #accdea;
+  --alt-theme-color: #9dda8f;
+      --light-color: #ffffff;
+       --dark-color: #434952;
 }
 
 html,
 body,
 #root {
-  background: #accdea;
-  color: #ffffff;
+  background: var(--theme-color);
+  color: var(--light-color);
   height: 100%;
 }
 
 body {
-  font-family: var(--font-sans);
+  font-family: var(--font-family);
   font-optical-sizing: auto;
   font-weight: normal;
   font-style: normal;
@@ -24,11 +29,11 @@ body {
 }
 
 .page-content {
-  background-image: url("radial-logo.png");
+  background-image: url("assets/background.png"); /* 1240x593 */
   background-repeat: no-repeat;
   background-position: top center;
   background-size: auto;
-  background-size: clamp(100px, 35vw, 1000px);
+  background-size: clamp(11vw, 33vw, 55vw);
 }
 
 /* <weight>: Use a value from 100 to 900 */
