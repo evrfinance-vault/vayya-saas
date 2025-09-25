@@ -4,8 +4,8 @@ import "./Panel.css";
 
 export default function VayyaBoardPanel() {
   return (
-  <div className="overview-grid">
-    <Card title="Calendar" />
-  </div>
+    <div className="overview-grid">
+      <Card title="Calendar" />
+    </div>
   );
 }

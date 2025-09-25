@@ -3,10 +3,10 @@
     "Urbanist", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue",
     Arial, "Noto Sans", "Liberation Sans", sans-serif;
 
-      --theme-color: #accdea;
+  --theme-color: #accdea;
   --alt-theme-color: #9dda8f;
-      --light-color: #ffffff;
-       --dark-color: #434952;
+  --light-color: #ffffff;
+  --dark-color: #434952;
 }
 
 html,

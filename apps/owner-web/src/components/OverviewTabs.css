@@ -25,19 +25,23 @@
   width: 20%;
   min-height: 100px;
 
-  transition: transform 140ms ease, box-shadow 140ms ease, background-color 140ms ease, color 140ms ease;
+  transition:
+    transform 140ms ease,
+    box-shadow 140ms ease,
+    background-color 140ms ease,
+    color 140ms ease;
   will-change: transform, box-shadow;
   backdrop-filter: saturate(140%) blur(4px);
 }
 
 .overview-tab:hover {
   transform: translateY(-20px);
-  box-shadow: 0 10px 24px -12px rgba(0,0,0,0.25);
+  box-shadow: 0 10px 24px -12px rgba(0, 0, 0, 0.25);
 }
 
 .overview-tab[aria-selected="true"] {
   background: var(--tab-bg-selected);
-  box-shadow: 0 8px 24px -10px rgba(0,0,0,0.25);
+  box-shadow: 0 8px 24px -10px rgba(0, 0, 0, 0.25);
   transform: translateY(-40px);
 }
 

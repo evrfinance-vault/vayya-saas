@@ -1,12 +1,18 @@
 import React from "react";
 import "./OverviewTabs.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { IconProp } from "@fortawesome/fontawesome-svg-core";
 
-export type TabKey = "total-revenue" | "active-payment-plans" | "vayya-board" | "late-payments" | "pending-applications";
+export type TabKey =
+  | "total-revenue"
+  | "active-payment-plans"
+  | "vayya-board"
+  | "late-payments"
+  | "pending-applications";
 
 export type TabDef = {
   key: TabKey;
-  icon: Object;
+  icon: IconProp;
   label: string;
   badge?: number | string;
 };
@@ -43,16 +49,17 @@ export default function OverviewTabs({ tabs, value, onChange }: Props) {
               </span>
               <span className="overview-tab-label">
                 {tab.label}
-                <br/>
-                {tab.badge !== undefined && <span className="overview-tab-badge">{tab.badge}</span>}
+                <br />
+                {tab.badge !== undefined && (
+                  <span className="overview-tab-badge">{tab.badge}</span>
+                )}
               </span>
             </button>
           );
         })}
       </div>
 
-      <div className="overview-tab-background">
-      </div>
+      <div className="overview-tab-background"></div>
     </div>
   );
 }
