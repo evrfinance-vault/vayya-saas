@@ -1,0 +1,12 @@
+.overview-panel {
+  margin-top: 20px;
+}
+
+.overview-tab-change {
+  animation: ovFadeUp 200ms ease-out both;
+}
+
+@keyframes ovFadeUp {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
