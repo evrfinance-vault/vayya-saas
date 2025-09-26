@@ -74,7 +74,9 @@ export default function OverviewPage(): React.ReactElement {
       style={{
         padding: 24,
         marginLeft: 12,
+        marginRight: 12,
         marginTop: 24,
+        marginBottom: 24,
         display: "grid",
         gap: 0,
       }}

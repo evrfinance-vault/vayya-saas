@@ -59,7 +59,7 @@ export default function OverviewTabs({ tabs, value, onChange }: Props) {
         })}
       </div>
 
-      <div className="overview-tab-background"></div>
+      <div className="overview-tab-background" />
     </div>
   );
 }
