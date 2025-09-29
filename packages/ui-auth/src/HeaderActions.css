@@ -3,12 +3,10 @@
   --vu-icon-btn-bg: rgba(255, 255, 255, 0.25);
   --vu-icon-btn-border: rgba(255, 255, 255, 0.55);
   --vu-icon-btn-hover-bg: rgba(255, 255, 255, 0.75);
-  --vu-icon-btn-icon: #ffffff;
-  --vu-icon-btn-hover-icon: #434952;
+  --vu-icon-btn-icon: var(--light-color);
+  --vu-icon-btn-hover-icon: var(--dark-color);
 
-  --vu-badge-bg: #1d4ed8; /* bright blue */
-  --vu-badge-color: #ffffff;
-  --vu-badge-border: #ffffff; /* ring around badge */
+  --vu-badge-bg: var(--alt-theme-color); /* bright blue */
 }
 /* ================================================ */
 
@@ -52,7 +50,6 @@
   border-color: #93c5fd;
 }
 
-/* Badge (absolute-positioned, works regardless of Font Awesome "layers") */
 .vu-badge {
   position: absolute;
   top: 12.5%;
@@ -61,9 +58,8 @@
   height: 20px;
   padding: 0;
   border-radius: 999px;
-  background: var(--vu-badge-bg);
-  color: var(--vu-badge-color);
-  border: 0 solid var(--vu-badge-border);
+  background: var(--alt-theme-color);
+  color: var(--light-color);
   font-size: 12px;
   font-weight: 800;
   line-height: 16px;

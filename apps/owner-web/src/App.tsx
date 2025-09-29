@@ -10,7 +10,6 @@ import { Header, useDocumentTitle } from "@packages/ui-auth";
 import "./styles/global.css";
 
 import OverviewPage from "./pages/OverviewPage";
-import CalendarPage from "./pages/CalendarPage";
 import PaymentPlansPage from "./pages/PaymentPlansPage";
 import CustomersPage from "./pages/CustomersPage";
 import ApplicationsPage from "./pages/ApplicationsPage";
@@ -67,7 +66,6 @@ function TitleSetter({
 export default function App(): React.ReactElement {
   const navLinks = [
     { label: "Overview", key: "overview", href: "/" },
-    { label: "Calendar", key: "calendar", href: "/calendar" },
     { label: "Payment Plans", key: "plans", href: "/payment-plans" },
     { label: "Customers", key: "customers", href: "/customers" },
     { label: "Applications", key: "applications", href: "/applications" },
@@ -78,10 +76,10 @@ export default function App(): React.ReactElement {
     <BrowserRouter
       future={{ v7_startTransition: true, v7_relativeSplatPath: true }}
     >
-      <TitleSetter brand="Vayya" navLinks={navLinks} />
+      <TitleSetter brand="Kayya" navLinks={navLinks} />
 
       <Header
-        title="vayya"
+        title="kayya"
         navLinks={navLinks}
         renderLink={(l) => (
           <NavLink
@@ -98,7 +96,6 @@ export default function App(): React.ReactElement {
 
       <Routes>
         <Route path="/" element={<OverviewPage />} />
-        <Route path="/calendar" element={<CalendarPage />} />
         <Route path="/payment-plans" element={<PaymentPlansPage />} />
         <Route path="/customers" element={<CustomersPage />} />
         <Route path="/applications" element={<ApplicationsPage />} />
