@@ -37,15 +37,20 @@ const TABS: TabDef[] = [
     key: "active-payment-plans",
     icon: faSackDollar,
     label: "Active Payment Plans",
-    badge: 0,
+    badge: "0",
   },
-  { key: "vayya-board", icon: faGrip, label: "Vayya Board", badge: "" },
-  { key: "late-payments", icon: faSackXmark, label: "Late Payments", badge: 0 },
+  { key: "vayya-board", icon: faGrip, label: "Vayya Board", badge: "~" },
+  {
+    key: "late-payments",
+    icon: faSackXmark,
+    label: "Late Payments",
+    badge: "0",
+  },
   {
     key: "pending-applications",
     icon: faSpinner,
     label: "Pending Applications",
-    badge: 0,
+    badge: "0",
   },
 ];
 
