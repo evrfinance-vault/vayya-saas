@@ -23,7 +23,8 @@
     "prettier": "prettier . --check",
     "prettier:write": "prettier . --write",
     "clean": "rimraf --glob \"node_modules\" \"apps/*/node_modules\" \"packages/*/node_modules\" \"**/package-lock.json\"",
-    "typecheck": "npm run typecheck --workspaces --if-present"
+    "typecheck": "npm run typecheck --workspaces --if-present",
+    "release": "scripts/release.sh"
   },
   "devDependencies": {
     "@auth0/auth0-react": "^2.4.0",
