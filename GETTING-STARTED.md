@@ -1,8 +1,8 @@
-# Getting Started with Vayya SaaS
+# Getting Started with Kayya SaaS
 
 ## Tech Stack
 
-Vayya SaaS is a modular monolith:
+Kayya SaaS is a modular monolith:
 
 - **Back-end:** Node.js + Express + TypeScript + Postgres
 - **Front-ends:** React (Vite) for Small Business Owners, Borrowers, and Admins

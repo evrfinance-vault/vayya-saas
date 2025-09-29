@@ -10,7 +10,7 @@ export function RoleGate({ expectedRole, children }: Props) {
   const { user } = useAuth0();
   const claimKey =
     (import.meta as any).env.VITE_AUTH0_ROLE_CLAIM ||
-    "https://vayya.evr.finance/role";
+    "https://kayya.evr.finance/role";
   const role = (user as Record<string, any> | undefined)?.[claimKey];
 
   if (!role) {

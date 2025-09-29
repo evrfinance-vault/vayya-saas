@@ -76,10 +76,10 @@ export default function App(): React.ReactElement {
     <BrowserRouter
       future={{ v7_startTransition: true, v7_relativeSplatPath: true }}
     >
-      <TitleSetter brand="Vayya" navLinks={navLinks} />
+      <TitleSetter brand="Kayya" navLinks={navLinks} />
 
       <Header
-        title="vayya"
+        title="kayya"
         navLinks={navLinks}
         renderLink={(l) => (
           <NavLink

@@ -7,7 +7,7 @@ import {
   faHeartPulse,
 } from "@fortawesome/free-solid-svg-icons";
 
-export default function VayyaBoardPanel() {
+export default function BoardPanel() {
   return (
     <div className="overview-grid">
       <Card title="Account Health" icon={faHeartPulse} />

@@ -7,7 +7,7 @@ import { faEllipsisVertical } from "@fortawesome/free-solid-svg-icons";
 export type TabKey =
   | "total-revenue"
   | "active-payment-plans"
-  | "vayya-board"
+  | "kayya-board"
   | "late-payments"
   | "pending-applications";
 

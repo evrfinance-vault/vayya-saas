@@ -17,7 +17,7 @@ import {
   LatePaymentsPanel,
   PendingApplicationsPanel,
   TotalRevenuePanel,
-  VayyaBoardPanel,
+  BoardPanel,
 } from "../components/panels";
 
 const tinydot: React.CSSProperties = {
@@ -39,7 +39,7 @@ const TABS: TabDef[] = [
     label: "Active Payment Plans",
     badge: "0",
   },
-  { key: "vayya-board", icon: faGrip, label: "Vayya Board", badge: "~" },
+  { key: "kayya-board", icon: faGrip, label: "Kayya Board", badge: "~" },
   {
     key: "late-payments",
     icon: faSackXmark,
@@ -59,7 +59,7 @@ export default function OverviewPage(): React.ReactElement {
   const today = useDateStamp();
 
   const [searchParams, setSearchParams] = useSearchParams();
-  const defaultTab = (searchParams.get("tab") as TabKey) || "vayya-board";
+  const defaultTab = (searchParams.get("tab") as TabKey) || "kayya-board";
   const [tab, setTab] = React.useState<TabKey>(defaultTab);
 
   React.useEffect(() => {
@@ -109,7 +109,7 @@ export default function OverviewPage(): React.ReactElement {
           {tab === "late-payments" && <LatePaymentsPanel />}
           {tab === "pending-applications" && <PendingApplicationsPanel />}
           {tab === "total-revenue" && <TotalRevenuePanel />}
-          {tab === "vayya-board" && <VayyaBoardPanel />}
+          {tab === "kayya-board" && <BoardPanel />}
         </div>
       </section>
     </div>

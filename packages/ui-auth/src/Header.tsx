@@ -62,7 +62,7 @@ const nav: React.CSSProperties = {
 };
 
 export function Header(props: Props): React.ReactElement {
-  const { title = "Vayya", navLinks, renderLink, ...actions } = props;
+  const { title = "Kayya", navLinks, renderLink, ...actions } = props;
 
   return (
     <header style={bar}>
