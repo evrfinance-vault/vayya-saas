@@ -12,7 +12,7 @@
   border: 0;
   border-top-left-radius: 20px;
   border-top-right-radius: 20px;
-  padding: 14px;
+  padding: 14px 14px 14px 15px;
   background: color-mix(in srgb, var(--theme-color), var(--light-color));
   color: var(--dark-color);
   cursor: pointer;
@@ -156,8 +156,8 @@
 
 .overview-tab-options {
   position: absolute;
-  top: 18px;
-  right: 8px;
+  top: 15px;
+  right: 15px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
