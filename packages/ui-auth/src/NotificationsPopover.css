@@ -1,4 +1,3 @@
-/* ======= Tweak these to match your header ======= */
 :root {
   --vu-pop-bg: var(--light-color);
   --vu-pop-fg: var(--dark-color);
@@ -9,7 +8,6 @@
   --vu-unread-dot: var(--alt-theme-color);
   --vu-link: var(--alt-theme-color);
 }
-/* ================================================ */
 
 .vu-popover {
   position: absolute;
@@ -101,7 +99,6 @@
   margin-top: 3px;
 }
 
-/* Make whole item clickable when href is provided */
 .vu-note-cover {
   position: absolute;
   inset: 0;

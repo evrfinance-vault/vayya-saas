@@ -9,6 +9,7 @@ export type TitleAlignment = "left" | "center";
 type Props = {
   title: string;
   icon?: IconProp;
+  header?: React.ReactNode;
   align?: TitleAlignment;
   width?: CardSize;
   height?: CardSize;
@@ -18,22 +19,28 @@ type Props = {
 export default function Card({
   title,
   icon,
+  header,
   align = "left",
   width = "1x",
   height = "1x",
   children,
 }: Props) {
   return (
-    <div className={`overview-card card-w-${width} card-h-${height}`}>
-      <div className={`card-align-${align}`}>
-        {icon && (
-          <span className="card-icon">
-            <FontAwesomeIcon icon={icon} size="1x" />
-          </span>
+    <section className={`overview-card card-w-${width} card-h-${height}`}>
+      <header className="card-header">
+        <div className="card-title">
+          {icon && (
+            <span className="card-icon">
+              <FontAwesomeIcon icon={icon} size="1x" />
+            </span>
+          )}
+          <h3 className={`card-align-${align}`}>{title}</h3>
+        </div>
+        {header && (
+          <div className="card-header-text">{header}</div>
         )}
-        <span className="card-title">{title}</span>
-      </div>
-      <div>{children}</div>
-    </div>
+      </header>
+      <div className="card-body">{children}</div>
+    </section>
   );
 }
