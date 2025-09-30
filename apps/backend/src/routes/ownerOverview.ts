@@ -9,8 +9,12 @@ export const ownerOverview = Router();
  * Shape: [{ id, firstName, lastName, description, badge, amountCents }]
  */
 ownerOverview.get("/api/owner/overview/name", async (req, res) => {
-  const limit = Math.min(parseInt(String(req.query.limit ?? "10"), 10) || 10, 50);
-  const today = new Date(); today.setHours(0,0,0,0);
+  const limit = Math.min(
+    parseInt(String(req.query.limit ?? "10"), 10) || 10,
+    50,
+  );
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
 
   const rows = await prisma.payment.findMany({
     take: limit,
@@ -18,13 +22,19 @@ ownerOverview.get("/api/owner/overview/name", async (req, res) => {
     include: { patient: true },
   });
 
-  const data = rows.map(p => {
+  type Row = (typeof rows)[number];
+
+  const data = rows.map((p: Row) => {
     const full = `${p.patient.firstName} ${p.patient.lastName}`.trim();
     const badge =
-      p.status === "HOLD"    ? "Hold" :
-      p.status === "PAID"    ? "Paid" :
-      p.dueDate >= today && p.dueDate <= new Date(today.getTime() + 86400000 - 1) ? "Due Today" :
-      "Pending";
+      p.status === "HOLD"
+        ? "Hold"
+        : p.status === "PAID"
+          ? "Paid"
+          : p.dueDate >= today &&
+              p.dueDate <= new Date(today.getTime() + 86400000 - 1)
+            ? "Due Today"
+            : "Pending";
 
     return {
       id: p.id,
@@ -34,7 +44,7 @@ ownerOverview.get("/api/owner/overview/name", async (req, res) => {
       description: p.methodLabel ?? "",
       badge,
       amountCents: p.amountCents,
-      dueDate: p.dueDate.toISOString()
+      dueDate: p.dueDate.toISOString(),
     };
   });
 

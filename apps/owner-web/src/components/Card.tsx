@@ -36,9 +36,7 @@ export default function Card({
           )}
           <h3 className={`card-align-${align}`}>{title}</h3>
         </div>
-        {header && (
-          <div className="card-header-text">{header}</div>
-        )}
+        {header && <div className="card-header-text">{header}</div>}
       </header>
       <div className="card-body">{children}</div>
     </section>

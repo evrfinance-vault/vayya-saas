@@ -1,3 +1,5 @@
+/* eslint-env es2021 */
+
 import { PrismaClient } from "@prisma/client";
 
 // Avoid creating many clients in dev with hot reloads

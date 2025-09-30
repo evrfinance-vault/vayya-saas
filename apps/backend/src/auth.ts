@@ -12,12 +12,14 @@ export const checkJwt = auth({
 });
 
 export const requireAuth: RequestHandler = skipAuth
-  ? ((req, _res, next) => {
+  ? (req, _res, next) => {
       // logs what's up so we won't forget auth is bypassed
       if (!req.headers["x-skip-auth-logged"]) {
-        console.warn("⚠️  Auth bypass active (SKIP_AUTH_ON_DEV=1, NODE_ENV!=production)");
+        console.warn(
+          "⚠️  Auth bypass active (SKIP_AUTH_ON_DEV=1, NODE_ENV!=production)",
+        );
         (req.headers as any)["x-skip-auth-logged"] = "1";
       }
       next();
-    })
+    }
   : checkJwt;

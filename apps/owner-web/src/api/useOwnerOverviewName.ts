@@ -16,9 +16,11 @@ export function useOwnerOverviewName(limit = 8) {
 
   useEffect(() => {
     const ctl = new AbortController();
-    fetch(`http://localhost:4000/api/owner/overview/name?limit=${limit}`, { signal: ctl.signal })
-      .then(r => r.json())
-      .then(d => setItems(d.items ?? []))
+    fetch(`http://localhost:4000/api/owner/overview/name?limit=${limit}`, {
+      signal: ctl.signal,
+    })
+      .then((r) => r.json())
+      .then((d) => setItems(d.items ?? []))
       .finally(() => setLoading(false));
     return () => ctl.abort();
   }, [limit]);

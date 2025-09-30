@@ -108,7 +108,7 @@
   color: var(--dark-color);
   font-weight: 600;
   font-size: 12px;
- }
+}
 
 .card-body {
   flex: 1 1 auto;

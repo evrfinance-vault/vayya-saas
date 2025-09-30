@@ -1,4 +1,7 @@
-.namecard-skel { opacity: .6; font-weight: 600; }
+.namecard-skel {
+  opacity: 0.6;
+  font-weight: 600;
+}
 
 .namecard-list {
   margin: 0;
@@ -13,7 +16,7 @@
 .namecard-row {
   box-sizing: border-box;
   display: grid;
-  grid-template-columns: 36px minmax(0,1fr) auto;
+  grid-template-columns: 36px minmax(0, 1fr) auto;
   align-items: center;
   gap: 8px;
   padding: 10px 4px;
@@ -40,9 +43,25 @@
   color: #111827;
 }
 
-.namecard-main { min-width: 0; }
-.namecard-title { font-size: 15px; font-weight: 500; color: #0f172a; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.namecard-desc  { font-size: 11px; margin-top: 3px; color: rgba(15,23,42,.55); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.namecard-main {
+  min-width: 0;
+}
+.namecard-title {
+  font-size: 15px;
+  font-weight: 500;
+  color: #0f172a;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.namecard-desc {
+  font-size: 11px;
+  margin-top: 3px;
+  color: rgba(15, 23, 42, 0.55);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 
 .namecard-right {
   --badge-padding: 8px;
@@ -73,14 +92,28 @@
   font-size: 10px;
   font-weight: 600;
   color: #0f172a;
-  background: rgba(15,23,42,.06);
+  background: rgba(15, 23, 42, 0.06);
 }
 
-.namecard-badge.hold      { background: #e0e7ff; color: #3730a3; }
-.namecard-badge.due-today { background: #fee2e2; color: #991b1b; }
-.namecard-badge.pending   { background: #fce7f3; color: #9d174d; }
-.namecard-badge.paid      { background: #dcfce7; color: #065f46; }
+.namecard-badge.hold {
+  background: #e0e7ff;
+  color: #3730a3;
+}
+.namecard-badge.due-today {
+  background: #fee2e2;
+  color: #991b1b;
+}
+.namecard-badge.pending {
+  background: #fce7f3;
+  color: #9d174d;
+}
+.namecard-badge.paid {
+  background: #dcfce7;
+  color: #065f46;
+}
 
-@media (max-width: 640px){
-  .namecard-badge{ display: none; }
+@media (max-width: 640px) {
+  .namecard-badge {
+    display: none;
+  }
 }

@@ -10,7 +10,11 @@ type Props = {
   limit?: number;
 };
 
-export default function NameCard({ width = "1x", height = "1x", limit = 50 }: Props) {
+export default function NameCard({
+  width = "1x",
+  height = "1x",
+  limit = 50,
+}: Props) {
   const { items, loading } = useOwnerOverviewName(limit);
 
   return (
@@ -32,16 +36,23 @@ export default function NameCard({ width = "1x", height = "1x", limit = 50 }: Pr
               </span>
 
               <div className="namecard-main">
-                <div className="namecard-title" title={`${it.firstName} ${it.lastName}`.trim()}>
+                <div
+                  className="namecard-title"
+                  title={`${it.firstName} ${it.lastName}`.trim()}
+                >
                   {it.firstName} {it.lastName}
                 </div>
-                {it.description && <div className="namecard-desc">{it.description}</div>}
+                {it.description && (
+                  <div className="namecard-desc">{it.description}</div>
+                )}
               </div>
 
               <div className="namecard-right">
                 <div className="namecard-amount">{fmtUSD(it.amountCents)}</div>
                 {it.badge && (
-                  <span className={`namecard-badge ${slug(it.badge)}`}>{it.badge}</span>
+                  <span className={`namecard-badge ${slug(it.badge)}`}>
+                    {it.badge}
+                  </span>
                 )}
               </div>
             </li>
@@ -54,11 +65,18 @@ export default function NameCard({ width = "1x", height = "1x", limit = 50 }: Pr
 
 /* helpers */
 function initials(f?: string, l?: string) {
-  const a = (f ?? "").trim(), b = (l ?? "").trim();
+  const a = (f ?? "").trim(),
+    b = (l ?? "").trim();
   return `${(a[0] ?? "?").toUpperCase()}${(b[0] ?? "").toUpperCase()}`;
 }
 function fmtUSD(cents: number) {
   const dollars = Math.round(cents / 100);
-  return new Intl.NumberFormat("en-US", { style: "currency", currency: "USD", maximumFractionDigits: 0 }).format(dollars);
+  return new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+    maximumFractionDigits: 0,
+  }).format(dollars);
 }
-function slug(s: string) { return s.toLowerCase().replace(/[^a-z0-9]+/g, "-"); }
+function slug(s: string) {
+  return s.toLowerCase().replace(/[^a-z0-9]+/g, "-");
+}
