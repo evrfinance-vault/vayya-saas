@@ -1,4 +1,4 @@
-import { PrismaClient } from "@prisma/client"; // ⬅️ drop PaymentStatus import
+import { PrismaClient } from "@prisma/client";
 
 const prisma = new PrismaClient();
 
@@ -10,8 +10,11 @@ function daysFromNow(n: number) {
 }
 
 async function main() {
-  await prisma.payment.deleteMany();
-  await prisma.patient.deleteMany();
+  await prisma.$transaction([
+    prisma.payment.deleteMany(),
+    prisma.paymentPlan.deleteMany(),
+    prisma.patient.deleteMany(),
+  ]);
 
   const [sophia, ava, noah, liam, emma] = await prisma.$transaction([
     prisma.patient.create({
@@ -43,13 +46,42 @@ async function main() {
     }),
   ]);
 
+  const patients = await prisma.patient.findMany({ select: { id: true } });
+
+  const HEALTH: Array<"EXCELLENT" | "GOOD" | "FAIR" | "POOR"> = [
+    "EXCELLENT",
+    "GOOD",
+    "FAIR",
+    "POOR",
+  ];
+
+  function pickHealth(): (typeof HEALTH)[number] {
+    const bag = ["EXCELLENT", "EXCELLENT", "GOOD", "GOOD", "FAIR", "POOR"];
+    return bag[Math.floor(Math.random() * bag.length)] as any;
+  }
+
+  await prisma.$transaction(
+    patients.flatMap((p) => {
+      const k = 2 + Math.floor(Math.random() * 3);
+      return Array.from({ length: k }).map(() =>
+        prisma.paymentPlan.create({
+          data: {
+            patientId: p.id,
+            principalCents: 50000 + Math.floor(Math.random() * 450000),
+            health: pickHealth(),
+          },
+        }),
+      );
+    }),
+  );
+
   await prisma.$transaction([
     prisma.payment.create({
       data: {
         patientId: sophia.id,
         dueDate: daysFromNow(2),
         amountCents: 5800,
-        status: "HOLD", // ← enum as string literal
+        status: "HOLD",
         methodLabel: "Self-Financed",
         holdReason: "Manual review",
       },
