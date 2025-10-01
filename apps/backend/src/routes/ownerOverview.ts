@@ -50,3 +50,31 @@ ownerOverview.get("/api/owner/overview/name", async (req, res) => {
 
   res.json({ items: data });
 });
+
+// GET /api/owner/overview/account-health
+ownerOverview.get("/api/owner/overview/account-health", async (_req, res) => {
+  const grouped = await prisma.paymentPlan.groupBy({
+    by: ["health"],
+    _count: { _all: true },
+    _sum: { principalCents: true },
+  });
+
+  const counts = { EXCELLENT: 0, GOOD: 0, FAIR: 0, POOR: 0 } as Record<
+    string,
+    number
+  >;
+  let totalPrincipalCents = 0;
+
+  for (const g of grouped) {
+    counts[g.health] = g._count._all;
+    totalPrincipalCents += g._sum.principalCents ?? 0;
+  }
+
+  const totalPlans = counts.EXCELLENT + counts.GOOD + counts.FAIR + counts.POOR;
+
+  return res.json({
+    totalPlans,
+    totalPrincipalCents,
+    byHealth: counts,
+  });
+});
