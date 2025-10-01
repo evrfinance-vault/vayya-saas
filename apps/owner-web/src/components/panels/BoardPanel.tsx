@@ -1,16 +1,16 @@
 import React from "react";
 import Card from "../Card";
 import NameCard from "../cards/NameCard";
+import AccountHealthCard from "../cards/AccountHealthCard";
 import {
   faCalendarDays,
   faDollarSign,
-  faHeartPulse,
 } from "@fortawesome/free-solid-svg-icons";
 
 export default function BoardPanel() {
   return (
     <div className="overview-grid">
-      <Card title="Account Health" icon={faHeartPulse} />
+      <AccountHealthCard />
       <Card title="Total Revenue by Plan" icon={faDollarSign} width="2x" />
       <NameCard height="3x" />
       <Card

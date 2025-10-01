@@ -1,0 +1,87 @@
+.ah-skel {
+  opacity: 0.6;
+  font-weight: 600;
+}
+
+.ah-ring-wrap {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
+}
+
+.ah-ring {
+  --c-excellent: #34d399; /* green-400 */
+       --c-good: #bfdbfe; /* blue-200 */
+       --c-fair: #fcd34d; /* amber-300 */
+       --c-poor: #fca5a5; /* red-300 */
+
+  --size: clamp(220px, 60%, 320px);
+  --radius: calc(var(--size) * 0.42); /* distance from center to dots */
+  --dot: calc(var(--size) * 0.085);   /* dot diameter */
+  position: relative;
+  width: var(--size);
+  height: var(--size);
+  margin-inline: auto;
+}
+
+.ah-dot {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: var(--dot);
+  height: var(--dot);
+  border-radius: 50%;
+  transform: translate(-50%, -50%) rotate(var(--angle)) translate(var(--radius))
+    rotate(calc(-1 * var(--angle)));
+  box-shadow:
+    0 0 0 1px rgba(15, 23, 42, 0.05) inset,
+    0 1px 2px rgba(15, 23, 42, 0.06);
+  opacity: 0.95;
+}
+
+.ah-dot.excellent {
+  background: var(--c-excellent);
+}
+.ah-dot.good {
+  background: var(--c-good);
+}
+.ah-dot.fair {
+  background: var(--c-fair);
+}
+.ah-dot.poor {
+  background: var(--c-poor);
+}
+
+.ah-center {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  pointer-events: none;
+  gap: 6px;
+}
+
+.ah-total {
+  display: block;
+  font-size: 28px;
+  font-weight: 800;
+  color: #0f172a;
+  line-height: 1.05;
+}
+
+.ah-sub {
+  display: block;
+  font-size: 14px;
+  color: rgba(15, 23, 42, 0.65);
+}
+
+@media (max-width: 640px) {
+  .ah-ring {
+    --size: clamp(180px, 70vw, 240px);
+  }
+}
