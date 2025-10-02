@@ -14,9 +14,13 @@
 }
 
 .namecard-row {
+  --amount-and-badge-width: 50px;
+
   box-sizing: border-box;
   display: grid;
-  grid-template-columns: 36px minmax(0, 1fr) auto;
+  grid-template-columns: 36px minmax(0, 1fr) fit-content(
+      var(--amount-and-badge-width)
+    );
   align-items: center;
   gap: 8px;
   padding: 10px 4px;
@@ -37,7 +41,6 @@
   place-items: center;
   font-size: 14px;
   font-weight: 700;
-  color: white;
   letter-spacing: 0.2px;
   background: #eef2f7;
   color: #111827;
@@ -46,6 +49,7 @@
 .namecard-main {
   min-width: 0;
 }
+
 .namecard-title {
   font-size: 15px;
   font-weight: 500;
@@ -54,27 +58,30 @@
   overflow: hidden;
   text-overflow: ellipsis;
 }
+
 .namecard-desc {
   font-size: 11px;
   margin-top: 3px;
   color: rgba(15, 23, 42, 0.55);
   white-space: nowrap;
+  overflow: hidden;
   text-overflow: ellipsis;
 }
 
 .namecard-right {
   --badge-padding: 8px;
-
   display: flex;
   flex-direction: column;
   align-items: flex-end;
   gap: 4px;
   padding-right: var(--badge-padding);
+  width: var(--amount-and-badge-width);
 }
 
 .namecard-amount {
+  white-space: nowrap;
   justify-self: end;
-  min-width: 68px;
+  min-width: 0;
   text-align: right;
   font-size: 14px;
   font-weight: 600;

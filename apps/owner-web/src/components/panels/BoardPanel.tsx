@@ -3,7 +3,7 @@ import Card from "../Card";
 import NameCard from "../cards/NameCard";
 import AccountHealthCard from "../cards/AccountHealthCard";
 import RevenueByPlanCard from "../cards/RevenueByPlanCard";
-import { faCalendarDays } from "@fortawesome/free-solid-svg-icons";
+import PayoutCalendarCard from "../cards/PayoutCalendarCard";
 
 export default function BoardPanel() {
   return (
@@ -11,12 +11,7 @@ export default function BoardPanel() {
       <AccountHealthCard />
       <RevenueByPlanCard width="2x" />
       <NameCard height="3x" />
-      <Card
-        title="Payout Calendar"
-        icon={faCalendarDays}
-        width="2x"
-        height="2x"
-      />
+      <PayoutCalendarCard width="2x" height="2x" />
       <Card title="AI Assistant" align="center" height="2x" />
     </div>
   );

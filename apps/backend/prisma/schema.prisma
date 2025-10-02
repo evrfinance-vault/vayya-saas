@@ -62,14 +62,18 @@ enum PlanType {
 }
 
 model PaymentPlan {
-  id             String     @id @default(cuid())
-  createdAt      DateTime   @default(now())
-  updatedAt      DateTime   @updatedAt
-  patientId      String
-  patient        Patient    @relation(fields: [patientId], references: [id], onDelete: Cascade)
-  principalCents Int
-  health         PlanHealth
-  planType       PlanType   @default(SELF)
-  payments       Payment[]
-  onHold         Boolean    @default(false)
+  id               String     @id @default(cuid())
+  createdAt        DateTime   @default(now())
+  updatedAt        DateTime   @updatedAt
+  patientId        String
+  patient          Patient    @relation(fields: [patientId], references: [id], onDelete: Cascade)
+  principalCents   Int
+  downPaymentCents Int        @default(0)
+  termMonths       Int        @default(12)
+  startDate        DateTime   @default(now())
+  billingDay       Int        @default(15)
+  health           PlanHealth
+  planType         PlanType   @default(SELF)
+  payments         Payment[]
+  onHold           Boolean    @default(false)
 }

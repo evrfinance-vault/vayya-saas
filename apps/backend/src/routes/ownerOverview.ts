@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { prisma } from "../db/prisma";
-import { startOfMonth, addMonths, format, isSameDay } from "date-fns";
+import { startOfMonth, getDate, addMonths, format, isSameDay } from "date-fns";
 
 export const ownerOverview = Router();
 
@@ -18,10 +18,9 @@ ownerOverview.get("/api/owner/overview/name", async (req, res) => {
     orderBy: [{ dueDate: "asc" }],
     where: {
       OR: [
-        { status: "PENDING" }, // upcoming / overdue
-        { paymentPlan: { onHold: true } }, // plan on hold
+        { status: "PENDING" },
+        { paymentPlan: { onHold: true } },
       ],
-      // only from last month onward to keep it fresh
       dueDate: { gte: startOfMonth(addMonths(today, -1)) },
     },
     include: {
@@ -97,13 +96,11 @@ ownerOverview.get("/api/owner/overview/revenue-by-plan", async (req, res) => {
   const now = new Date();
   const start = startOfMonth(addMonths(now, -(months - 1)));
 
-  // get paid payments in range with plan type
   const payments = await prisma.payment.findMany({
     where: { paidAt: { gte: start, lte: now } },
     include: { paymentPlan: { select: { planType: true } } },
   });
 
-  // bucket per month
   type Point = { label: string; date: Date; self: number; kayya: number };
   const points: Point[] = [];
   for (let i = 0; i < months; i++) {
@@ -125,4 +122,51 @@ ownerOverview.get("/api/owner/overview/revenue-by-plan", async (req, res) => {
 
   const max = points.reduce((m, p) => Math.max(m, p.self, p.kayya), 0);
   res.json({ points, max });
+});
+
+// GET /api/owner/overview/payouts-by-day?year=YYYY&month=1-12
+// - PAID payments counted on paidAt day
+// - all others counted on dueDate day
+ownerOverview.get("/api/owner/overview/payouts-by-day", async (req, res) => {
+  const now = new Date();
+  const year = Number(req.query.year ?? now.getFullYear());
+  const month1 = Number(req.query.month ?? now.getMonth() + 1);
+  const month0 = Math.min(12, Math.max(1, month1)) - 1;
+
+  const start = startOfMonth(new Date(year, month0, 1));
+  const next = startOfMonth(addMonths(start, 1));
+
+  const [paid, scheduled] = await Promise.all([
+    prisma.payment.findMany({
+      where: { status: "PAID", paidAt: { gte: start, lt: next } },
+      select: { amountCents: true, paidAt: true },
+    }),
+    prisma.payment.findMany({
+      where: { NOT: { status: "PAID" }, dueDate: { gte: start, lt: next } },
+      select: { amountCents: true, dueDate: true },
+    }),
+  ]);
+
+  const totals: Record<number, number> = {};
+  const paidTotals: Record<number, number> = {};
+  const schedTotals: Record<number, number> = {};
+
+  for (const p of paid) {
+    const d = getDate(p.paidAt!);
+    paidTotals[d] = (paidTotals[d] ?? 0) + p.amountCents;
+    totals[d] = (totals[d] ?? 0) + p.amountCents;
+  }
+  for (const s of scheduled) {
+    const d = getDate(s.dueDate);
+    schedTotals[d] = (schedTotals[d] ?? 0) + s.amountCents;
+    totals[d] = (totals[d] ?? 0) + s.amountCents;
+  }
+
+  res.json({
+    year,
+    month: month1,
+    totals,
+    paid: paidTotals,
+    scheduled: schedTotals,
+  });
 });

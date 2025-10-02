@@ -1,125 +1,148 @@
-import { PrismaClient, PlanType, PaymentStatus } from "@prisma/client";
-import { addMonths, startOfMonth, setDate, addDays, isBefore } from "date-fns";
+import {
+  PrismaClient,
+  PlanType,
+  PlanHealth,
+  PaymentStatus,
+} from "@prisma/client";
+import { startOfMonth, addMonths, addDays, isBefore } from "date-fns";
+import { createPlanWithSchedule } from "../src/lib/schedule";
 
 const prisma = new PrismaClient();
 
-function pick<T>(arr: T[]) {
-  return arr[Math.floor(Math.random() * arr.length)];
-}
+const FIRSTS = [
+  "John",
+  "Sophia",
+  "Benjamin",
+  "Ava",
+  "Liam",
+  "Noah",
+  "Emma",
+  "Mia",
+  "Oliver",
+  "Lucas",
+  "Isabella",
+  "Ethan",
+  "Amelia",
+  "Harper",
+  "Elijah",
+  "Henry",
+  "James",
+  "Mila",
+  "Charlotte",
+  "Levi",
+  "Aria",
+  "William",
+  "Jack",
+  "Luna",
+  "Chloe",
+  "Layla",
+  "Evelyn",
+  "Scarlett",
+  "Ella",
+  "Aiden",
+  "Zoe",
+  "Hannah",
+  "Grace",
+  "Penelope",
+  "Nora",
+  "Sebastian",
+];
+const LASTS = [
+  "Smith",
+  "Johnson",
+  "Williams",
+  "Brown",
+  "Jones",
+  "Garcia",
+  "Miller",
+  "Davis",
+  "Rodriguez",
+  "Martinez",
+  "Hernandez",
+  "Lopez",
+  "Gonzalez",
+  "Wilson",
+  "Anderson",
+  "Thomas",
+  "Taylor",
+  "Moore",
+  "Jackson",
+  "Martin",
+  "Lee",
+  "Perez",
+  "Thompson",
+  "White",
+  "Harris",
+  "Sanchez",
+  "Clark",
+  "Ramirez",
+  "Lewis",
+  "Robinson",
+  "Walker",
+  "Young",
+  "Allen",
+  "King",
+  "Wright",
+  "Scott",
+];
 
-function daysFromNow(n: number) {
-  const d = new Date();
-  d.setHours(0, 0, 0, 0);
-  d.setDate(d.getDate() + n);
-  return d;
-}
+const pick = <T>(arr: readonly T[]) =>
+  arr[Math.floor(Math.random() * arr.length)];
+const randInt = (min: number, max: number) =>
+  Math.floor(Math.random() * (max - min + 1)) + min;
 
 async function main() {
-  await prisma.$transaction([
-    prisma.payment.deleteMany(),
-    prisma.paymentPlan.deleteMany(),
-    prisma.patient.deleteMany(),
-  ]);
+  await prisma.payment.deleteMany();
+  await prisma.paymentPlan.deleteMany();
+  await prisma.patient.deleteMany();
 
-  const [sophia, ava, noah, liam, emma] = await prisma.$transaction([
-    prisma.patient.create({
-      data: {
-        firstName: "Sophia",
-        lastName: "Lewis",
-        email: "sophia@example.com",
-      },
-    }),
-    prisma.patient.create({
-      data: { firstName: "Ava", lastName: "Turner", email: "ava@example.com" },
-    }),
-    prisma.patient.create({
-      data: {
-        firstName: "Noah",
-        lastName: "Brooks",
-        email: "noah@example.com",
-      },
-    }),
-    prisma.patient.create({
-      data: {
-        firstName: "Liam",
-        lastName: "Nguyen",
-        email: "liam@example.com",
-      },
-    }),
-    prisma.patient.create({
-      data: { firstName: "Emma", lastName: "Diaz", email: "emma@example.com" },
-    }),
-  ]);
-
-  const patients = await prisma.patient.findMany({ select: { id: true } });
-
-  const HEALTH: Array<"EXCELLENT" | "GOOD" | "FAIR" | "POOR"> = [
-    "EXCELLENT",
-    "GOOD",
-    "FAIR",
-    "POOR",
-  ];
-
-  function pickHealth(): (typeof HEALTH)[number] {
-    const bag = ["EXCELLENT", "EXCELLENT", "GOOD", "GOOD", "FAIR", "POOR"];
-    return bag[Math.floor(Math.random() * bag.length)] as any;
-  }
+  const PATIENT_COUNT = 36;
 
   const today = new Date();
-  const rangeStart = startOfMonth(addMonths(today, -11));
-  const DUE_DAYS = [5, 12, 20, 28];
+  const anchor = startOfMonth(today);
 
-  for (const p of patients) {
-    const planCount = 1 + Math.floor(Math.random() * 2);
+  const patients = [];
+  for (let i = 0; i < PATIENT_COUNT; i++) {
+    const firstName = pick(FIRSTS);
+    const lastName = pick(LASTS);
+    patients.push(
+      await prisma.patient.create({
+        data: { firstName, lastName },
+      }),
+    );
+  }
+
+  for (const pt of patients) {
+    const planCount = randInt(1, 2);
     for (let i = 0; i < planCount; i++) {
-      const plan = await prisma.paymentPlan.create({
-        data: {
-          patientId: p.id,
-          principalCents: 50000 + Math.floor(Math.random() * 450000),
-          health: pickHealth(),
-          planType: pick([PlanType.SELF, PlanType.KAYYA]),
-          onHold: Math.random() < 0.12, // ~12% of plans on hold
-        },
+      const principal = randInt(5_000, 20_000) * 100;
+      const down = pick([0, 500, 750, 1_000, 1_500]) * 100;
+      const term = pick([6, 9, 12, 18, 24]);
+      const billingDay = pick([5, 9, 12, 16, 20, 23, 28]);
+      const startMonthsAgo = randInt(0, 14);
+      const startDate = addMonths(anchor, -startMonthsAgo);
+
+      const plan = await createPlanWithSchedule(prisma, {
+        patientId: pt.id,
+        principalCents: principal,
+        downPaymentCents: down,
+        termMonths: term,
+        startDate,
+        billingDay,
+        planType: Math.random() < 0.5 ? "SELF" : "KAYYA",
+        health: pick(["EXCELLENT", "GOOD", "FAIR", "POOR"] as const),
+        onHold: Math.random() < 0.12,
       });
 
-      const dueDay = pick(DUE_DAYS);
-
-      for (let m = 0; m < 12; m++) {
-        const base = addMonths(rangeStart, m);
-        const due = setDate(base, dueDay);
-
-        // status logic:
-        // - past months: 75% paid, otherwise pending (overdue)
-        // - current month: mostly pending, sometimes due today if dates align
-        // - future months: pending
-        let status = PaymentStatus.PENDING;
-        let paidAt: Date | null = null;
-
-        if (isBefore(due, startOfMonth(today))) {
-          if (Math.random() < 0.75) {
-            status = PaymentStatus.PAID;
-            paidAt = addDays(due, Math.floor(Math.random() * 7)); // up to a week after due
-          }
-        } else if (
-          due.getMonth() === today.getMonth() &&
-          due.getFullYear() === today.getFullYear()
-        ) {
-          // leave as PENDING; UI will tag "Due today" if same day
-        } else {
-          // future: pending
+      const past = plan.payments.filter((p) => isBefore(p.dueDate, anchor));
+      for (const p of past) {
+        if (Math.random() < 0.7) {
+          const paidAt = addDays(p.dueDate, randInt(0, 6));
+          await prisma.payment.update({
+            where: { id: p.id },
+            data: { status: PaymentStatus.PAID, paidAt },
+          });
         }
-
-        const amt = 5000 + Math.floor(Math.random() * 25000); // $50–$250
-        await prisma.payment.create({
-          data: {
-            patientId: p.id,
-            paymentPlanId: plan.id,
-            amountCents: amt,
-            status,
-            dueDate: due,
-            paidAt,
-          },
-        });
       }
     }
   }
@@ -128,6 +151,7 @@ async function main() {
 main()
   .then(async () => {
     await prisma.$disconnect();
+    console.log("✅ Seeded with 36 patients, mixed plans & payment history.");
   })
   .catch(async (e) => {
     console.error(e);

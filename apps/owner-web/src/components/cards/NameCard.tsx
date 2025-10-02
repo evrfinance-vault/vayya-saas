@@ -13,7 +13,7 @@ type Props = {
 export default function NameCard({
   width = "1x",
   height = "1x",
-  limit = 50,
+  limit = 10,
 }: Props) {
   const { items, loading } = useOwnerOverviewName(limit);
 
