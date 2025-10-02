@@ -32,28 +32,21 @@ export default function NameCard({
           {items.map((it) => (
             <li key={it.id} className="namecard-row">
               <span className="namecard-avatar" aria-hidden="true">
-                {initials(it.firstName, it.lastName)}
+                {it.initials}
               </span>
 
               <div className="namecard-main">
-                <div
-                  className="namecard-title"
-                  title={`${it.firstName} ${it.lastName}`.trim()}
-                >
-                  {it.firstName} {it.lastName}
+                <div className="namecard-title" title={it.name}>
+                  {it.name}
                 </div>
-                {it.description && (
-                  <div className="namecard-desc">{it.description}</div>
-                )}
+                <div className="namecard-desc">{it.methodLabel}</div>
               </div>
 
               <div className="namecard-right">
-                <div className="namecard-amount">{fmtUSD(it.amountCents)}</div>
-                {it.badge && (
-                  <span className={`namecard-badge ${slug(it.badge)}`}>
-                    {it.badge}
-                  </span>
-                )}
+                <div className="namecard-amount">{fmtUSD(it.amount)}</div>
+                <span className={`namecard-badge ${slug(it.badge)}`}>
+                  {it.badge}
+                </span>
               </div>
             </li>
           ))}
@@ -63,20 +56,14 @@ export default function NameCard({
   );
 }
 
-/* helpers */
-function initials(f?: string, l?: string) {
-  const a = (f ?? "").trim(),
-    b = (l ?? "").trim();
-  return `${(a[0] ?? "?").toUpperCase()}${(b[0] ?? "").toUpperCase()}`;
-}
-function fmtUSD(cents: number) {
-  const dollars = Math.round(cents / 100);
+function fmtUSD(dollars: number) {
   return new Intl.NumberFormat("en-US", {
     style: "currency",
     currency: "USD",
     maximumFractionDigits: 0,
   }).format(dollars);
 }
+
 function slug(s: string) {
   return s.toLowerCase().replace(/[^a-z0-9]+/g, "-");
 }

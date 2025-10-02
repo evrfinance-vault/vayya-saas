@@ -12,13 +12,13 @@
 
 .ah-ring {
   --c-excellent: #34d399; /* green-400 */
-       --c-good: #bfdbfe; /* blue-200 */
-       --c-fair: #fcd34d; /* amber-300 */
-       --c-poor: #fca5a5; /* red-300 */
+  --c-good: #bfdbfe; /* blue-200 */
+  --c-fair: #fcd34d; /* amber-300 */
+  --c-poor: #fca5a5; /* red-300 */
 
   --size: clamp(220px, 60%, 320px);
   --radius: calc(var(--size) * 0.42); /* distance from center to dots */
-  --dot: calc(var(--size) * 0.085);   /* dot diameter */
+  --dot: calc(var(--size) * 0.085); /* dot diameter */
   position: relative;
   width: var(--size);
   height: var(--size);

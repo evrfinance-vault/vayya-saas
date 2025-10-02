@@ -2,12 +2,12 @@ import { useEffect, useState } from "react";
 
 export type NameItem = {
   id: string;
-  firstName: string;
-  lastName: string;
-  description: string;
+  name: string;
+  initials: string;
+  methodLabel: string;
   badge: "Hold" | "Pending" | "Paid" | "Due Today" | string;
-  amountCents: number;
-  dueDate: string;
+  amount: number;
+  dueDate: Date;
 };
 
 export function useOwnerOverviewName(limit = 8) {
