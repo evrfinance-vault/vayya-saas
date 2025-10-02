@@ -17,17 +17,6 @@ type Props = {
   showNotifications?: boolean;
 };
 
-const bar: React.CSSProperties = {
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "space-between",
-  padding: "12px 16px",
-  position: "sticky",
-  top: 0,
-  background: "#accdea",
-  color: "#ffffff",
-  zIndex: 10,
-};
 const left: React.CSSProperties = {
   display: "flex",
   alignItems: "center",
@@ -65,7 +54,7 @@ export function Header(props: Props): React.ReactElement {
   const { title = "Kayya", navLinks, renderLink, ...actions } = props;
 
   return (
-    <header style={bar}>
+    <header className="header-bar">
       <div style={left}>
         {
           <h2 className="site-title" style={brand}>
