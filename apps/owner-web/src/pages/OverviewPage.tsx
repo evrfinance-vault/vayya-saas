@@ -86,16 +86,23 @@ export default function OverviewPage(): React.ReactElement {
         gap: 0,
       }}
     >
-      <div className="preheading" style={{ fontSize: "small" }}>
-        <span style={tinydot}>
-          <FontAwesomeIcon icon={faCircle} />
-        </span>
-        Live Dashboard • {today}
-      </div>
+      <div className="overview-hero">
+        <div className="preheading" style={{ fontSize: "small" }}>
+          <span style={tinydot}>
+            <FontAwesomeIcon icon={faCircle} />
+          </span>
+          Live Dashboard • {today}
+        </div>
 
-      <h1 className="heading">
-        {greeting}, <UserBadge />
-      </h1>
+        <h1 className="heading">
+          {greeting}, <UserBadge />
+        </h1>
+
+        <p className="hero-blurb">
+          Kayya is an innovative financing platform that allows businesses
+          in elective health care to offer in-house financing to their patients.
+        </p>
+      </div>
 
       <section className="page-overview">
         <OverviewTabs tabs={TABS} value={tab} onChange={setTab} />
