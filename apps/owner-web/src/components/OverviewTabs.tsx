@@ -79,6 +79,13 @@ export default function OverviewTabs({
                   <FontAwesomeIcon icon={faEllipsisVertical} size="lg" />
                 </button>
               )}
+
+              {selected && (
+                <>
+                  <img className="tab-cap tab-cap-left" src="/assets/tab-curved-left.svg" alt="" aria-hidden="true" />
+                  <img className="tab-cap tab-cap-right" src="/assets/tab-curved-right.svg" alt="" aria-hidden="true" />
+                </>
+              )}
             </div>
           );
         })}
