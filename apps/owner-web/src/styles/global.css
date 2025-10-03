@@ -1,20 +1,19 @@
-/* Treat title like a logo: no selection, no text cursor */
 .site-title {
   user-select: none;
-  -webkit-user-select: none; /* Safari */
+  -webkit-user-select: none;
   -moz-user-select: none;
   -ms-user-select: none;
-  -webkit-touch-callout: none; /* iOS long-press menu */
-  cursor: default; /* arrow cursor instead of I-beam */
-  display: inline-block; /* helps avoid odd text behaviors */
+  -webkit-touch-callout: none;
+  cursor: default;
+  display: inline-block;
 }
 
 .preheading {
-  display: "flex";
-  align-items: "center";
+  display: flex;
+  align-items: center;
   font-weight: 500;
   margin-bottom: 0;
-  gap: 4;
+  gap: 4px;
 }
 
 .heading {

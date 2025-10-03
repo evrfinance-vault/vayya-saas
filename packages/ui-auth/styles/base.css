@@ -33,7 +33,7 @@ body {
   background-repeat: no-repeat;
   background-position: top center;
   background-size: auto;
-  background-size: clamp(25vw, 50vw, 100%);
+  background-size: clamp(25vw, 45vw, 65vw);
 }
 
 /* <weight>: Use a value from 100 to 900 */
