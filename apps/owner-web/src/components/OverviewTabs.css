@@ -208,7 +208,7 @@
   opacity: 1;
 }
 
-.tab-cap-left  {
+.tab-cap-left {
   left: 0;
   transform: translateX(calc(-1 * var(--cap-w)));
 }

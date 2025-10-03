@@ -17,10 +17,7 @@ ownerOverview.get("/api/owner/overview/name", async (req, res) => {
     take: limit,
     orderBy: [{ dueDate: "asc" }],
     where: {
-      OR: [
-        { status: "PENDING" },
-        { paymentPlan: { onHold: true } },
-      ],
+      OR: [{ status: "PENDING" }, { paymentPlan: { onHold: true } }],
       dueDate: { gte: startOfMonth(addMonths(today, -1)) },
     },
     include: {

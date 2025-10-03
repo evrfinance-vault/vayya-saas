@@ -99,8 +99,8 @@ export default function OverviewPage(): React.ReactElement {
         </h1>
 
         <p className="hero-blurb">
-          Kayya is an innovative financing platform that allows businesses
-          in elective health care to offer in-house financing to their patients.
+          Kayya is an innovative financing platform that allows businesses in
+          elective health care to offer in-house financing to their patients.
         </p>
       </div>
 
