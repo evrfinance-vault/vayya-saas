@@ -3,6 +3,7 @@
   width: 100%;
   height: 100%;
 }
+
 .rev-svg {
   width: 100%;
   height: 100%;
@@ -11,30 +12,35 @@
 
 .rev-grid {
   stroke: rgba(15, 23, 42, 0.08);
-  stroke-width: 1;
+  stroke-width: 0;
+  shape-rendering: crispEdges;
 }
-.rev-ytick {
+
+.rev-ytick,
+.rev-xtick {
   font-size: 12px;
-  fill: rgba(15, 23, 42, 0.55);
+  fill: rgba(15, 23, 42, 0.95);
+}
+
+.rev-ytick {
   text-anchor: end;
   dominant-baseline: middle;
 }
+
 .rev-xtick {
-  font-size: 12px;
-  fill: rgba(15, 23, 42, 0.55);
   text-anchor: middle;
+  dominant-baseline: hanging;
+  pointer-events: none;
 }
 
 .rev-line {
   fill: none;
-  stroke-width: 3;
+  stroke-width: 2;
+  vector-effect: non-scaling-stroke;
+  stroke-linecap: round;
+  stroke-linejoin: round;
 }
-.rev-line.self {
-  stroke: #22c55e;
-} /* green-500 */
-.rev-line.kayya {
-  stroke: #60a5fa;
-} /* blue-400 */
+
 .rev-line.self {
   stroke: #9dda8f;
 }
@@ -42,18 +48,19 @@
   stroke: #accdea;
 }
 
-.rev-dot.self {
-  stroke: #434952;
-  fill: #ffffff;
-}
-.rev-dot.kayya {
-  stroke: #434952;
-  fill: #ffffff;
-}
-
 .rev-hover-line {
   stroke: rgba(15, 23, 42, 0.25);
   stroke-dasharray: 4 4;
+  vector-effect: non-scaling-stroke;
+}
+
+.rev-dot.self,
+.rev-dot.kayya {
+  stroke: #434952;
+  stroke-width: 2;
+  fill: #ffffff;
+  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.15));
+  pointer-events: none;
 }
 
 .rev-hit {
@@ -68,16 +75,17 @@
   font-size: 12px;
   color: rgba(15, 23, 42, 0.7);
 }
+
 .rev-key {
   width: 10px;
   height: 10px;
   border-radius: 999px;
   display: inline-block;
 }
+
 .rev-key.legend {
   margin-left: 12px;
 }
-
 .rev-key.self {
   background: #9dda8f;
 }
@@ -87,29 +95,47 @@
 
 .rev-tooltip {
   position: absolute;
-  bottom: 8px;
   transform: translateX(-50%);
-  background: rgba(255, 255, 255, 0.95);
-  border: 1px solid rgba(15, 23, 42, 0.08);
-  border-radius: 10px;
+  background-color: rgba(15, 23, 42, 0.9);
+  border-radius: 999px;
   padding: 8px 10px;
   box-shadow: 0 8px 18px -10px rgba(0, 0, 0, 0.25);
   font-size: 12px;
-  color: #0f172a;
+  color: #ffffff;
   pointer-events: none;
+  z-index: 10;
+  will-change: transform, left;
+  white-space: nowrap;
 }
+
 .rev-tip-row {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 4px;
   white-space: nowrap;
 }
-.rev-tip-label {
-  color: rgba(15, 23, 42, 0.6);
-  margin-left: auto;
-}
+
 .rev-skel {
   opacity: 0.6;
   font-weight: 600;
   padding: 16px;
+}
+
+@media (max-width: 640px) {
+  .rev-ytick,
+  .rev-xtick {
+    font-size: 11px;
+  }
+  .rev-line {
+    stroke-width: 2.5;
+  }
+}
+
+.rev-hover-band {
+  fill: rgba(220, 220, 220, 0.2);
+}
+
+.rev-area {
+  mix-blend-mode: multiply;
+  pointer-events: none;
 }
