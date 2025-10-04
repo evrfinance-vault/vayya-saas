@@ -6,20 +6,20 @@
   --vu-icon-btn-icon: var(--light-color);
   --vu-icon-btn-hover-icon: var(--dark-color);
 
-  --vu-badge-bg: var(--alt-theme-color); /* bright blue */
+  --vu-badge-bg: var(--alt-theme-color);
 }
 /* ================================================ */
 
 .vu-icon-group {
   display: flex;
   gap: 12px;
-  position: relative; /* popover anchors here (top-right) */
+  position: relative;
 }
 
 .vu-note-anchor {
   position: relative;
   display: inline-block;
-} /* anchor for popover */
+}
 
 .vu-icon-btn {
   position: relative;
@@ -58,7 +58,7 @@
   height: 20px;
   padding: 0;
   border-radius: 999px;
-  background: var(--alt-theme-color);
+  background: #1013f5;
   color: var(--light-color);
   font-size: 12px;
   font-weight: 800;
