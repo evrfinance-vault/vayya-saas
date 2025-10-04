@@ -86,10 +86,7 @@ export default function AccountHealthCard({
     text: string;
   } | null>(null);
 
-  function onDotEnter(
-    e: React.MouseEvent<SVGElement>,
-    label: string,
-  ) {
+  function onDotEnter(e: React.MouseEvent<SVGElement>, label: string) {
     if (!wrapRef.current) return;
     const wb = wrapRef.current.getBoundingClientRect();
     const cb = (e.currentTarget as SVGElement).getBoundingClientRect();

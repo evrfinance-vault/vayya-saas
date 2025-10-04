@@ -170,9 +170,20 @@ export default function PayoutCalendarCard({
 
         {hover && (
           <div className="pc-tip" style={tipStyle()}>
-            <div className="fa-stack" style={{ fontSize: "8px", lineHeight: 1 }}>
-              <FontAwesomeIcon icon={faCircle} className="fa-stack-2x" color="#000000" />
-              <FontAwesomeIcon icon={faStar} className="fa-stack-1x" color="#f5c33b" />
+            <div
+              className="fa-stack"
+              style={{ fontSize: "8px", lineHeight: 1 }}
+            >
+              <FontAwesomeIcon
+                icon={faCircle}
+                className="fa-stack-2x"
+                color="#000000"
+              />
+              <FontAwesomeIcon
+                icon={faStar}
+                className="fa-stack-1x"
+                color="#f5c33b"
+              />
             </div>
             {fmtUSD(hover.cents)}
           </div>
