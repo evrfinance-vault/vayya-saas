@@ -116,13 +116,24 @@ export default function OverviewPage(): React.ReactElement {
       <div className="overview-hero">
         <div className="preheading" style={{ fontSize: "small" }}>
           <span
-            title={health === null ? "Checking…" : health ? "API healthy" : "API unreachable"}
-            aria-label={health === null ? "Checking back-end status" : health ? "Back-end online" : "Back-end offline"}
+            title={
+              health === null
+                ? "Checking…"
+                : health
+                  ? "API healthy"
+                  : "API unreachable"
+            }
+            aria-label={
+              health === null
+                ? "Checking back-end status"
+                : health
+                  ? "Back-end online"
+                  : "Back-end offline"
+            }
             style={{ fontSize: "x-small", color: dotColor, marginRight: 3 }}
           >
             <FontAwesomeIcon icon={faCircle} />
           </span>
-
           Live Dashboard • {today}
         </div>
 
