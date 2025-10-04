@@ -43,7 +43,7 @@ const TABS: TabDef[] = [
   {
     key: "late-payments",
     icon: faSackXmark,
-    label: "Late Payments",
+    label: "Missed/Late Payments",
     badge: "0",
   },
   {
