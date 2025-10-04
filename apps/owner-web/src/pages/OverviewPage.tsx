@@ -1,6 +1,6 @@
 import React from "react";
 import "./OverviewPage.css";
-import { useGreeting, useDateStamp, UserBadge } from "@packages/ui-auth";
+import { useGreeting, useDateStamp, UserBadge, ENV } from "@packages/ui-auth";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faCircle,
@@ -19,12 +19,6 @@ import {
   TotalRevenuePanel,
   BoardPanel,
 } from "../components/panels";
-
-const tinydot: React.CSSProperties = {
-  fontSize: "x-small",
-  color: "lightgreen",
-  marginRight: 3,
-};
 
 const TABS: TabDef[] = [
   {
@@ -54,9 +48,40 @@ const TABS: TabDef[] = [
   },
 ];
 
+function useBackendHealth(pollingTimeInMS = 30000) {
+  const apiBase =
+    (ENV as any)?.VITE_API_URL ||
+    (ENV as any)?.API_BASE_URL ||
+    "http://localhost:4000";
+
+  const url = `${apiBase.replace(/\/$/, "")}/health`;
+  const [ok, setOk] = React.useState<boolean | null>(null);
+
+  const check = React.useCallback(async () => {
+    try {
+      const ctrl = new AbortController();
+      const t = setTimeout(() => ctrl.abort(), 4500);
+      const res = await fetch(url, { signal: ctrl.signal });
+      clearTimeout(t);
+      setOk(res.ok);
+    } catch {
+      setOk(false);
+    }
+  }, [url]);
+
+  React.useEffect(() => {
+    check();
+    const id = setInterval(check, pollingTimeInMS);
+    return () => clearInterval(id);
+  }, [check, pollingTimeInMS]);
+
+  return ok;
+}
+
 export default function OverviewPage(): React.ReactElement {
   const greeting = useGreeting();
   const today = useDateStamp();
+  const health = useBackendHealth();
 
   const [searchParams, setSearchParams] = useSearchParams();
   const defaultTab = (searchParams.get("tab") as TabKey) || "kayya-board";
@@ -73,6 +98,8 @@ export default function OverviewPage(): React.ReactElement {
     );
   }, [tab, setSearchParams]);
 
+  const dotColor = health === null ? "#f2f2f2" : health ? "#90ee90" : "#edbf91";
+
   return (
     <div
       className="page-content"
@@ -88,9 +115,14 @@ export default function OverviewPage(): React.ReactElement {
     >
       <div className="overview-hero">
         <div className="preheading" style={{ fontSize: "small" }}>
-          <span style={tinydot}>
+          <span
+            title={health === null ? "Checking…" : health ? "API healthy" : "API unreachable"}
+            aria-label={health === null ? "Checking back-end status" : health ? "Back-end online" : "Back-end offline"}
+            style={{ fontSize: "x-small", color: dotColor, marginRight: 3 }}
+          >
             <FontAwesomeIcon icon={faCircle} />
           </span>
+
           Live Dashboard • {today}
         </div>
 

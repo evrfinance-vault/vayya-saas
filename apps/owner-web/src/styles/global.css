@@ -16,6 +16,22 @@
   gap: 4px;
 }
 
+@keyframes pulse {
+  0%, 100% {
+    opacity: 0.6;
+    transform: scale(1);
+  }
+
+  50% {
+    opacity: 1;
+    transform: scale(1.06);
+  }
+}
+
+.preheading .fa-circle[title="Checking…"] {
+  animation: pulse 1.2s ease-in-out infinite;
+}
+
 .heading {
   font-weight: 300;
   margin-top: 0;
