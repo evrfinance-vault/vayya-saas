@@ -99,23 +99,28 @@
   font-weight: 600;
   color: #0f172a;
   background: rgba(15, 23, 42, 0.06);
+  width: 100%;
+  text-align: center;
 }
 
 .namecard-badge.hold {
-  background: #e0e7ff;
-  color: #3730a3;
+  background: #b3c7ff33;
+  color: #9aaee6;
 }
+
 .namecard-badge.due-today {
   background: #fee2e2;
   color: #991b1b;
 }
+
 .namecard-badge.pending {
-  background: #fce7f3;
-  color: #9d174d;
+  background: #f4abff33;
+  color: #ff078c;
 }
+
 .namecard-badge.paid {
-  background: #dcfce7;
-  color: #065f46;
+  background: #a2db9444;
+  color: #a2db94;
 }
 
 @media (max-width: 640px) {
