@@ -37,9 +37,11 @@ const right: React.CSSProperties = {
   justifyContent: "right",
   width: "15%",
   gap: 12,
+  marginRight: 16,
 };
 const brand: React.CSSProperties = {
   fontWeight: 700,
+  marginLeft: 16,
 };
 const nav: React.CSSProperties = {
   display: "flex",
