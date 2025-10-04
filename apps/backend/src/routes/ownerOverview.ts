@@ -1,6 +1,16 @@
 import { Router } from "express";
 import { prisma } from "../db/prisma";
-import { startOfMonth, getDate, addMonths, format, isSameDay } from "date-fns";
+import {
+  startOfMonth,
+  getDate,
+  addMonths,
+  format,
+  isSameDay,
+  startOfWeek,
+  addWeeks,
+  subWeeks,
+  differenceInCalendarWeeks,
+} from "date-fns";
 
 export const ownerOverview = Router();
 
@@ -87,8 +97,67 @@ ownerOverview.get("/api/owner/overview/account-health", async (_req, res) => {
   });
 });
 
-// GET /api/owner/overview/revenue-by-plan?months=12
+/**
+ * GET /api/owner/overview/revenue-by-plan
+ *
+ * Query:
+ * - bucket=week|month (default week)
+ * - weeks=number (default 52)
+ * - months=number (default 12)  // only used when bucket=month
+ *
+ * For PAID payments we count revenue at `paidAt`, otherwise at `dueDate`.
+ * Weekly buckets start on Monday (ISO-like).
+ * Returns dollars (not cents) to match your card’s formatter.
+ */
 ownerOverview.get("/api/owner/overview/revenue-by-plan", async (req, res) => {
+  const bucket = (req.query.bucket as "week" | "month") || "week";
+
+  if (bucket === "week") {
+    const weeks = Math.max(1, Math.min(104, Number(req.query.weeks ?? 52)));
+    const now = new Date();
+    const start = startOfWeek(subWeeks(now, weeks - 1), { weekStartsOn: 1 }); // Monday
+    const end = addWeeks(start, weeks); // exclusive
+
+    // Fetch only what we need
+    const pays = await prisma.payment.findMany({
+      where: {
+        OR: [
+          { status: "PAID", paidAt: { gte: start, lt: end } },
+          { NOT: { status: "PAID" }, dueDate: { gte: start, lt: end } },
+        ],
+      },
+      select: {
+        amountCents: true,
+        status: true,
+        paidAt: true,
+        dueDate: true,
+        paymentPlan: { select: { planType: true } },
+      },
+    });
+
+    const points = Array.from({ length: weeks }, (_, i) => {
+      const d = addWeeks(start, i);
+      const iso = startOfWeek(d, { weekStartsOn: 1 })
+        .toISOString()
+        .slice(0, 10);
+      return { date: iso, self: 0, kayya: 0 };
+    });
+
+    for (const p of pays) {
+      const eff = p.status === "PAID" && p.paidAt ? p.paidAt : p.dueDate;
+      if (!eff) continue;
+      if (eff < start || eff >= end) continue;
+      const idx = differenceInCalendarWeeks(eff, start, { weekStartsOn: 1 });
+      if (idx < 0 || idx >= weeks) continue;
+      const key = p.paymentPlan.planType === "KAYYA" ? "kayya" : "self";
+      points[idx][key] += Math.round(p.amountCents / 100); // dollars
+    }
+
+    const max = points.reduce((m, p) => Math.max(m, p.self, p.kayya), 0);
+    return res.json({ points, max });
+  }
+
+  // Fallback: monthly (keeps old behavior if you ever request ?bucket=month)
   const months = Math.max(1, Math.min(36, Number(req.query.months ?? 12)));
   const now = new Date();
   const start = startOfMonth(addMonths(now, -(months - 1)));
@@ -118,12 +187,17 @@ ownerOverview.get("/api/owner/overview/revenue-by-plan", async (req, res) => {
   }
 
   const max = points.reduce((m, p) => Math.max(m, p.self, p.kayya), 0);
-  res.json({ points, max });
+  res.json({
+    points: points.map((p) => ({
+      date: p.date.toISOString().slice(0, 10),
+      self: p.self,
+      kayya: p.kayya,
+    })),
+    max,
+  });
 });
 
 // GET /api/owner/overview/payouts-by-day?year=YYYY&month=1-12
-// - PAID payments counted on paidAt day
-// - all others counted on dueDate day
 ownerOverview.get("/api/owner/overview/payouts-by-day", async (req, res) => {
   const now = new Date();
   const year = Number(req.query.year ?? now.getFullYear());
