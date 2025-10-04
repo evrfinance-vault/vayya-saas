@@ -78,24 +78,40 @@ export default function AccountHealthCard({
   const segs = segments();
 
   const wrapRef = React.useRef<HTMLDivElement>(null);
+  const tipRef = React.useRef<HTMLDivElement>(null);
+
   const [hover, setHover] = React.useState<{
     x: number;
     y: number;
     text: string;
   } | null>(null);
 
-  function onDotEnter(e: React.MouseEvent<HTMLSpanElement>, label: string) {
+  function onDotEnter(
+    e: React.MouseEvent<SVGElement>,
+    label: string,
+  ) {
     if (!wrapRef.current) return;
     const wb = wrapRef.current.getBoundingClientRect();
-    const cb = (e.currentTarget as HTMLSpanElement).getBoundingClientRect();
+    const cb = (e.currentTarget as SVGElement).getBoundingClientRect();
     const cx = cb.left + cb.width / 2 - wb.left;
     const cy = cb.top + cb.height / 2 - wb.top;
     setHover({ x: cx, y: cy, text: label });
+  }
+  function onDotMove(e: React.MouseEvent<SVGElement>) {
+    if (!hover) return;
+    // keep x/y updated while moving along the same knob
+    if (!wrapRef.current) return;
+    const wb = wrapRef.current.getBoundingClientRect();
+    const cb = (e.currentTarget as SVGElement).getBoundingClientRect();
+    const cx = cb.left + cb.width / 2 - wb.left;
+    const cy = cb.top + cb.height / 2 - wb.top;
+    setHover((h) => (h ? { ...h, x: cx, y: cy } : h));
   }
   function onDotLeave() {
     setHover(null);
   }
 
+  // Edge-aware tooltip (clamp horizontally, flip below if not enough room above)
   function tipStyle(): React.CSSProperties {
     if (!hover || !wrapRef.current) return {};
     const wrap = wrapRef.current;
@@ -103,26 +119,33 @@ export default function AccountHealthCard({
     const h = wrap.clientHeight;
 
     const GAP = 10;
-    const EDGE = 80;
+    const EDGE = 8;
 
-    const isTopHalf = hover.y < h / 2;
+    // measure current tooltip box
+    const tw = tipRef.current?.offsetWidth ?? 180;
+    const th = tipRef.current?.offsetHeight ?? 34;
 
-    let tx = "-50%";
-    let ty = "-100%";
-    let top = hover.y - GAP;
+    // clamp x so tooltip never overflows
+    const minX = EDGE + tw / 2;
+    const maxX = w - EDGE - tw / 2;
+    let x = hover.x;
+    if (x < minX) x = minX;
+    if (x > maxX) x = maxX;
 
-    if (isTopHalf) {
-      ty = "0";
-      top = hover.y + GAP;
-    }
+    // decide above vs below using actual available space
+    const haveSpaceAbove = hover.y - th - GAP >= EDGE;
+    const haveSpaceBelow = h - (hover.y + GAP + th) >= EDGE;
+    const placeBelow = !haveSpaceAbove && haveSpaceBelow;
 
-    if (hover.x < EDGE) tx = "0";
-    else if (w - hover.x < EDGE) tx = "-100%";
+    const top = placeBelow ? hover.y + GAP : hover.y - GAP;
+    const transform = placeBelow
+      ? "translate(-50%, 0)"
+      : "translate(-50%, -100%)";
 
     return {
-      left: hover.x,
+      left: x,
       top,
-      transform: `translate(${tx},${ty})`,
+      transform,
       position: "absolute",
       pointerEvents: "none",
       zIndex: 10,
@@ -209,6 +232,7 @@ export default function AccountHealthCard({
                     onMouseEnter={
                       isHealth ? (e) => onDotEnter(e, label) : undefined
                     }
+                    onMouseMove={isHealth ? onDotMove : undefined}
                     onMouseLeave={isHealth ? onDotLeave : undefined}
                   >
                     <path
@@ -223,7 +247,6 @@ export default function AccountHealthCard({
                         r: 9999,
                       })}
                       aria-label={label}
-                      data-tip={label}
                       role="img"
                       tabIndex={-1}
                     />
@@ -241,7 +264,7 @@ export default function AccountHealthCard({
           </div>
 
           {hover && (
-            <div className="ah-tip" style={tipStyle()}>
+            <div ref={tipRef} className="ah-tip" style={tipStyle()}>
               {hover.text}
             </div>
           )}
