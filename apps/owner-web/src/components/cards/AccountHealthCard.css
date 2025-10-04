@@ -12,46 +12,21 @@
 }
 
 .ah-ring {
-  --c-excellent: #34d399; /* green-400 */
-  --c-good: #bfdbfe; /* blue-200 */
-  --c-fair: #fcd34d; /* amber-300 */
-  --c-poor: #fca5a5; /* red-300 */
+  --c-excellent: #9dda8f;
+  --c-good: #accdea;
+  --c-fair: #f2efa6;
+  --c-poor: #ebadaf;
 
   --size: clamp(220px, 60%, 320px);
-  --radius: calc(var(--size) * 0.42); /* distance from center to dots */
-  --dot: calc(var(--size) * 0.085); /* dot diameter */
+  --radius: calc(var(--size) * 0.42);
+
+  --dotL: calc(var(--size) * 0.09);
+  --dotS: calc(var(--size) * 0.055);
+
   position: relative;
   width: var(--size);
   height: var(--size);
   margin-inline: auto;
-}
-
-.ah-dot {
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: var(--dot);
-  height: var(--dot);
-  border-radius: 50%;
-  transform: translate(-50%, -50%) rotate(var(--angle)) translate(var(--radius))
-    rotate(calc(-1 * var(--angle)));
-  box-shadow:
-    0 0 0 1px rgba(15, 23, 42, 0.05) inset,
-    0 1px 2px rgba(15, 23, 42, 0.06);
-  opacity: 0.95;
-}
-
-.ah-dot.excellent {
-  background: var(--c-excellent);
-}
-.ah-dot.good {
-  background: var(--c-good);
-}
-.ah-dot.fair {
-  background: var(--c-fair);
-}
-.ah-dot.poor {
-  background: var(--c-poor);
 }
 
 .ah-center {
@@ -74,7 +49,6 @@
   color: #0f172a;
   line-height: 1.05;
 }
-
 .ah-sub {
   display: block;
   font-size: 14px;
@@ -84,6 +58,9 @@
 @media (max-width: 640px) {
   .ah-ring {
     --size: clamp(180px, 70vw, 240px);
+    --radius: calc(var(--size) * 0.4);
+    --dotL: calc(var(--size) * 0.086);
+    --dotS: calc(var(--size) * 0.052);
   }
 }
 
@@ -91,13 +68,36 @@
   position: absolute;
   pointer-events: none;
   z-index: 10;
-  background: rgba(255, 255, 255, 0.98);
-  border: 1px solid rgba(15, 23, 42, 0.08);
+  background-color: rgba(15, 23, 42, 0.9);
   border-radius: 10px;
   padding: 8px 10px;
   font-size: 12px;
-  color: #0f172a;
-  box-shadow: 0 8px 18px -10px rgba(0, 0, 0, 0.25);
-  transform: translate(-50%, -100%); /* above & centered by default */
+  color: #ffffff;
+  transform: translate(-50%, -100%);
   white-space: nowrap;
+}
+
+.ah-svg {
+  width: var(--size);
+  height: var(--size);
+  display: block;
+  overflow: visible;
+}
+
+.ah-knob {
+  fill: currentColor;
+  filter: drop-shadow(0 1px 2px rgba(15, 23, 42, 0.08));
+}
+
+.ah-knob.excellent {
+  color: var(--c-excellent);
+}
+.ah-knob.good {
+  color: var(--c-good);
+}
+.ah-knob.fair {
+  color: var(--c-fair);
+}
+.ah-knob.poor {
+  color: var(--c-poor);
 }

@@ -20,8 +20,7 @@ export default function AccountHealthCard({
     POOR: "poor",
   };
 
-  // build 28 segments, proportionally colored by health
-  const SEGMENTS = 28;
+  const SEGMENTS = 24;
 
   function segments() {
     if (!data || data.totalPlans === 0) {
@@ -37,11 +36,9 @@ export default function AccountHealthCard({
       POOR: Math.round((byHealth.POOR / total) * SEGMENTS),
     };
 
-    // adjust rounding so sum == SEGMENTS
     const keys = ["EXCELLENT", "GOOD", "FAIR", "POOR"] as const;
     let sum = keys.reduce((s, k) => s + targetCounts[k], 0);
     while (sum > SEGMENTS) {
-      // trim from smallest
       const k = keys.reduce(
         (m, k) => (targetCounts[k] < targetCounts[m] ? k : m),
         "POOR" as const,
@@ -50,7 +47,6 @@ export default function AccountHealthCard({
       sum--;
     }
     while (sum < SEGMENTS) {
-      // add to largest healthy first
       const k = ["EXCELLENT", "GOOD", "FAIR", "POOR"].reduce(
         (m, k) =>
           targetCounts[k as keyof typeof targetCounts] >
@@ -133,6 +129,48 @@ export default function AccountHealthCard({
     };
   }
 
+  type TrapezoidOpts = {
+    cx: number;
+    cy: number;
+    radius: number;
+    topWidth: number;
+    bottomWidth: number;
+    height: number;
+    r: number;
+  };
+
+  function roundedTrapezoidD(o: TrapezoidOpts): string {
+    const { cx, cy, radius, topWidth, bottomWidth, height } = o;
+    const r = Math.min(
+      o.r,
+      topWidth / 2 - 1,
+      bottomWidth / 2 - 1,
+      height / 2 - 1,
+    );
+
+    const x1 = cx - topWidth / 2;
+    const y1 = cy - radius;
+    const x2 = cx + topWidth / 2;
+    const y2 = y1;
+    const x3 = cx + bottomWidth / 2;
+    const y3 = y1 + height;
+    const x4 = cx - bottomWidth / 2;
+    const y4 = y3;
+
+    return [
+      `M ${x1 + r} ${y1}`,
+      `L ${x2 - r} ${y2}`,
+      `Q ${x2} ${y2} ${x2} ${y2 + r}`,
+      `L ${x3} ${y3 - r}`,
+      `Q ${x3} ${y3} ${x3 - r} ${y3}`,
+      `L ${x4 + r} ${y4}`,
+      `Q ${x4} ${y4} ${x4} ${y4 - r}`,
+      `L ${x1} ${y1 + r}`,
+      `Q ${x1} ${y1} ${x1 + r} ${y1}`,
+      `Z`,
+    ].join(" ");
+  }
+
   return (
     <Card
       title="Account Health"
@@ -148,33 +186,51 @@ export default function AccountHealthCard({
             className="ah-ring"
             style={{ ["--seg-count" as any]: segs.length }}
           >
-            {segs.map((h, i) => {
-              const angle = (360 / segs.length) * i;
+            <svg className="ah-svg" viewBox="0 0 1000 1000" aria-hidden="true">
+              {segs.map((h, i) => {
+                const angle = (360 / segs.length) * i;
 
-              const isHealth = (
-                ["EXCELLENT", "GOOD", "FAIR", "POOR"] as const
-              ).includes(h as any);
-              const hh = isHealth ? (h as Health) : null;
-              const n = hh ? (counts[hh] ?? 0) : 0;
-              const label = hh
-                ? n > 0
-                  ? `${n} account${n === 1 ? "" : "s"} in ${LABEL[hh]} health`
-                  : `No accounts in ${LABEL[hh]} health`
-                : "";
+                const isHealth = (
+                  ["EXCELLENT", "GOOD", "FAIR", "POOR"] as const
+                ).includes(h as any);
+                const hh = isHealth ? (h as Health) : null;
+                const n = hh ? (counts[hh] ?? 0) : 0;
+                const label = hh
+                  ? n > 0
+                    ? `${n} account${n === 1 ? "" : "s"} in ${LABEL[hh]} health`
+                    : `No accounts in ${LABEL[hh]} health`
+                  : "";
 
-              return (
-                <span
-                  key={i}
-                  className={`ah-dot ${String(h).toLowerCase()}`}
-                  style={{ ["--angle" as any]: `${angle}deg` }}
-                  onMouseEnter={
-                    isHealth ? (e) => onDotEnter(e, label) : undefined
-                  }
-                  onMouseLeave={isHealth ? onDotLeave : undefined}
-                  aria-label={label || undefined}
-                />
-              );
-            })}
+                return (
+                  <g
+                    key={i}
+                    transform={`rotate(${angle} 500 500)`}
+                    className="ah-knob-wrap"
+                    onMouseEnter={
+                      isHealth ? (e) => onDotEnter(e, label) : undefined
+                    }
+                    onMouseLeave={isHealth ? onDotLeave : undefined}
+                  >
+                    <path
+                      className={`ah-knob ${String(h).toLowerCase()}`}
+                      d={roundedTrapezoidD({
+                        cx: 500,
+                        cy: 500,
+                        radius: 420,
+                        topWidth: 90,
+                        bottomWidth: 75,
+                        height: 120,
+                        r: 9999,
+                      })}
+                      aria-label={label}
+                      data-tip={label}
+                      role="img"
+                      tabIndex={-1}
+                    />
+                  </g>
+                );
+              })}
+            </svg>
 
             <div className="ah-center">
               <div className="ah-total">
@@ -198,5 +254,5 @@ export default function AccountHealthCard({
 function fmtUSDk(cents: number) {
   const dollars = Math.round(cents / 100);
   const k = dollars / 1000;
-  return `$${k.toFixed(1)}K`;
+  return `$${k.toFixed(0)}k`;
 }
