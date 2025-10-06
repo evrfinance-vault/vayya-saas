@@ -130,7 +130,7 @@ async function main() {
         startDate,
         billingDay,
         planType: Math.random() < 0.5 ? "SELF" : "KAYYA",
-        health: pick(["EXCELLENT", "GOOD", "FAIR", "POOR"] as const),
+        health: pick(["EXCELLENT", "EXCELLENT", "EXCELLENT", "GOOD", "GOOD", "FAIR", "POOR"] as const),
         onHold: Math.random() < 0.12,
       });
 
