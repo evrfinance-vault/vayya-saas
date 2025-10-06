@@ -4,8 +4,7 @@ import "./PayoutCalendarCard.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faCalendarDays,
-  faChevronLeft,
-  faChevronRight,
+  faCaretDown,
   faCircle,
   faStar,
 } from "@fortawesome/free-solid-svg-icons";
@@ -21,16 +20,33 @@ export default function PayoutCalendarCard({
 }: Props) {
   const [view, setView] = React.useState(() => {
     const d = new Date();
-    return { y: d.getFullYear(), m: d.getMonth() + 1 }; // 1..12
+    return { y: d.getFullYear(), m: d.getMonth() + 1 };
   });
+
+  const [mode, setMode] = React.useState<"day" | "week" | "month">("month");
+
+  const monthOptions = React.useMemo(() => {
+    const start = new Date();
+    start.setDate(1);
+    const opts: { y: number; m: number; label: string; key: string }[] = [];
+    for (let i = 0; i < 12; i++) {
+      const d = new Date(start.getFullYear(), start.getMonth() + i, 1);
+      const y = d.getFullYear();
+      const m = d.getMonth() + 1;
+      opts.push({
+        y,
+        m,
+        label: d.toLocaleString("en-US", { month: "short" }),
+        key: `${y}-${m}`,
+      });
+    }
+    return opts;
+  }, []);
+
   const { data, loading } = useOwnerPayoutsByDay(view.y, view.m);
 
-  const monthName = new Date(view.y, view.m - 1).toLocaleString("en-US", {
-    month: "short",
-    year: "numeric",
-  });
   const daysInMonth = new Date(view.y, view.m, 0).getDate();
-  const firstDow = new Date(view.y, view.m - 1, 1).getDay(); // 0=Sun
+  const firstDow = new Date(view.y, view.m - 1, 1).getDay();
 
   const cells: Array<{ day: number | null }> = [];
   for (let i = 0; i < firstDow; i++) cells.push({ day: null });
@@ -45,34 +61,57 @@ export default function PayoutCalendarCard({
       minimumFractionDigits: 2,
     }).format(cents / 100);
 
-  function prevMonth() {
-    const d = new Date(view.y, view.m - 2, 1);
-    setView({ y: d.getFullYear(), m: d.getMonth() + 1 });
-  }
-  function nextMonth() {
-    const d = new Date(view.y, view.m, 1);
-    setView({ y: d.getFullYear(), m: d.getMonth() + 1 });
-  }
-
   const header = (
     <div className="pc-head">
-      <div className="pc-month">{monthName}</div>
-      <button
-        type="button"
-        className="pc-nav"
-        onClick={prevMonth}
-        aria-label="Previous month"
-      >
-        <FontAwesomeIcon icon={faChevronLeft} />
-      </button>
-      <button
-        type="button"
-        className="pc-nav"
-        onClick={nextMonth}
-        aria-label="Next month"
-      >
-        <FontAwesomeIcon icon={faChevronRight} />
-      </button>
+      <div className="pc-select-wrap">
+        <select
+          className="pc-month-select"
+          value={`${view.y}-${view.m}`}
+          aria-label="Select month"
+          onChange={(e) => {
+            const [y, m] = e.target.value.split("-").map(Number);
+            setView({ y, m });
+          }}
+        >
+          {monthOptions.map((o) => (
+            <option key={o.key} value={o.key}>
+              {o.label}
+            </option>
+          ))}
+        </select>
+        <FontAwesomeIcon
+          icon={faCaretDown}
+          className="pc-caret"
+          aria-hidden="true"
+        />
+      </div>
+
+      <div className="pc-seg" role="group" aria-label="Calendar view">
+        <button
+          type="button"
+          className={mode === "day" ? "on" : ""}
+          aria-pressed={mode === "day"}
+          onClick={() => setMode("day")}
+        >
+          Day
+        </button>
+        <button
+          type="button"
+          className={mode === "week" ? "on" : ""}
+          aria-pressed={mode === "week"}
+          onClick={() => setMode("week")}
+        >
+          Week
+        </button>
+        <button
+          type="button"
+          className={mode === "month" ? "on" : ""}
+          aria-pressed={mode === "month"}
+          onClick={() => setMode("month")}
+        >
+          Month
+        </button>
+      </div>
     </div>
   );
 
@@ -110,12 +149,8 @@ export default function PayoutCalendarCard({
     let tx = "0";
     let ty = "-100%";
 
-    if (wrapW - hover.x < EST_W) {
-      tx = "-100%";
-    }
-    if (hover.y < EDGE_Y) {
-      ty = "0";
-    }
+    if (wrapW - hover.x < EST_W) tx = "-100%";
+    if (hover.y < EDGE_Y) ty = "0";
 
     return {
       left: hover.x,

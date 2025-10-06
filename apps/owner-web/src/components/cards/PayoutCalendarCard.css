@@ -5,15 +5,11 @@
   height: 100%;
 }
 
-.pc-head {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-}
 .pc-month {
   font-weight: 600;
-  color: #0f172a;
+  color: var(--dark-color);
 }
+
 .pc-nav {
   width: 28px;
   height: 28px;
@@ -24,6 +20,7 @@
   place-items: center;
   cursor: pointer;
 }
+
 .pc-nav:hover {
   background: #f8fafc;
 }
@@ -36,6 +33,7 @@
   color: rgba(15, 23, 42, 0.55);
   font-size: 12px;
 }
+
 .pc-dow-cell {
   text-align: center;
 }
@@ -64,10 +62,12 @@
   font-weight: 600;
   cursor: default;
 }
+
 .pc-dot.none {
   background: #eef2f6;
   color: #0f172a;
 }
+
 .pc-dot.has {
   background: #9dda8f;
   color: #fff;
@@ -98,4 +98,84 @@
 
 .ah-tip {
   transform: translate(-50%, -100%);
+}
+
+.pc-head {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.pc-seg {
+  display: inline-flex;
+  border: 0;
+  border-radius: 8px;
+  background: #eef2f6;
+  overflow: hidden;
+  padding: 3px 4px;
+}
+
+.pc-seg > button {
+  appearance: none;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  padding: 6px 10px;
+  font-size: 12px;
+  color: var(--dark-color);
+  cursor: pointer;
+}
+
+.pc-seg > button:first-of-type {
+  margin-right: 2px;
+}
+
+.pc-seg > button:last-of-type {
+  margin-left: 2px;
+}
+
+.pc-seg > button:hover {
+  background: #f8fafc;
+}
+
+.pc-seg > button.on {
+  background: #ffffff;
+  color: var(--dark-color);
+}
+
+.pc-select-wrap {
+  position: relative;
+  display: inline-block;
+}
+
+.pc-month-select {
+  padding: 9px 28px 9px 12px;
+  border-radius: 8px;
+  border: 0;
+  background: #eef2f6;
+  font-size: 12px;
+  color: var(--dark-color);
+  cursor: pointer;
+
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+}
+
+.pc-month-select:focus {
+  outline: none;
+}
+
+.pc-caret {
+  position: absolute;
+  right: 9px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 12px;
+  color: var(--dark-color);
+  pointer-events: none;
+}
+
+.pc-month-select:focus + .pc-caret {
+  color: rgba(15, 23, 42, 0.8);
 }
