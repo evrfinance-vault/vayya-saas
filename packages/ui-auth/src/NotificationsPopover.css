@@ -4,7 +4,7 @@
   --vu-pop-border: #e5e7eb;
   --vu-pop-shadow:
     0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-  --vu-note-hover: #f8fafc;
+  --vu-note-hover: #f1f5f9;
   --vu-unread-dot: #1013f5;
   --vu-link: var(--alt-theme-color);
 }
