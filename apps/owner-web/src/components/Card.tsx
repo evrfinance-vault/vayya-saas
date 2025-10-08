@@ -28,7 +28,7 @@ export default function Card({
   return (
     <section className={`overview-card card-w-${width} card-h-${height}`}>
       <header className="card-header">
-        <div className="card-title">
+        <div className={`card-title card-align-${align}`}>
           {icon && (
             <span className="card-icon">
               <FontAwesomeIcon icon={icon} size="1x" />
