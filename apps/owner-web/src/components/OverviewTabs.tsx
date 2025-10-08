@@ -33,6 +33,41 @@ export default function OverviewTabs({
 }: Props) {
   const listRef = React.useRef<HTMLDivElement>(null);
 
+  const [openFor, setOpenFor] = React.useState<TabKey | null>(null);
+
+  const toggleMenu = React.useCallback(
+    (key: TabKey) => {
+      setOpenFor((cur) => (cur === key ? null : key));
+      onOptions?.(key);
+    },
+    [onOptions],
+  );
+
+  React.useEffect(() => {
+    const onDocClick = (e: MouseEvent) => {
+      const root = listRef.current;
+      if (!root) return;
+      const target = e.target as Node;
+
+      const menu = root.querySelector(".overview-tab-menu");
+      const btn = root.querySelector(".overview-tab-options");
+      const clickedInside =
+        (!!menu && menu.contains(target)) || (!!btn && btn.contains(target));
+
+      if (!clickedInside) setOpenFor(null);
+    };
+    document.addEventListener("click", onDocClick);
+    return () => document.removeEventListener("click", onDocClick);
+  }, []);
+
+  React.useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setOpenFor(null);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, []);
+
   return (
     <div className="wrapper">
       <div
@@ -43,6 +78,9 @@ export default function OverviewTabs({
       >
         {tabs.map((tab) => {
           const selected = tab.key === value;
+          const showOptions = selected && tab.key === "total-revenue";
+          const menuOpen = openFor === tab.key;
+
           return (
             <div
               key={tab.key}
@@ -66,14 +104,16 @@ export default function OverviewTabs({
                 )}
               </div>
 
-              {selected && (
+              {showOptions && (
                 <button
                   type="button"
                   className="overview-tab-options"
                   aria-label={`${tab.label} options`}
+                  aria-haspopup="menu"
+                  aria-expanded={menuOpen}
                   onClick={(event) => {
                     event.stopPropagation();
-                    onOptions?.(tab.key);
+                    toggleMenu(tab.key);
                   }}
                 >
                   <FontAwesomeIcon icon={faEllipsisVertical} size="lg" />
@@ -95,6 +135,24 @@ export default function OverviewTabs({
                     aria-hidden="true"
                   />
                 </>
+              )}
+
+              {menuOpen && (
+                <div
+                  role="menu"
+                  className="overview-tab-menu"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <button role="menuitem" className="overview-tab-menu-item">
+                    Export CSV
+                  </button>
+                  <button role="menuitem" className="overview-tab-menu-item">
+                    Export PDF
+                  </button>
+                  <button role="menuitem" className="overview-tab-menu-item">
+                    Print
+                  </button>
+                </div>
               )}
             </div>
           );

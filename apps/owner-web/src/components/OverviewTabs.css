@@ -3,14 +3,15 @@
   gap: 8px;
   align-items: center;
   margin: 60px 50px -39px;
-  isolation: isolate;
-  z-index: 3;
+  position: relative;
+  overflow: visible;
 }
 
 .overview-tab {
   --tab-bg-selected: #f8fcff;
 
   position: relative;
+  z-index: 1;
   border: 0;
   border-top-left-radius: 20px;
   border-top-right-radius: 20px;
@@ -26,13 +27,13 @@
     background-color 140ms ease,
     color 140ms ease,
     opacity 140ms ease,
-    padding 140ms ease;
+    padding 140ms ease,
+    z-index 140ms ease;
   will-change: transform;
   backdrop-filter: saturate(140%) blur(4px);
   transform: translateZ(0);
   backface-visibility: hidden;
-  z-index: 1;
-  opacity: 0.8;
+  opacity: 0.9;
 }
 
 .overview-tab .overview-tab-options {
@@ -42,7 +43,7 @@
 .overview-tab[aria-selected="true"] {
   background: var(--tab-bg-selected);
   transform: translateY(-36px);
-  z-index: 5;
+  z-index: 3;
   opacity: 1;
 
   --cap-w: 64px;
@@ -87,6 +88,7 @@
 
 .overview-tab[aria-selected="true"] .overview-tab-options {
   display: inline-flex;
+  z-index: 4;
   animation: ovPopIn 140ms ease-out both;
 }
 
@@ -176,12 +178,7 @@
 }
 
 .overview-tab-options:hover {
-  background: rgba(15, 23, 42, 0.06);
-}
-
-.overview-tab-options:focus-visible {
-  outline: 3px solid rgba(59, 130, 246, 0.45);
-  outline-offset: 2px;
+  background-color: #eef2f6;
 }
 
 .overview-tab-background {
@@ -192,6 +189,8 @@
   background-color: #f8fcff;
   border-top-left-radius: 40px;
   border-top-right-radius: 40px;
+  z-index: 2;
+  pointer-events: none;
 }
 
 .tab-cap {
@@ -216,4 +215,34 @@
 .tab-cap-right {
   right: 0;
   transform: translateX(var(--cap-w));
+}
+
+.overview-tab-menu {
+  position: absolute;
+  top: 46px;
+  right: calc(-160px + 28px - 3px);
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  max-width: 160px;
+  padding: 8px;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  z-index: 100;
+  animation: ovPopIn 140ms ease-out both;
+}
+
+.overview-tab-menu-item {
+  width: 100%;
+  text-align: left;
+  background: transparent;
+  border: 0;
+  padding: 8px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 13px;
+  color: var(--dark-color);
+}
+
+.overview-tab-menu-item:hover {
+  background: #f1f5f9;
 }
