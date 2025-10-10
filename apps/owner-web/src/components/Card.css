@@ -116,7 +116,6 @@
 }
 
 .card-icon {
-  background-color: var(--alt-theme-color);
   color: var(--light-color);
   padding: 7px 5px;
   border-radius: 10px;

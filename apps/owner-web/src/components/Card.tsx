@@ -9,6 +9,7 @@ export type TitleAlignment = "left" | "center";
 type Props = {
   title: string;
   icon?: IconProp;
+  iconColor?: string;
   header?: React.ReactNode;
   align?: TitleAlignment;
   width?: CardSize;
@@ -19,6 +20,7 @@ type Props = {
 export default function Card({
   title,
   icon,
+  iconColor = "#9dda8f",
   header,
   align = "left",
   width = "1x",
@@ -30,7 +32,7 @@ export default function Card({
       <header className="card-header">
         <div className={`card-title card-align-${align}`}>
           {icon && (
-            <span className="card-icon">
+            <span className="card-icon" style={{ backgroundColor: iconColor }}>
               <FontAwesomeIcon icon={icon} size="1x" />
             </span>
           )}
