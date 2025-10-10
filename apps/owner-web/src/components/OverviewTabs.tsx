@@ -1,7 +1,7 @@
 import React from "react";
 import "./OverviewTabs.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { IconProp } from "@fortawesome/fontawesome-svg-core";
+import type { IconProp } from "@fortawesome/fontawesome-svg-core";
 import { faEllipsisVertical } from "@fortawesome/free-solid-svg-icons";
 
 export type TabKey =
