@@ -33,7 +33,7 @@ const TABS: TabDef[] = [
     label: "Active Payment Plans",
     badge: "0",
   },
-  { key: "kayya-board", icon: faGrip, label: "Kayya Board", badge: "~" },
+  { key: "kayya-board", icon: faGrip, label: "Kayya Board", badge: "" },
   {
     key: "late-payments",
     icon: faSackXmark,

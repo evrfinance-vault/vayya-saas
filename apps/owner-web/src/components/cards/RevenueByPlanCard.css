@@ -11,7 +11,6 @@
 }
 
 .rev-grid {
-  stroke: rgba(15, 23, 42, 0.08);
   stroke-width: 0;
   shape-rendering: crispEdges;
 }
@@ -19,7 +18,7 @@
 .rev-ytick,
 .rev-xtick {
   font-size: 12px;
-  fill: rgba(15, 23, 42, 0.95);
+  fill: var(--dark-color);
 }
 
 .rev-ytick {
@@ -42,24 +41,23 @@
 }
 
 .rev-line.self {
-  stroke: #9dda8f;
+  stroke: var(--alt-theme-color);
 }
 .rev-line.kayya {
-  stroke: #accdea;
+  stroke: var(--theme-color);
 }
 
 .rev-hover-line {
-  stroke: rgba(15, 23, 42, 0.25);
+  stroke: rgb(var(--dark-color-rgb) / 50%);
   stroke-dasharray: 4 4;
   vector-effect: non-scaling-stroke;
 }
 
 .rev-dot.self,
 .rev-dot.kayya {
-  stroke: #434952;
+  stroke: var(--dark-color);
   stroke-width: 2;
-  fill: #ffffff;
-  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.15));
+  fill: var(--light-color);
   pointer-events: none;
 }
 
@@ -73,7 +71,7 @@
   align-items: center;
   gap: 4px;
   font-size: 12px;
-  color: rgba(15, 23, 42, 0.7);
+  color: var(--dark-color);
 }
 
 .rev-key {
@@ -87,21 +85,23 @@
   margin-left: 12px;
 }
 .rev-key.self {
-  background: #9dda8f;
+  background: var(--alt-theme-color);
 }
 .rev-key.kayya {
-  background: #accdea;
+  background: var(--theme-color);
 }
 
 .rev-tooltip {
   position: absolute;
   transform: translateX(-50%);
-  background-color: rgba(15, 23, 42, 0.9);
+  background-color: var(--dark-color);
   border-radius: 999px;
   padding: 8px 10px;
-  box-shadow: 0 8px 18px -10px rgba(0, 0, 0, 0.25);
+  box-shadow:
+    0 10px 15px -3px rgb(var(--dark-color-rgb) / 10%),
+    0 4px 6px -2px rgb(var(--dark-color-rgb) / 5%);
   font-size: 12px;
-  color: #ffffff;
+  color: var(--light-color);
   pointer-events: none;
   z-index: 10;
   will-change: transform, left;
@@ -132,7 +132,7 @@
 }
 
 .rev-hover-band {
-  fill: rgba(220, 220, 220, 0.2);
+  fill: rgb(var(--background-color-rgb) / 45%);
 }
 
 .rev-area {

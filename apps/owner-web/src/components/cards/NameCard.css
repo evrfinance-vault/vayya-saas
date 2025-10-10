@@ -14,13 +14,9 @@
 }
 
 .namecard-row {
-  --amount-and-badge-width: 50px;
-
   box-sizing: border-box;
   display: grid;
-  grid-template-columns: 36px minmax(0, 1fr) fit-content(
-      var(--amount-and-badge-width)
-    );
+  grid-template-columns: 36px minmax(0, 1fr) fit-content(50px);
   align-items: center;
   gap: 8px;
   padding: 10px 4px;
@@ -28,7 +24,7 @@
 }
 
 .namecard-row + .namecard-row {
-  border-top: 1px solid #e9eef5;
+  border-top: 1px solid var(--border-color);
   margin-top: 4px;
   padding-top: 14px;
 }
@@ -42,8 +38,8 @@
   font-size: 14px;
   font-weight: 700;
   letter-spacing: 0.2px;
-  background: #eef2f7;
-  color: #111827;
+  background: var(--background-color);
+  color: var(--dark-color);
 }
 
 .namecard-main {
@@ -53,7 +49,7 @@
 .namecard-title {
   font-size: 15px;
   font-weight: 500;
-  color: #0f172a;
+  color: var(--dark-color);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -62,20 +58,19 @@
 .namecard-desc {
   font-size: 11px;
   margin-top: 3px;
-  color: rgba(15, 23, 42, 0.55);
+  color: rgb(var(--dark-color-rgb) / 75%);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
 .namecard-right {
-  --badge-padding: 8px;
   display: flex;
   flex-direction: column;
   align-items: flex-end;
   gap: 4px;
-  padding-right: var(--badge-padding);
-  width: var(--amount-and-badge-width);
+  padding-right: 8px;
+  width: 50px;
 }
 
 .namecard-amount {
@@ -85,42 +80,50 @@
   text-align: right;
   font-size: 14px;
   font-weight: 600;
-  color: #0f172a;
+  color: var(--dark-color);
   letter-spacing: 0.1px;
 }
 
 .namecard-badge {
   justify-self: end;
   white-space: nowrap;
-  margin-right: calc(-1 * var(--badge-padding));
-  padding: 3px var(--badge-padding);
+  margin-right: calc(-1 * 8px);
+  padding: 3px 8px;
   border-radius: 999px;
   font-size: 10px;
   font-weight: 600;
-  color: #0f172a;
-  background: rgba(15, 23, 42, 0.06);
+  color: var(--dark-color);
+  background: rgb(var(--dark-color-rgb) / 10%);
   width: 100%;
   text-align: center;
 }
 
 .namecard-badge.hold {
-  background: #b3c7ff33;
-  color: #9aaee6;
+  --hold-badge-color-rgb: 154 90 238;
+
+  background: rgb(var(--hold-badge-color-rgb) / 10%);
+  color: rgb(var(--hold-badge-color-rgb));
 }
 
 .namecard-badge.due-today {
-  background: #fee2e2;
-  color: #991b1b;
+  --due-today-badge-color-rgb: 255 43 43;
+
+  background: rgb(var(--due-today-badge-color-rgb) / 10%);
+  color: rgb(var(--due-today-badge-color-rgb));
 }
 
 .namecard-badge.pending {
-  background: #f4abff33;
-  color: #ff078c;
+  --pending-badge-color-rgb: 255 7 140;
+
+  background: rgb(var(--pending-badge-color-rgb) / 10%);
+  color: rgb(var(--pending-badge-color-rgb));
 }
 
 .namecard-badge.paid {
-  background: #a2db9444;
-  color: #a2db94;
+  --paid-badge-color-rgb: 111 168 97;
+
+  background: rgb(var(--paid-badge-color-rgb) / 10%);
+  color: rgb(var(--paid-badge-color-rgb));
 }
 
 @media (max-width: 640px) {

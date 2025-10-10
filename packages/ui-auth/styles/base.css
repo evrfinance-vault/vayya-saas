@@ -3,10 +3,27 @@
     "Urbanist", system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue",
     Arial, "Noto Sans", "Liberation Sans", sans-serif;
 
-  --theme-color: #accdea;
-  --alt-theme-color: #9dda8f;
-  --light-color: #ffffff;
-  --dark-color: #434952;
+  /* app color palette */
+  --alt-theme-color-rgb: 157 218 143; /* soft green */
+  --background-color-rgb: 238 242 246; /* soft(er) grey */
+  --border-color-rgb: 229 231 235; /* soft grey */
+  --dark-color-rgb: 067 073 082; /* black */
+  --light-color-rgb: 255 255 255; /* white */
+  --menu-item-color-rgb: 241 245 249; /* soft(est) grey */
+  --theme-color-rgb: 172 205 234; /* soft blue */
+  --unread-color-rgb: 016 019 245; /* deep blue */
+
+  --alt-theme-color: rgb(var(--alt-theme-color-rgb));
+  --background-color: rgb(var(--background-color-rgb));
+  --border-color: rgb(var(--border-color-rgb));
+  --dark-color: rgb(var(--dark-color-rgb));
+  --light-color: rgb(var(--light-color-rgb));
+  --menu-item-color: rgb(var(--menu-item-color-rgb));
+  --theme-color: rgb(var(--theme-color-rgb));
+  --unread-color: rgb(var(--unread-color-rgb));
+
+  /* how to use with partial opacity */
+  /* --translucent-theme-color: rgb(var(--theme-color-rgb) / 75%); */
 }
 
 html,
@@ -34,6 +51,36 @@ body {
   background-position: top center;
   background-size: auto;
   background-size: clamp(25vw, 45vw, 65vw);
+}
+
+.preheading {
+  display: flex;
+  align-items: center;
+  font-weight: 500;
+  margin-bottom: 0;
+  gap: 4px;
+}
+
+@keyframes pulse {
+  0%,
+  100% {
+    opacity: 0.6;
+    transform: scale(1);
+  }
+
+  50% {
+    opacity: 1;
+    transform: scale(1.05);
+  }
+}
+
+.preheading .fa-circle[title="Checking…"] {
+  animation: pulse 1.2s ease-in-out infinite;
+}
+
+.heading {
+  font-weight: 300;
+  margin-top: 0;
 }
 
 /* <weight>: Use a value from 100 to 900 */

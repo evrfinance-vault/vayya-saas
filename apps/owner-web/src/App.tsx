@@ -7,8 +7,6 @@ import {
   useLocation,
 } from "react-router-dom";
 import { Header, useDocumentTitle } from "@packages/ui-auth";
-import "./styles/global.css";
-
 import OverviewPage from "./pages/OverviewPage";
 import PaymentPlansPage from "./pages/PaymentPlansPage";
 import CustomersPage from "./pages/CustomersPage";

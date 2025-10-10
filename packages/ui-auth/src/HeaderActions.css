@@ -1,15 +1,3 @@
-/* ======= Tweak these to match your header ======= */
-:root {
-  --vu-icon-btn-bg: rgba(255, 255, 255, 0.25);
-  --vu-icon-btn-border: rgba(255, 255, 255, 0.55);
-  --vu-icon-btn-hover-bg: rgba(255, 255, 255, 0.75);
-  --vu-icon-btn-icon: var(--light-color);
-  --vu-icon-btn-hover-icon: var(--dark-color);
-
-  --vu-badge-bg: var(--alt-theme-color);
-}
-/* ================================================ */
-
 .vu-icon-group {
   display: flex;
   gap: 12px;
@@ -26,8 +14,9 @@
   width: 52px;
   height: 52px;
   border-radius: 12px;
-  border: 0 solid var(--vu-icon-btn-border);
-  background: var(--vu-icon-btn-bg);
+  border: 0 solid rgb(var(--light-color-rgb) / 55%);
+  background: rgb(var(--light-color-rgb) / 25%);
+  color: var(--light-color);
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -36,18 +25,11 @@
     background 120ms ease,
     border-color 120ms ease,
     transform 80ms ease;
-  color: var(--vu-icon-btn-icon);
 }
 
 .vu-icon-btn:hover {
-  background: var(--vu-icon-btn-hover-bg);
-  color: var(--vu-icon-btn-hover-icon);
-}
-
-.vu-icon-btn:focus-visible {
-  outline: 2px solid #93c5fd;
-  outline-offset: 2px;
-  border-color: #93c5fd;
+  background: rgb(var(--light-color-rgb) / 75%);
+  color: var(--dark-color);
 }
 
 .vu-badge {
@@ -58,7 +40,7 @@
   height: 20px;
   padding: 0;
   border-radius: 999px;
-  background: #1013f5;
+  background: var(--unread-color);
   color: var(--light-color);
   font-size: 12px;
   font-weight: 800;

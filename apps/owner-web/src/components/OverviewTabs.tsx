@@ -99,9 +99,7 @@ export default function OverviewTabs({
                   </span>
                 )}
                 <span className="overview-tab-label">{tab.label}</span>
-                {tab.badge && (
-                  <span className="overview-tab-badge">{tab.badge}</span>
-                )}
+                <span className="overview-tab-badge">{tab.badge}</span>
               </div>
 
               {showOptions && (

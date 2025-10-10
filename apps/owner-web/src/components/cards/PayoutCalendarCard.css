@@ -10,27 +10,12 @@
   color: var(--dark-color);
 }
 
-.pc-nav {
-  width: 28px;
-  height: 28px;
-  border-radius: 8px;
-  border: 1px solid rgba(15, 23, 42, 0.08);
-  background: #fff;
-  display: grid;
-  place-items: center;
-  cursor: pointer;
-}
-
-.pc-nav:hover {
-  background: #f8fafc;
-}
-
 .pc-dow {
   display: grid;
   grid-template-columns: repeat(7, 1fr);
   gap: 16px;
   padding: 0 4px;
-  color: rgba(15, 23, 42, 0.55);
+  color: rgb(var(--dark-color-rgb) / 65%);
   font-size: 12px;
 }
 
@@ -64,13 +49,13 @@
 }
 
 .pc-dot.none {
-  background: #eef2f6;
-  color: #0f172a;
+  background: var(--background-color);
+  color: var(--dark-color);
 }
 
 .pc-dot.has {
-  background: #9dda8f;
-  color: #fff;
+  background: var(--alt-theme-color);
+  color: var(--light-color);
 }
 
 .pc-wrap {
@@ -86,12 +71,14 @@
   position: absolute;
   pointer-events: none;
   z-index: 10;
-  background-color: rgba(15, 23, 42, 0.9);
+  background-color: var(--dark-color);
   border-radius: 999px;
   padding: 6px 10px 6px 8px;
   font-size: 12px;
-  color: #ffffff;
-  box-shadow: 0 8px 18px -10px rgba(0, 0, 0, 0.25);
+  color: var(--light-color);
+  box-shadow:
+    0 10px 15px -3px rgb(var(--dark-color-rgb) / 10%),
+    0 4px 6px -2px rgb(var(--dark-color-rgb) / 5%);
   transform: translate(0, -100%);
   white-space: nowrap;
 }
@@ -110,7 +97,7 @@
   display: inline-flex;
   border: 0;
   border-radius: 8px;
-  background: #eef2f6;
+  background: var(--background-color);
   overflow: hidden;
   padding: 3px 4px;
 }
@@ -135,11 +122,11 @@
 }
 
 .pc-seg > button:hover {
-  background: #f8fafc;
+  background: rgb(var(--light-color-rgb) / 75%);
 }
 
 .pc-seg > button.on {
-  background: #ffffff;
+  background: var(--light-color);
   color: var(--dark-color);
 }
 
@@ -152,7 +139,7 @@
   padding: 9px 28px 9px 12px;
   border-radius: 8px;
   border: 0;
-  background: #eef2f6;
+  background: var(--background-color);
   font-size: 12px;
   color: var(--dark-color);
   cursor: pointer;
@@ -177,5 +164,5 @@
 }
 
 .pc-month-select:focus + .pc-caret {
-  color: rgba(15, 23, 42, 0.8);
+  color: var(--dark-color);
 }

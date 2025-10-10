@@ -2,7 +2,9 @@
 }
 
 .overview-panel {
+  position: relative;
   margin: 40px auto 0;
+  z-index: 2;
 }
 
 .overview-tab-change {
@@ -51,7 +53,7 @@
   line-height: 1.5;
   font-weight: 500;
   font-size: clamp(14px, 1.05vw, 16px);
-  color: rgba(255, 255, 255, 0.88);
+  color: var(--light-color);
   margin: 0;
 }
 

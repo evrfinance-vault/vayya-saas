@@ -37,7 +37,7 @@
   height: 44px;
   border-radius: 999px;
   border: 0;
-  background: #eef2f6;
+  background: var(--background-color);
   padding: 0 52px 0 16px;
   font-size: 14px;
   outline: none;
@@ -45,7 +45,7 @@
 }
 
 .ai-input > input::placeholder {
-  color: rgba(15, 23, 42, 0.55);
+  color: rgb(var(--dark-color-rgb) / 75%);
 }
 
 .ai-send {
@@ -60,7 +60,7 @@
   display: grid;
   place-items: center;
   cursor: pointer;
-  background: #9dda8f;
+  background: var(--alt-theme-color);
   color: white;
 }
 
