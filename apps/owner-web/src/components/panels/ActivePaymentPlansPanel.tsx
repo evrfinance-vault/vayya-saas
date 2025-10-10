@@ -8,3 +8,7 @@ export default function ActivePaymentPlansPanel() {
     </div>
   );
 }
+
+// The “active plans” overview tab will have customer search, and owners
+// will be able to change the payment due dates, and optionally put plans on hold
+// for up to two months.
