@@ -28,28 +28,50 @@
   box-sizing: border-box;
 }
 
+.card-w-025x {
+  --card-cols: 1;
+}
+
+.card-w-05x {
+  --card-cols: 2;
+}
+
 .card-w-1x {
   --card-cols: 3;
 }
+
 .card-w-2x {
   --card-cols: 6;
 }
+
 .card-w-3x {
   --card-cols: 9;
 }
+
 .card-w-4x {
   --card-cols: 12;
+}
+
+.card-h-025x {
+  --card-rows: 3;
+}
+
+.card-h-05x {
+  --card-rows: 5;
 }
 
 .card-h-1x {
   --card-rows: 10;
 }
+
 .card-h-2x {
   --card-rows: 15;
 }
+
 .card-h-3x {
   --card-rows: 25;
 }
+
 .card-h-4x {
   --card-rows: 25;
 }

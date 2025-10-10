@@ -3,7 +3,7 @@ import "./Card.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { IconProp } from "@fortawesome/fontawesome-svg-core";
 
-export type CardSize = "1x" | "2x" | "3x" | "4x";
+export type CardSize = "025x" | "05x" | "1x" | "2x" | "3x" | "4x";
 export type TitleAlignment = "left" | "center";
 
 type Props = {
