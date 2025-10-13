@@ -11,6 +11,12 @@ import {
 import InfoCard from "../cards/InfoCard";
 import NoticeCard from "../cards/NoticeCard";
 import SpreadsheetCard from "../cards/SpreadsheetCard";
+import {
+  useTotalRevenueSummary,
+  useTotalRevenueMonthly,
+  fmtUSD,
+  type PlanKey,
+} from "../../api/useTotalRevenue";
 
 type Row = {
   month: string;
@@ -22,38 +28,35 @@ type Row = {
   platformFees: string;
 };
 
-const rows: Row[] = [
-  {
-    month: "October 2025",
-    interest: "$45,280.50",
-    fees: "$3,200.00",
-    total: "$48,480.50",
-    volume: "$82,000.00",
-    repayRate: "94.5%",
-    platformFees: "$2,424.03",
-  },
-  {
-    month: "September 2025",
-    interest: "$42,100.25",
-    fees: "$2,950.00",
-    total: "$45,050.25",
-    volume: "$78,000.00",
-    repayRate: "95.2%",
-    platformFees: "$2,252.51",
-  },
-  // …
-];
-
 export default function TotalRevenuePanel() {
+  const [monthsBack, setMonthsBack] = React.useState<"3m" | "6m" | "12m" | "ltd">("12m");
+  const [plan, setPlan] = React.useState<PlanKey>("ALL");
+
+  const { data: summary } = useTotalRevenueSummary();
+  const { data: months } = useTotalRevenueMonthly(monthsBack, plan);
+
+  const rows: Row[] = React.useMemo(() => {
+    if (!months) return [];
+    return months.map((m) => ({
+      month: m.label,
+      interest: "—",
+      fees: "—",
+      total: fmtUSD(m.revenueCents),
+      volume: fmtUSD(m.loanVolumeCents),
+      repayRate: `${m.repaymentRatePct.toFixed(1)}%`,
+      platformFees: fmtUSD(m.platformFeesCents),
+    }));
+  }, [months]);
+
   return (
     <div className="overview-grid">
       <InfoCard
         title="Total Revenue (YTD)"
         icon={faDollarSign}
         iconColor="var(--theme-color)"
-        value={256932.25}
+        value={fmtUSD(summary?.ytdRevenueCents ?? 0)}
         kind="money"
-        subtext="+18.5% from last year"
+        subtext={summary?.yoyDeltaPct ?? 0}
         subIcon={faArrowTrendUp}
         width="1x"
         height="05x"
@@ -93,8 +96,8 @@ export default function TotalRevenuePanel() {
       />
 
       <NoticeCard
-        backgroundColor="var(--unread-color)"
-        title="Kayya platform fees: $12,846.62 (5% of revenue)"
+        backgroundColor="rgb(var(--unread-color-rgb) / 50%)"
+        title={`Kayya Fees: ${fmtUSD(summary?.platformFeesYtdCents ?? 0)}`}
         titleColor="var(--light-color)"
         icon={faInfo}
         iconColor="var(--light-color)"
@@ -116,6 +119,12 @@ export default function TotalRevenuePanel() {
         rows={rows}
         width="4x"
         height="3x"
+        rangeValue={monthsBack}
+        onRangeChange={setMonthsBack}
+        planValue={plan}
+        onPlanChange={setPlan}
+        rangeOptions={["3m", "6m", "12m", "ltd"]}
+        planOptions={["ALL", "SELF", "KAYYA"]}
       />
     </div>
   );

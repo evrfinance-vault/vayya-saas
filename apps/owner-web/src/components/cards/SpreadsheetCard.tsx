@@ -4,6 +4,7 @@ import "./SpreadsheetCard.css";
 import type { IconProp } from "@fortawesome/fontawesome-svg-core";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faCaretDown } from "@fortawesome/free-solid-svg-icons";
+import type { PlanKey } from "../../api/useTotalRevenue";
 
 type Column<T> = {
   key: keyof T;
@@ -12,6 +13,8 @@ type Column<T> = {
   align?: "left" | "center" | "right";
   render?: (row: T) => React.ReactNode;
 };
+
+type RangeKey = "3m" | "6m" | "12m" | "ltd";
 
 type Props<T extends object> = {
   title: string;
@@ -25,8 +28,12 @@ type Props<T extends object> = {
   columns: Column<T>[];
   rows: T[];
   showPlanFilter?: boolean;
-  onPlanChange?: (p: "ALL" | "SELF" | "KAYYA") => void;
-  onRangeChange?: (r: "3m" | "6m" | "12m" | "ytd") => void;
+  planValue?: PlanKey;
+  onPlanChange?: (p: PlanKey) => void;
+  rangeValue?: RangeKey;
+  onRangeChange?: (r: RangeKey) => void;
+  rangeOptions?: RangeKey[];
+  planOptions?: PlanKey[];
 };
 
 export default function SpreadsheetCard<T extends object>({
@@ -41,44 +48,77 @@ export default function SpreadsheetCard<T extends object>({
   columns,
   rows,
   showPlanFilter = true,
+  planValue,
   onPlanChange,
+  rangeValue,
   onRangeChange,
+  rangeOptions = ["3m", "6m", "12m", "ltd"],
+  planOptions = ["ALL", "SELF", "KAYYA"],
 }: Props<T>) {
+  const [internalRange, setInternalRange] = React.useState<RangeKey>(rangeValue ?? "12m");
+  const [internalPlan, setInternalPlan] = React.useState<PlanKey>(planValue ?? "ALL");
+
+  React.useEffect(() => {
+    if (rangeValue) setInternalRange(rangeValue);
+  }, [rangeValue]);
+
+  React.useEffect(() => {
+    if (planValue) setInternalPlan(planValue);
+  }, [planValue]);
+
+  const range = rangeValue ?? internalRange;
+  const setRange = onRangeChange ?? setInternalRange;
+
+  const plan = planValue ?? internalPlan;
+  const setPlan = onPlanChange ?? setInternalPlan;
+
+  const rangeLabel = (r: RangeKey) => {
+    switch (r) {
+      case "3m":
+        return "Last 3 months";
+      case "6m":
+        return "Last 6 months";
+      case "12m":
+        return "Last 12 months";
+      case "ltd":
+        return "Lifetime";
+    }
+  };
+
+  const planLabel = (p: PlanKey) =>
+    p === "ALL" ? "All plans" : p === "KAYYA" ? "Kayya-backed" : "Self-financed";
+
   const header = (
     <div className="ss-controls">
       <div className="ss-select-wrap">
         <select
           className="ss-select"
-          defaultValue="12m"
-          onChange={(e) => onRangeChange?.(e.target.value as any)}
+          value={range}
+          onChange={(e) => setRange(e.target.value as RangeKey)}
         >
-          <option value="3m">Last 3 months</option>
-          <option value="6m">Last 6 months</option>
-          <option value="12m">Last 12 months</option>
-          <option value="ytd">Year to date</option>
+          {rangeOptions.map((opt) => (
+            <option key={opt} value={opt}>
+              {rangeLabel(opt)}
+            </option>
+          ))}
         </select>
-        <FontAwesomeIcon
-          icon={faCaretDown}
-          className="ss-caret"
-          aria-hidden="true"
-        />
+        <FontAwesomeIcon icon={faCaretDown} className="ss-caret" aria-hidden="true" />
       </div>
+
       {showPlanFilter && (
         <div className="ss-select-wrap">
           <select
             className="ss-select"
-            defaultValue="ALL"
-            onChange={(e) => onPlanChange?.(e.target.value as any)}
+            value={plan}
+            onChange={(e) => setPlan(e.target.value as PlanKey)}
           >
-            <option value="ALL">All plans</option>
-            <option value="KAYYA">Kayya-backed</option>
-            <option value="SELF">Self-financed</option>
+            {planOptions.map((opt) => (
+              <option key={opt} value={opt}>
+                {planLabel(opt)}
+              </option>
+            ))}
           </select>
-          <FontAwesomeIcon
-            icon={faCaretDown}
-            className="ss-caret"
-            aria-hidden="true"
-          />
+          <FontAwesomeIcon icon={faCaretDown} className="ss-caret" aria-hidden="true" />
         </div>
       )}
     </div>
@@ -109,6 +149,7 @@ export default function SpreadsheetCard<T extends object>({
             ))}
           </div>
         </div>
+
         <div className="ss-tbody" role="rowgroup">
           {rows.map((row, i) => (
             <div key={i} className="ss-row" role="row">

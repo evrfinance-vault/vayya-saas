@@ -10,15 +10,15 @@ import {
   addWeeks,
   subWeeks,
   differenceInCalendarWeeks,
+  startOfYear,
+  addYears,
 } from "date-fns";
+
+const PLATFORM_FEE_BPS = Number(process.env.PLATFORM_FEE_BPS ?? 500);
 
 export const ownerOverview = Router();
 
-/**
- * GET /api/owner/overview/name
- * Returns upcoming payments for the "Name" card.
- * Shape: [{ id, firstName, lastName, description, badge, amountCents }]
- */
+// GET /api/owner/overview/name
 ownerOverview.get("/api/owner/overview/name", async (req, res) => {
   const limit = Math.min(25, Number(req.query.limit ?? 10));
   const today = new Date();
@@ -62,13 +62,6 @@ ownerOverview.get("/api/owner/overview/name", async (req, res) => {
   res.json({ items: data });
 });
 
-function initialsFor(n: string) {
-  const parts = n.split(/\s+/).filter(Boolean);
-  const first = parts[0]?.[0] ?? "";
-  const last = parts[parts.length - 1]?.[0] ?? "";
-  return (first + last).toUpperCase();
-}
-
 // GET /api/owner/overview/account-health
 ownerOverview.get("/api/owner/overview/account-health", async (_req, res) => {
   const grouped = await prisma.paymentPlan.groupBy({
@@ -97,28 +90,17 @@ ownerOverview.get("/api/owner/overview/account-health", async (_req, res) => {
   });
 });
 
-/**
- * GET /api/owner/overview/revenue-by-plan
- *
- * Query:
- * - bucket=week|month (default week)
- * - weeks=number (default 52)
- * - months=number (default 12)  // only used when bucket=month
- *
- * For PAID payments we count revenue at `paidAt`, otherwise at `dueDate`.
- * Weekly buckets start on Monday (ISO-like).
- * Returns dollars (not cents) to match your card’s formatter.
- */
+// GET /api/owner/overview/revenue-by-plan?bucket=week&weeks=52
+// GET /api/owner/overview/revenue-by-plan?bucket=month&months=12
 ownerOverview.get("/api/owner/overview/revenue-by-plan", async (req, res) => {
   const bucket = (req.query.bucket as "week" | "month") || "week";
 
   if (bucket === "week") {
     const weeks = Math.max(1, Math.min(104, Number(req.query.weeks ?? 52)));
     const now = new Date();
-    const start = startOfWeek(subWeeks(now, weeks - 1), { weekStartsOn: 1 }); // Monday
-    const end = addWeeks(start, weeks); // exclusive
+    const start = startOfWeek(subWeeks(now, weeks - 1), { weekStartsOn: 1 });
+    const end = addWeeks(start, weeks);
 
-    // Fetch only what we need
     const pays = await prisma.payment.findMany({
       where: {
         OR: [
@@ -150,14 +132,13 @@ ownerOverview.get("/api/owner/overview/revenue-by-plan", async (req, res) => {
       const idx = differenceInCalendarWeeks(eff, start, { weekStartsOn: 1 });
       if (idx < 0 || idx >= weeks) continue;
       const key = p.paymentPlan.planType === "KAYYA" ? "kayya" : "self";
-      points[idx][key] += Math.round(p.amountCents / 100); // dollars
+      points[idx][key] += Math.round(p.amountCents / 100);
     }
 
     const max = points.reduce((m, p) => Math.max(m, p.self, p.kayya), 0);
     return res.json({ points, max });
   }
 
-  // Fallback: monthly (keeps old behavior if you ever request ?bucket=month)
   const months = Math.max(1, Math.min(36, Number(req.query.months ?? 12)));
   const now = new Date();
   const start = startOfMonth(addMonths(now, -(months - 1)));
@@ -183,7 +164,7 @@ ownerOverview.get("/api/owner/overview/revenue-by-plan", async (req, res) => {
     );
     if (idx < 0 || idx >= months) continue;
     const key = pay.paymentPlan.planType === "KAYYA" ? "kayya" : "self";
-    points[idx][key] += pay.amountCents / 100; // dollars
+    points[idx][key] += pay.amountCents / 100;
   }
 
   const max = points.reduce((m, p) => Math.max(m, p.self, p.kayya), 0);
@@ -241,3 +222,217 @@ ownerOverview.get("/api/owner/overview/payouts-by-day", async (req, res) => {
     scheduled: schedTotals,
   });
 });
+
+// GET /api/owner/total-revenue/summary
+ownerOverview.get("/api/owner/total-revenue/summary", async (_req, res) => {
+  const now = new Date();
+  const ytdStart = startOfYear(now);
+  const prevStart = startOfYear(addYears(now, -1));
+  const prevEnd = addYears(now, -1);
+
+  const [allAgg, ytdAgg, prevAgg] = await Promise.all([
+    prisma.payment.aggregate({
+      where: { status: "PAID" },
+      _sum: { amountCents: true },
+    }),
+    prisma.payment.aggregate({
+      where: { status: "PAID", paidAt: { gte: ytdStart, lte: now } },
+      _sum: { amountCents: true },
+    }),
+    prisma.payment.aggregate({
+      where: { status: "PAID", paidAt: { gte: prevStart, lte: prevEnd } },
+      _sum: { amountCents: true },
+    }),
+  ]);
+
+  const allTimeRevenueCents = allAgg._sum.amountCents ?? 0;
+  const ytdRevenueCents = ytdAgg._sum.amountCents ?? 0;
+  const prevCents = prevAgg._sum.amountCents ?? 0;
+
+  const yoyDeltaPct = prevCents
+    ? ((ytdRevenueCents - prevCents) / prevCents) * 100
+    : 0;
+
+  const platformFeesYtdCents = Math.round(
+    (ytdRevenueCents * PLATFORM_FEE_BPS) / 10000,
+  );
+
+  res.json({
+    allTimeRevenueCents,
+    ytdRevenueCents,
+    yoyDeltaPct,
+    platformFeeBps: PLATFORM_FEE_BPS,
+    platformFeesYtdCents,
+  });
+});
+
+// GET /api/owner/total-revenue/monthly?range=3m|6m|12m|ltd&plan=ALL|SELF|KAYYA
+// GET /api/owner/total-revenue/monthly?months=12
+// GET /api/owner/total-revenue/monthly
+ownerOverview.get("/api/owner/total-revenue/monthly", async (req, res) => {
+  type PlanKey = "ALL" | "SELF" | "KAYYA";
+  const planParam = String(req.query.plan ?? "ALL").toUpperCase() as PlanKey;
+  const plan: PlanKey = planParam === "SELF" || planParam === "KAYYA" ? planParam : "ALL";
+
+  const range = req.query.range ? String(req.query.range).toLowerCase() : undefined;
+  const monthsFromRange =
+    range === "3m" ? 3 :
+    range === "6m" ? 6 :
+    range === "12m" ? 12 :
+    range === "ltd" ? null : undefined;
+
+  let explicitMonths: number | undefined;
+  if (req.query.months != null) {
+    const n = Number(req.query.months);
+    if (Number.isFinite(n)) {
+      explicitMonths = Math.max(1, Math.min(120, n));
+    }
+  }
+
+  const now = new Date();
+  const endMonth = startOfMonth(now);
+
+  const planWhere = (p: PlanKey) =>
+    p === "ALL" ? {} : ({ paymentPlan: { is: { planType: p } } } as const);
+
+  let firstMonth: Date;
+  if (monthsFromRange === null) {
+    const [minPaid, minDue, minStart] = await Promise.all([
+      prisma.payment.aggregate({
+        where: { status: "PAID", ...planWhere(plan) },
+        _min: { paidAt: true },
+      }),
+      prisma.payment.aggregate({
+        where: { ...planWhere(plan) },
+        _min: { dueDate: true },
+      }),
+      prisma.paymentPlan.aggregate({
+        where: plan === "ALL" ? {} : { planType: plan },
+        _min: { startDate: true },
+      }),
+    ]);
+
+    const candidates = [
+      minPaid._min.paidAt ?? undefined,
+      minDue._min.dueDate ?? undefined,
+      minStart._min.startDate ?? undefined,
+    ].filter(Boolean) as Date[];
+
+    const earliest = candidates.length
+      ? candidates.reduce((a, b) => (a < b ? a : b))
+      : endMonth;
+
+    firstMonth = startOfMonth(earliest);
+  } else {
+    const m = explicitMonths ?? monthsFromRange ?? 12;
+    firstMonth = startOfMonth(addMonths(endMonth, -(m - 1)));
+  }
+
+  const monthsCount =
+    monthsFromRange === null
+      ? Math.max(
+          1,
+          (endMonth.getFullYear() - firstMonth.getFullYear()) * 12 +
+            (endMonth.getMonth() - firstMonth.getMonth()) +
+            1,
+        )
+      : (explicitMonths ?? (monthsFromRange ?? 12));
+
+  const nextAfterEnd = addMonths(endMonth, 1);
+
+  const [paid, due, startedPlans] = await Promise.all([
+    prisma.payment.findMany({
+      where: {
+        status: "PAID",
+        paidAt: { gte: firstMonth, lt: nextAfterEnd },
+        ...planWhere(plan),
+      },
+      select: { amountCents: true, paidAt: true },
+      orderBy: { paidAt: "desc" },
+    }),
+    prisma.payment.findMany({
+      where: {
+        dueDate: { gte: firstMonth, lt: nextAfterEnd },
+        ...planWhere(plan),
+      },
+      select: { amountCents: true, dueDate: true },
+      orderBy: { dueDate: "desc" },
+    }),
+    prisma.paymentPlan.findMany({
+      where: {
+        startDate: { gte: firstMonth, lt: nextAfterEnd },
+        ...(plan === "ALL" ? {} : { planType: plan }),
+      },
+      select: { principalCents: true, startDate: true },
+      orderBy: { startDate: "desc" },
+    }),
+  ]);
+
+  const idxFromFirst = (d: Date) =>
+    (d.getFullYear() - firstMonth.getFullYear()) * 12 +
+    (d.getMonth() - firstMonth.getMonth());
+
+  type Row = {
+    ym: string;
+    label: string;
+    revenueCents: number;
+    loanVolumeCents: number;
+    dueCents: number;
+    paidCents: number;
+    repaymentRatePct: number;
+    platformFeesCents: number;
+  };
+
+  const rows: Row[] = [];
+  for (let i = monthsCount - 1; i >= 0; i--) {
+    const mStart = startOfMonth(addMonths(firstMonth, i));
+    rows.push({
+      ym: format(mStart, "yyyy-MM"),
+      label: format(mStart, "MMMM yyyy"),
+      revenueCents: 0,
+      loanVolumeCents: 0,
+      dueCents: 0,
+      paidCents: 0,
+      repaymentRatePct: 0,
+      platformFeesCents: 0,
+    });
+  }
+
+  const writePos = (d: Date) => {
+    const idx = idxFromFirst(d);
+    return monthsCount - 1 - idx;
+  };
+
+  for (const p of paid) {
+    const pos = writePos(p.paidAt!);
+    if (pos >= 0 && pos < monthsCount) {
+      rows[pos].revenueCents += p.amountCents;
+      rows[pos].paidCents += p.amountCents;
+    }
+  }
+  for (const p of due) {
+    const pos = writePos(p.dueDate);
+    if (pos >= 0 && pos < monthsCount) rows[pos].dueCents += p.amountCents;
+  }
+  for (const pl of startedPlans) {
+    const pos = writePos(pl.startDate);
+    if (pos >= 0 && pos < monthsCount) rows[pos].loanVolumeCents += pl.principalCents;
+  }
+
+  for (const r of rows) {
+    r.repaymentRatePct =
+      r.dueCents > 0 ? Math.min(100, (r.paidCents / r.dueCents) * 100) : 0;
+    r.platformFeesCents = Math.round((r.revenueCents * PLATFORM_FEE_BPS) / 10000);
+  }
+
+  res.json({ months: rows });
+});
+
+// helpers
+
+function initialsFor(n: string) {
+  const parts = n.split(/\s+/).filter(Boolean);
+  const first = parts[0]?.[0] ?? "";
+  const last = parts[parts.length - 1]?.[0] ?? "";
+  return (first + last).toUpperCase();
+}
