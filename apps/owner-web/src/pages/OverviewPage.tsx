@@ -19,6 +19,7 @@ import {
   TotalRevenuePanel,
   BoardPanel,
 } from "../components/panels";
+import { useTotalRevenueSummary, fmtUSD } from "../api/useTotalRevenue";
 
 const TABS: TabDef[] = [
   {
@@ -100,6 +101,21 @@ export default function OverviewPage(): React.ReactElement {
 
   const dotColor = health === null ? "#f2f2f2" : health ? "#90ee90" : "#edbf91";
 
+  const { data: trSummary } = useTotalRevenueSummary();
+
+  const tabs = React.useMemo(
+    () =>
+      TABS.map((t) =>
+        t.key === "total-revenue"
+          ? {
+              ...t,
+              badge: trSummary ? fmtUSD(trSummary.allTimeRevenueCents) : "—",
+            }
+          : t,
+      ),
+    [trSummary],
+  );
+
   return (
     <div
       className="page-content"
@@ -148,7 +164,7 @@ export default function OverviewPage(): React.ReactElement {
       </div>
 
       <section className="page-overview">
-        <OverviewTabs tabs={TABS} value={tab} onChange={setTab} />
+        <OverviewTabs tabs={tabs} value={tab} onChange={setTab} />
         <div
           key={tab}
           id={`panel-${tab}`}
