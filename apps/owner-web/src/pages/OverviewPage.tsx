@@ -117,18 +117,7 @@ export default function OverviewPage(): React.ReactElement {
   );
 
   return (
-    <div
-      className="page-content"
-      style={{
-        padding: 24,
-        marginLeft: 12,
-        marginRight: 12,
-        marginTop: 24,
-        marginBottom: 24,
-        display: "grid",
-        gap: 0,
-      }}
-    >
+    <div className="page-content">
       <div className="overview-hero">
         <div className="preheading" style={{ fontSize: "small" }}>
           <span

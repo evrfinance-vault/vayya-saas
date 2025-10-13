@@ -51,6 +51,10 @@ body {
   background-position: top center;
   background-size: auto;
   background-size: clamp(25vw, 45vw, 65vw);
+  display: grid;
+  gap: 0;
+  margin: 24px 12px;
+  padding: 24px;
 }
 
 .preheading {
