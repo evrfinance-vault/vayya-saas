@@ -112,7 +112,7 @@ export default function TotalRevenuePanel() {
         width="4x"
         height="3x"
         rangeValue={monthsBack}
-        onRangeChange={setMonthsBack}
+        onRangeChange={(v) => setMonthsBack(v as typeof monthsBack)}
         planValue={plan}
         onPlanChange={setPlan}
         rangeOptions={["3m", "6m", "12m", "ltd"]}

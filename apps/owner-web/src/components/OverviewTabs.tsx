@@ -80,7 +80,10 @@ export default function OverviewTabs({
           const selected = tab.key === value;
           const showOptions =
             selected &&
-            (tab.key === "total-revenue" || tab.key === "active-payment-plans");
+            (tab.key === "total-revenue" ||
+              tab.key === "active-payment-plans" ||
+              tab.key === "late-payments" ||
+              tab.key === "pending-applications");
           const menuOpen = openFor === tab.key;
 
           return (

@@ -161,11 +161,11 @@ export default function ActivePaymentPlansPanel(): React.ReactElement {
         width="4x"
         height="3x"
         rangeValue={range}
-        onRangeChange={setRange}
+        onRangeChange={(v) => setRange(v as typeof range)}
         planValue={plan}
         onPlanChange={setPlan}
         statusValue={status}
-        onStatusChange={setStatus}
+        onStatusChange={(s) => setStatus(s as typeof status)}
         showStatusFilter
       />
     </div>

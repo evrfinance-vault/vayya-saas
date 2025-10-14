@@ -15,7 +15,7 @@ type Column<T> = {
   render?: (row: T) => React.ReactNode;
 };
 
-type RangeKey = "3m" | "6m" | "12m" | "ltd";
+type RangeKey = "3m" | "6m" | "12m" | "ltd" | string;
 
 type Props<T extends object> = {
   title: string;
@@ -33,12 +33,11 @@ type Props<T extends object> = {
   onPlanChange?: (p: PlanKey) => void;
   rangeValue?: RangeKey;
   onRangeChange?: (r: RangeKey) => void;
-  rangeOptions?: RangeKey[];
+  rangeOptions?: Array<RangeKey | { value: RangeKey; label: string }>;
   planOptions?: PlanKey[];
-  statusValue?: "ALL" | "ACTIVE" | "HOLD" | "DELINQUENT" | "PAID";
-  onStatusChange?: (
-    s: "ALL" | "ACTIVE" | "HOLD" | "DELINQUENT" | "PAID",
-  ) => void;
+  statusValue?: string;
+  onStatusChange?: (s: string) => void;
+  statusOptions?: Array<string | { value: string; label: string }>;
   showStatusFilter?: boolean;
   headerControls?: React.ReactNode;
 };
@@ -63,6 +62,7 @@ export default function SpreadsheetCard<T extends object>({
   planOptions = ["ALL", "SELF", "KAYYA"],
   statusValue,
   onStatusChange,
+  statusOptions,
   showStatusFilter = false,
   headerControls,
 }: Props<T>) {
@@ -97,6 +97,8 @@ export default function SpreadsheetCard<T extends object>({
         return "Last 12 months";
       case "ltd":
         return "Lifetime";
+      default:
+        return String(r);
     }
   };
 
@@ -120,11 +122,18 @@ export default function SpreadsheetCard<T extends object>({
           value={range}
           onChange={(e) => setRange(e.target.value as RangeKey)}
         >
-          {rangeOptions.map((opt) => (
-            <option key={opt} value={opt}>
-              {rangeLabel(opt)}
-            </option>
-          ))}
+          {(rangeOptions ?? ["3m", "6m", "12m", "ltd"]).map((opt) => {
+            const val = typeof opt === "string" ? opt : opt.value;
+            const lab =
+              typeof opt === "string"
+                ? rangeLabel(opt)
+                : (opt.label ?? rangeLabel(opt.value));
+            return (
+              <option key={val} value={val}>
+                {lab}
+              </option>
+            );
+          })}
         </select>
         <FontAwesomeIcon
           icon={faCaretDown}
@@ -139,13 +148,20 @@ export default function SpreadsheetCard<T extends object>({
             className="ss-select"
             aria-label="Status filter"
             value={statusValue ?? "ALL"}
-            onChange={(e) => onStatusChange?.(e.target.value as any)}
+            onChange={(e) => onStatusChange?.(e.target.value)}
           >
-            <option value="ALL">All status</option>
-            <option value="ACTIVE">Active</option>
-            <option value="HOLD">On hold</option>
-            <option value="DELINQUENT">Delinquent</option>
-            <option value="PAID">Paid</option>
+            {(
+              statusOptions ?? ["ALL", "ACTIVE", "HOLD", "DELINQUENT", "PAID"]
+            ).map((opt) => {
+              const val = typeof opt === "string" ? opt : opt.value;
+              const lab =
+                typeof opt === "string" ? opt : (opt.label ?? opt.value);
+              return (
+                <option key={val} value={val}>
+                  {lab}
+                </option>
+              );
+            })}
           </select>
           <FontAwesomeIcon
             icon={faCaretDown}
@@ -177,6 +193,7 @@ export default function SpreadsheetCard<T extends object>({
       )}
     </div>
   );
+
   const header = headerControls ?? defaultHeader;
 
   return (

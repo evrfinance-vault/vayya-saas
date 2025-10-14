@@ -601,9 +601,13 @@ ownerOverview.get("/api/owner/late-payments/summary", async (_req, res) => {
   let cntDays = 0;
 
   for (const pl of plans) {
-    const outstanding = pl.payments.reduce((s, p) => s + p.amountCents, 0);
+    const outstanding = (pl.payments as Array<{ amountCents: number }>).reduce(
+      (s, p) => s + p.amountCents,
+      0,
+    );
     const overdue = pl.payments.filter(
-      (p) => p.status !== "PAID" && p.dueDate < now,
+      (p: { status: "PENDING" | "PAID" | "HOLD"; dueDate: Date }) =>
+        p.status !== "PAID" && p.status !== "HOLD" && p.dueDate < now,
     );
 
     if (overdue.length) {
@@ -623,15 +627,25 @@ ownerOverview.get("/api/owner/late-payments/summary", async (_req, res) => {
 
   const avgDaysOverdue = cntDays ? Math.round(sumDays / cntDays) : 0;
 
-  res.json({ delinquentAccounts, amountOverdueCents, atRiskCents, avgDaysOverdue });
+  res.json({
+    delinquentAccounts,
+    amountOverdueCents,
+    atRiskCents,
+    avgDaysOverdue,
+  });
 });
 
 // GET /api/owner/late-payments/list?status=ALL|LATE|HOLD&risk=ALL|LOW|MEDIUM|HIGH&daysMin=0
 ownerOverview.get("/api/owner/late-payments/list", async (req, res) => {
   type StatusKey = "ALL" | "LATE" | "HOLD";
-  const statusParam = String(req.query.status ?? "ALL").toUpperCase() as StatusKey;
+  const statusParam = String(
+    req.query.status ?? "ALL",
+  ).toUpperCase() as StatusKey;
   const riskParam = String(req.query.risk ?? "ALL").toUpperCase() as
-    | "ALL" | "LOW" | "MEDIUM" | "HIGH";
+    | "ALL"
+    | "LOW"
+    | "MEDIUM"
+    | "HIGH";
   const daysMin = Math.max(0, Number(req.query.daysMin ?? 0));
 
   const now = new Date();
@@ -690,14 +704,107 @@ ownerOverview.get("/api/owner/late-payments/list", async (req, res) => {
     };
   });
 
-  const filtered = rows.filter((r) => {
-    if (statusParam !== "ALL" && r.status !== statusParam) return false;
-    if (riskParam !== "ALL" && r.risk !== riskParam) return false;
-    if (r.daysOverdue < daysMin) return false;
-    return true;
-  });
+  const filtered = rows.filter(
+    (r: PlanRow) =>
+      (statusParam === "ALL" ? true : r.status === statusParam) &&
+      (riskParam === "ALL" ? true : r.risk === riskParam) &&
+      r.daysOverdue >= daysMin,
+  );
 
   res.json({ rows: filtered });
+});
+
+// GET /api/owner/applications/summary
+ownerOverview.get("/api/owner/applications/summary", async (_req, res) => {
+  const pendingStatuses = ["SENT", "PENDING", "CONTACTED"] as const;
+  const approvedStatuses = ["PAID", "DONE"] as const;
+
+  const now = new Date();
+  const last30 = new Date(now);
+  last30.setDate(now.getDate() - 30);
+
+  const [total, pending, last30Totals, last30Approved, pendingSum] =
+    await Promise.all([
+      prisma.application.count(),
+      prisma.application.count({
+        where: { status: { in: pendingStatuses as any } },
+      }),
+      prisma.application.count({ where: { submittedAt: { gte: last30 } } }),
+      prisma.application.count({
+        where: {
+          submittedAt: { gte: last30 },
+          status: { in: approvedStatuses as any },
+        },
+      }),
+      prisma.application.aggregate({
+        where: { status: { in: pendingStatuses as any } },
+        _sum: { amountCents: true },
+      }),
+    ]);
+
+  const approvalRatePct = last30Totals
+    ? (last30Approved / last30Totals) * 100
+    : 0;
+
+  res.json({
+    totalApplications: total,
+    pendingReviewCount: pending,
+    approvalRatePct,
+    totalRequestedCents: pendingSum._sum.amountCents ?? 0,
+  });
+});
+
+// GET /api/owner/applications?range=all|30d|90d|ytd&status=ALL|SENT|FAILED|PENDING|PAID|CONTACTED|DONE&plan=ALL|SELF|KAYYA
+ownerOverview.get("/api/owner/applications", async (req, res) => {
+  type PlanKey = "ALL" | "SELF" | "KAYYA";
+  type AppStatus =
+    | "ALL"
+    | "SENT"
+    | "FAILED"
+    | "PENDING"
+    | "PAID"
+    | "CONTACTED"
+    | "DONE";
+
+  const planQ = String(req.query.plan ?? "ALL").toUpperCase() as PlanKey;
+  const statusQ = String(req.query.status ?? "ALL").toUpperCase() as AppStatus;
+  const rangeQ = String(req.query.range ?? "all").toLowerCase(); // all|30d|90d|ytd
+
+  const planWhere = planQ === "ALL" ? {} : { planType: planQ as any };
+  const statusWhere = statusQ === "ALL" ? {} : { status: statusQ as any };
+
+  const now = new Date();
+  let submittedWhere: { gte?: Date; lt?: Date } = {};
+  if (rangeQ === "30d") {
+    submittedWhere = { gte: new Date(now.getTime() - 30 * 864e5) };
+  } else if (rangeQ === "90d") {
+    submittedWhere = { gte: new Date(now.getTime() - 90 * 864e5) };
+  } else if (rangeQ === "ytd") {
+    submittedWhere = { gte: new Date(now.getFullYear(), 0, 1) };
+  }
+
+  const apps = await prisma.application.findMany({
+    where: {
+      ...planWhere,
+      ...statusWhere,
+      ...(rangeQ === "all" ? {} : { submittedAt: submittedWhere }),
+    },
+    include: {
+      patient: { select: { firstName: true, lastName: true } },
+    },
+    orderBy: { submittedAt: "desc" },
+  });
+
+  const rows = apps.map((a: (typeof apps)[number]) => ({
+    id: a.id,
+    client: `${a.patient.firstName} ${a.patient.lastName}`.trim(),
+    amountCents: a.amountCents,
+    planType: a.planType,
+    status: a.status,
+    submittedAt: a.submittedAt,
+  }));
+
+  res.json({ rows });
 });
 
 // helpers
