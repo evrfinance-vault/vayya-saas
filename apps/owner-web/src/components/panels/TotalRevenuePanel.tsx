@@ -2,14 +2,12 @@ import React from "react";
 import {
   faBuildingColumns,
   faCircleCheck,
-  faInfo,
   faDollarSign,
   faList,
   faPiggyBank,
   faArrowTrendUp,
 } from "@fortawesome/free-solid-svg-icons";
 import InfoCard from "../cards/InfoCard";
-import NoticeCard from "../cards/NoticeCard";
 import SpreadsheetCard from "../cards/SpreadsheetCard";
 import {
   useTotalRevenueSummary,
@@ -29,7 +27,9 @@ type Row = {
 };
 
 export default function TotalRevenuePanel() {
-  const [monthsBack, setMonthsBack] = React.useState<"3m" | "6m" | "12m" | "ltd">("12m");
+  const [monthsBack, setMonthsBack] = React.useState<
+    "3m" | "6m" | "12m" | "ltd"
+  >("12m");
   const [plan, setPlan] = React.useState<PlanKey>("ALL");
 
   const { data: summary } = useTotalRevenueSummary();
@@ -54,9 +54,9 @@ export default function TotalRevenuePanel() {
         title="Total Revenue (YTD)"
         icon={faDollarSign}
         iconColor="var(--theme-color)"
-        value={fmtUSD(summary?.ytdRevenueCents ?? 0)}
+        value={(summary?.ytdRevenueCents ?? 0) / 100}
         kind="money"
-        subtext={summary?.yoyDeltaPct ?? 0}
+        subtext={`${(summary?.yoyDeltaPct ?? 0).toFixed(1)}%`}
         subIcon={faArrowTrendUp}
         width="1x"
         height="05x"
@@ -93,14 +93,6 @@ export default function TotalRevenuePanel() {
         subtext="Collection efficiency"
         width="1x"
         height="05x"
-      />
-
-      <NoticeCard
-        backgroundColor="rgb(var(--unread-color-rgb) / 50%)"
-        title={`Kayya Fees: ${fmtUSD(summary?.platformFeesYtdCents ?? 0)}`}
-        titleColor="var(--light-color)"
-        icon={faInfo}
-        iconColor="var(--light-color)"
       />
 
       <SpreadsheetCard<Row>

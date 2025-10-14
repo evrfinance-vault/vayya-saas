@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 
-const API = import.meta.env.VITE_API_URL?.replace(/\/$/, "") || "http://localhost:4000";
+const API =
+  import.meta.env.VITE_API_URL?.replace(/\/$/, "") || "http://localhost:4000";
 
 export type PlanKey = "ALL" | "SELF" | "KAYYA";
 
@@ -30,7 +31,7 @@ export function useTotalRevenueSummary() {
   useEffect(() => {
     const ctl = new AbortController();
     fetch(`${API}/api/owner/total-revenue/summary`, { signal: ctl.signal })
-      .then(r => r.json())
+      .then((r) => r.json())
       .then(setData)
       .finally(() => setLoading(false));
     return () => ctl.abort();
@@ -46,15 +47,13 @@ export function useTotalRevenueMonthly(range = "12m", plan: PlanKey = "ALL") {
     const ctl = new AbortController();
     setLoading(true);
 
-    fetch(`${API}/api/owner/total-revenue/monthly?range=${range}&plan=${plan}`, { signal: ctl.signal })
-      .then(async (r) => {
-        const payload = await r.json();
-        const arr =
-          payload?.months ??
-          payload?.rows ??
-          payload?.points ??
-          (Array.isArray(payload) ? payload : null);
-        setData(arr ?? []);
+    fetch(
+      `${API}/api/owner/total-revenue/monthly?range=${range}&plan=${plan}`,
+      { signal: ctl.signal },
+    )
+      .then((r) => r.json())
+      .then((payload) => {
+        setData(payload.months ?? payload.rows ?? payload.points ?? payload);
       })
       .finally(() => setLoading(false));
 
@@ -67,5 +66,6 @@ export function useTotalRevenueMonthly(range = "12m", plan: PlanKey = "ALL") {
 // helpers
 
 export const fmtUSD = (cents: number) =>
-  new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" })
-    .format((cents || 0) / 100);
+  new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(
+    (cents || 0) / 100,
+  );

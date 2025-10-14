@@ -78,7 +78,9 @@ export default function OverviewTabs({
       >
         {tabs.map((tab) => {
           const selected = tab.key === value;
-          const showOptions = selected && tab.key === "total-revenue";
+          const showOptions =
+            selected &&
+            (tab.key === "total-revenue" || tab.key === "active-payment-plans");
           const menuOpen = openFor === tab.key;
 
           return (

@@ -1,16 +1,14 @@
 .ss-controls {
-  display: inline-flex;
-  align-items: center;
+  display: flex;
   gap: 8px;
+  align-items: center;
 }
 
 .ss-select-wrap {
   position: relative;
-  display: inline-block;
 }
 
 .ss-select {
-  /* height: 28px; */
   padding: 9px 28px 9px 12px;
   border-radius: 8px;
   border: 0;
@@ -43,38 +41,44 @@
 }
 
 .ss-table {
-  display: flex;
-  flex-direction: column;
   width: 100%;
-  height: 100%;
+  overflow: hidden;
 }
-.ss-thead {
-  flex: 0 0 auto;
-}
+
+.ss-thead,
 .ss-tbody {
-  overflow: auto;
-  flex: 1 1 auto;
+  display: grid;
+  gap: 8px;
 }
 
 .ss-row {
   display: grid;
-  grid-auto-flow: column;
-  grid-auto-columns: 1fr;
-  gap: 12px;
-  padding: 10px 8px;
   align-items: center;
+  column-gap: 12px;
+  min-height: 38px;
 }
+
 .ss-head {
   font-weight: 700;
   color: rgb(var(--dark-color-rgb) / 75%);
   border-bottom: 1px solid var(--border-color);
 }
+
+.ss-cell {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
 .ss-cell.left {
   text-align: left;
 }
+
 .ss-cell.center {
   text-align: center;
 }
+
 .ss-cell.right {
   text-align: right;
 }

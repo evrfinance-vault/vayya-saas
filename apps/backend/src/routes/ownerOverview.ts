@@ -268,18 +268,25 @@ ownerOverview.get("/api/owner/total-revenue/summary", async (_req, res) => {
 
 // GET /api/owner/total-revenue/monthly?range=3m|6m|12m|ltd&plan=ALL|SELF|KAYYA
 // GET /api/owner/total-revenue/monthly?months=12
-// GET /api/owner/total-revenue/monthly
 ownerOverview.get("/api/owner/total-revenue/monthly", async (req, res) => {
   type PlanKey = "ALL" | "SELF" | "KAYYA";
   const planParam = String(req.query.plan ?? "ALL").toUpperCase() as PlanKey;
-  const plan: PlanKey = planParam === "SELF" || planParam === "KAYYA" ? planParam : "ALL";
+  const plan: PlanKey =
+    planParam === "SELF" || planParam === "KAYYA" ? planParam : "ALL";
 
-  const range = req.query.range ? String(req.query.range).toLowerCase() : undefined;
+  const range = req.query.range
+    ? String(req.query.range).toLowerCase()
+    : undefined;
   const monthsFromRange =
-    range === "3m" ? 3 :
-    range === "6m" ? 6 :
-    range === "12m" ? 12 :
-    range === "ltd" ? null : undefined;
+    range === "3m"
+      ? 3
+      : range === "6m"
+        ? 6
+        : range === "12m"
+          ? 12
+          : range === "ltd"
+            ? null
+            : undefined;
 
   let explicitMonths: number | undefined;
   if (req.query.months != null) {
@@ -336,7 +343,7 @@ ownerOverview.get("/api/owner/total-revenue/monthly", async (req, res) => {
             (endMonth.getMonth() - firstMonth.getMonth()) +
             1,
         )
-      : (explicitMonths ?? (monthsFromRange ?? 12));
+      : (explicitMonths ?? monthsFromRange ?? 12);
 
   const nextAfterEnd = addMonths(endMonth, 1);
 
@@ -416,16 +423,162 @@ ownerOverview.get("/api/owner/total-revenue/monthly", async (req, res) => {
   }
   for (const pl of startedPlans) {
     const pos = writePos(pl.startDate);
-    if (pos >= 0 && pos < monthsCount) rows[pos].loanVolumeCents += pl.principalCents;
+    if (pos >= 0 && pos < monthsCount)
+      rows[pos].loanVolumeCents += pl.principalCents;
   }
 
   for (const r of rows) {
     r.repaymentRatePct =
       r.dueCents > 0 ? Math.min(100, (r.paidCents / r.dueCents) * 100) : 0;
-    r.platformFeesCents = Math.round((r.revenueCents * PLATFORM_FEE_BPS) / 10000);
+    r.platformFeesCents = Math.round(
+      (r.revenueCents * PLATFORM_FEE_BPS) / 10000,
+    );
   }
 
   res.json({ months: rows });
+});
+
+// GET /api/owner/active-plans?range=3m|6m|12m|ltd&status=ALL|ACTIVE|HOLD|DELINQUENT|PAID&plan=ALL|SELF|KAYYA
+ownerOverview.get("/api/owner/active-plans", async (req, res) => {
+  type PlanKey = "ALL" | "SELF" | "KAYYA";
+  type StatusKey = "ALL" | "ACTIVE" | "HOLD" | "DELINQUENT" | "PAID";
+
+  type ActivePlanRow = {
+    id: string;
+    client: string;
+    amountCents: number;
+    outstandingCents: number;
+    aprBps: number;
+    termMonths: number;
+    progressPct: number;
+    status: StatusKey;
+    planType: "SELF" | "KAYYA";
+  };
+
+  const planParam = String(req.query.plan ?? "ALL").toUpperCase() as PlanKey;
+  const plan: PlanKey =
+    planParam === "SELF" || planParam === "KAYYA" ? planParam : "ALL";
+
+  const rangeParam = String(req.query.range ?? "12m").toLowerCase();
+  const monthsFromRange =
+    rangeParam === "3m"
+      ? 3
+      : rangeParam === "6m"
+        ? 6
+        : rangeParam === "12m"
+          ? 12
+          : rangeParam === "ltd"
+            ? null
+            : 12;
+
+  const statusParam = String(
+    req.query.status ?? "ALL",
+  ).toUpperCase() as StatusKey;
+  const statusFilter: StatusKey = [
+    "ALL",
+    "ACTIVE",
+    "HOLD",
+    "DELINQUENT",
+    "PAID",
+  ].includes(statusParam)
+    ? statusParam
+    : "ALL";
+
+  const now = new Date();
+  const endMonth = startOfMonth(now);
+  const firstMonth =
+    monthsFromRange == null
+      ? new Date(0)
+      : startOfMonth(addMonths(endMonth, -(monthsFromRange - 1)));
+
+  const wherePlan: any = {
+    ...(monthsFromRange == null ? {} : { startDate: { gte: firstMonth } }),
+    ...(plan === "ALL" ? {} : { planType: plan }),
+  };
+
+  const plans = await prisma.paymentPlan.findMany({
+    where: wherePlan,
+    include: {
+      patient: { select: { firstName: true, lastName: true } },
+      payments: {
+        select: {
+          amountCents: true,
+          status: true,
+          dueDate: true,
+          paidAt: true,
+        },
+        orderBy: { dueDate: "asc" },
+      },
+    },
+    orderBy: { startDate: "desc" },
+  });
+
+  type PlanWithJoins = {
+    id: string;
+    principalCents: number;
+    termMonths: number;
+    planType: "SELF" | "KAYYA";
+    onHold: boolean;
+    patient: { firstName: string; lastName: string };
+    payments: Array<{
+      amountCents: number;
+      status: "PENDING" | "PAID" | "HOLD";
+      dueDate: Date;
+      paidAt: Date | null;
+    }>;
+  };
+
+  const rows: ActivePlanRow[] = plans.map(
+    (pl: PlanWithJoins): ActivePlanRow => {
+      const fullName = `${pl.patient.firstName} ${pl.patient.lastName}`.trim();
+
+      let paidCount = 0;
+      let totalCount = pl.payments.length;
+      let outstandingCents = 0;
+      let hasOverdue = false;
+      let hasHold = pl.onHold;
+
+      for (const p of pl.payments) {
+        if (p.status === "PAID") paidCount++;
+        else outstandingCents += p.amountCents;
+
+        if (p.status !== "PAID" && p.status !== "HOLD" && p.dueDate < now) {
+          hasOverdue = true;
+        }
+        if (p.status === "HOLD") hasHold = true;
+      }
+
+      let derivedStatus: StatusKey;
+      if (totalCount > 0 && paidCount === totalCount) derivedStatus = "PAID";
+      else if (hasHold) derivedStatus = "HOLD";
+      else if (hasOverdue) derivedStatus = "DELINQUENT";
+      else derivedStatus = "ACTIVE";
+
+      const progressPct = totalCount
+        ? Math.round((paidCount / totalCount) * 100)
+        : 0;
+
+      const aprBps = 0;
+
+      return {
+        id: pl.id,
+        client: fullName,
+        amountCents: pl.principalCents,
+        outstandingCents,
+        aprBps,
+        termMonths: pl.termMonths,
+        progressPct,
+        status: derivedStatus,
+        planType: pl.planType,
+      };
+    },
+  );
+
+  const filtered: ActivePlanRow[] = rows.filter((r: ActivePlanRow) =>
+    statusFilter === "ALL" ? true : r.status === statusFilter,
+  );
+
+  res.json({ rows: filtered });
 });
 
 // helpers

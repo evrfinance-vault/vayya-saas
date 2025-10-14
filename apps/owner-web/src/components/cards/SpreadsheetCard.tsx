@@ -11,6 +11,7 @@ type Column<T> = {
   label: string;
   width?: string;
   align?: "left" | "center" | "right";
+  className?: string;
   render?: (row: T) => React.ReactNode;
 };
 
@@ -34,6 +35,11 @@ type Props<T extends object> = {
   onRangeChange?: (r: RangeKey) => void;
   rangeOptions?: RangeKey[];
   planOptions?: PlanKey[];
+  statusValue?: "ALL" | "ACTIVE" | "HOLD" | "DELINQUENT" | "PAID";
+  onStatusChange?: (
+    s: "ALL" | "ACTIVE" | "HOLD" | "DELINQUENT" | "PAID",
+  ) => void;
+  showStatusFilter?: boolean;
 };
 
 export default function SpreadsheetCard<T extends object>({
@@ -54,9 +60,16 @@ export default function SpreadsheetCard<T extends object>({
   onRangeChange,
   rangeOptions = ["3m", "6m", "12m", "ltd"],
   planOptions = ["ALL", "SELF", "KAYYA"],
+  statusValue,
+  onStatusChange,
+  showStatusFilter = false,
 }: Props<T>) {
-  const [internalRange, setInternalRange] = React.useState<RangeKey>(rangeValue ?? "12m");
-  const [internalPlan, setInternalPlan] = React.useState<PlanKey>(planValue ?? "ALL");
+  const [internalRange, setInternalRange] = React.useState<RangeKey>(
+    rangeValue ?? "12m",
+  );
+  const [internalPlan, setInternalPlan] = React.useState<PlanKey>(
+    planValue ?? "ALL",
+  );
 
   React.useEffect(() => {
     if (rangeValue) setInternalRange(rangeValue);
@@ -86,7 +99,16 @@ export default function SpreadsheetCard<T extends object>({
   };
 
   const planLabel = (p: PlanKey) =>
-    p === "ALL" ? "All plans" : p === "KAYYA" ? "Kayya-backed" : "Self-financed";
+    p === "ALL"
+      ? "All plans"
+      : p === "KAYYA"
+        ? "Kayya-backed"
+        : "Self-financed";
+
+  const colTemplate = React.useMemo(
+    () => columns.map((c) => c.width ?? "minmax(0,1fr)").join(" "),
+    [columns],
+  );
 
   const header = (
     <div className="ss-controls">
@@ -102,8 +124,34 @@ export default function SpreadsheetCard<T extends object>({
             </option>
           ))}
         </select>
-        <FontAwesomeIcon icon={faCaretDown} className="ss-caret" aria-hidden="true" />
+        <FontAwesomeIcon
+          icon={faCaretDown}
+          className="ss-caret"
+          aria-hidden="true"
+        />
       </div>
+
+      {showStatusFilter && (
+        <div className="ss-select-wrap">
+          <select
+            className="ss-select"
+            aria-label="Status filter"
+            value={statusValue ?? "ALL"}
+            onChange={(e) => onStatusChange?.(e.target.value as any)}
+          >
+            <option value="ALL">All status</option>
+            <option value="ACTIVE">Active</option>
+            <option value="HOLD">On hold</option>
+            <option value="DELINQUENT">Delinquent</option>
+            <option value="PAID">Paid</option>
+          </select>
+          <FontAwesomeIcon
+            icon={faCaretDown}
+            className="ss-caret"
+            aria-hidden="true"
+          />
+        </div>
+      )}
 
       {showPlanFilter && (
         <div className="ss-select-wrap">
@@ -118,7 +166,11 @@ export default function SpreadsheetCard<T extends object>({
               </option>
             ))}
           </select>
-          <FontAwesomeIcon icon={faCaretDown} className="ss-caret" aria-hidden="true" />
+          <FontAwesomeIcon
+            icon={faCaretDown}
+            className="ss-caret"
+            aria-hidden="true"
+          />
         </div>
       )}
     </div>
@@ -136,13 +188,18 @@ export default function SpreadsheetCard<T extends object>({
     >
       <div className="ss-table" role="table" aria-label={title}>
         <div className="ss-thead" role="rowgroup">
-          <div className="ss-row ss-head" role="row">
+          <div
+            className="ss-row ss-head"
+            role="row"
+            style={{ gridTemplateColumns: colTemplate }}
+          >
             {columns.map((c) => (
               <div
                 key={String(c.key)}
                 role="columnheader"
-                className={`ss-cell ${c.align ?? "left"}`}
-                style={{ width: c.width, color: rowHeaderColor }}
+                className={`ss-cell ${c.align ?? "left"} ${c.className ?? ""}`}
+                style={{ color: rowHeaderColor }}
+                title={c.label}
               >
                 {c.label}
               </div>
@@ -152,13 +209,18 @@ export default function SpreadsheetCard<T extends object>({
 
         <div className="ss-tbody" role="rowgroup">
           {rows.map((row, i) => (
-            <div key={i} className="ss-row" role="row">
+            <div
+              key={i}
+              className="ss-row"
+              role="row"
+              style={{ gridTemplateColumns: colTemplate }}
+            >
               {columns.map((c) => (
                 <div
                   key={String(c.key)}
                   role="cell"
-                  className={`ss-cell ${c.align ?? "left"}`}
-                  style={{ width: c.width, color: rowColor }}
+                  className={`ss-cell ${c.align ?? "left"} ${c.className ?? ""}`}
+                  style={{ color: rowColor }}
                 >
                   {c.render ? c.render(row) : String(row[c.key])}
                 </div>
