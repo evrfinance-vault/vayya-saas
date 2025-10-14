@@ -40,6 +40,7 @@ type Props<T extends object> = {
     s: "ALL" | "ACTIVE" | "HOLD" | "DELINQUENT" | "PAID",
   ) => void;
   showStatusFilter?: boolean;
+  headerControls?: React.ReactNode;
 };
 
 export default function SpreadsheetCard<T extends object>({
@@ -63,6 +64,7 @@ export default function SpreadsheetCard<T extends object>({
   statusValue,
   onStatusChange,
   showStatusFilter = false,
+  headerControls,
 }: Props<T>) {
   const [internalRange, setInternalRange] = React.useState<RangeKey>(
     rangeValue ?? "12m",
@@ -110,7 +112,7 @@ export default function SpreadsheetCard<T extends object>({
     [columns],
   );
 
-  const header = (
+  const defaultHeader = (
     <div className="ss-controls">
       <div className="ss-select-wrap">
         <select
@@ -175,6 +177,7 @@ export default function SpreadsheetCard<T extends object>({
       )}
     </div>
   );
+  const header = headerControls ?? defaultHeader;
 
   return (
     <Card

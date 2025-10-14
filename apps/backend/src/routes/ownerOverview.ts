@@ -581,6 +581,125 @@ ownerOverview.get("/api/owner/active-plans", async (req, res) => {
   res.json({ rows: filtered });
 });
 
+// GET /api/owner/late-payments/summary
+ownerOverview.get("/api/owner/late-payments/summary", async (_req, res) => {
+  const now = new Date();
+
+  const plans = await prisma.paymentPlan.findMany({
+    include: {
+      payments: {
+        where: { NOT: { status: "PAID" } },
+        select: { amountCents: true, status: true, dueDate: true },
+      },
+    },
+  });
+
+  let delinquentAccounts = 0;
+  let amountOverdueCents = 0;
+  let atRiskCents = 0;
+  let sumDays = 0;
+  let cntDays = 0;
+
+  for (const pl of plans) {
+    const outstanding = pl.payments.reduce((s, p) => s + p.amountCents, 0);
+    const overdue = pl.payments.filter(
+      (p) => p.status !== "PAID" && p.dueDate < now,
+    );
+
+    if (overdue.length) {
+      delinquentAccounts += 1;
+      atRiskCents += outstanding;
+      for (const p of overdue) {
+        amountOverdueCents += p.amountCents;
+        const days = Math.max(
+          0,
+          Math.floor((+now - +p.dueDate) / (1000 * 60 * 60 * 24)),
+        );
+        sumDays += days;
+        cntDays += 1;
+      }
+    }
+  }
+
+  const avgDaysOverdue = cntDays ? Math.round(sumDays / cntDays) : 0;
+
+  res.json({ delinquentAccounts, amountOverdueCents, atRiskCents, avgDaysOverdue });
+});
+
+// GET /api/owner/late-payments/list?status=ALL|LATE|HOLD&risk=ALL|LOW|MEDIUM|HIGH&daysMin=0
+ownerOverview.get("/api/owner/late-payments/list", async (req, res) => {
+  type StatusKey = "ALL" | "LATE" | "HOLD";
+  const statusParam = String(req.query.status ?? "ALL").toUpperCase() as StatusKey;
+  const riskParam = String(req.query.risk ?? "ALL").toUpperCase() as
+    | "ALL" | "LOW" | "MEDIUM" | "HIGH";
+  const daysMin = Math.max(0, Number(req.query.daysMin ?? 0));
+
+  const now = new Date();
+
+  const plans = await prisma.paymentPlan.findMany({
+    include: {
+      patient: { select: { firstName: true, lastName: true } },
+      payments: {
+        where: { NOT: { status: "PAID" } },
+        select: { amountCents: true, status: true, dueDate: true },
+        orderBy: { dueDate: "asc" },
+      },
+    },
+    orderBy: { startDate: "desc" },
+  });
+
+  type PlanRow = (typeof plans)[number];
+
+  const rows = plans.map((pl: PlanRow) => {
+    const full = `${pl.patient.firstName} ${pl.patient.lastName}`.trim();
+
+    let outstandingCents = 0;
+    let overdueCents = 0;
+    let missedCount = 0;
+    let hold = pl.onHold;
+    let maxDays = 0;
+
+    for (const p of pl.payments) {
+      outstandingCents += p.amountCents;
+      if (p.status === "HOLD") hold = true;
+      if (p.dueDate < now && p.status !== "HOLD") {
+        overdueCents += p.amountCents;
+        missedCount += 1;
+        const days = Math.max(
+          0,
+          Math.floor((+now - +p.dueDate) / (1000 * 60 * 60 * 24)),
+        );
+        if (days > maxDays) maxDays = days;
+      }
+    }
+
+    const isLate = overdueCents > 0;
+    const status: "LATE" | "HOLD" = hold && !isLate ? "HOLD" : "LATE";
+    const risk = riskFromDays(maxDays);
+
+    return {
+      id: pl.id,
+      client: full,
+      outstandingCents,
+      overdueCents,
+      daysOverdue: maxDays,
+      missedPayments: missedCount,
+      risk,
+      status,
+      planType: pl.planType,
+    };
+  });
+
+  const filtered = rows.filter((r) => {
+    if (statusParam !== "ALL" && r.status !== statusParam) return false;
+    if (riskParam !== "ALL" && r.risk !== riskParam) return false;
+    if (r.daysOverdue < daysMin) return false;
+    return true;
+  });
+
+  res.json({ rows: filtered });
+});
+
 // helpers
 
 function initialsFor(n: string) {
@@ -588,4 +707,10 @@ function initialsFor(n: string) {
   const first = parts[0]?.[0] ?? "";
   const last = parts[parts.length - 1]?.[0] ?? "";
   return (first + last).toUpperCase();
+}
+
+function riskFromDays(maxDays: number): "LOW" | "MEDIUM" | "HIGH" {
+  if (maxDays >= 45) return "HIGH";
+  if (maxDays >= 15) return "MEDIUM";
+  return "LOW";
 }
