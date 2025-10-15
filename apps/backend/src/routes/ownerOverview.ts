@@ -14,7 +14,15 @@ import {
   addYears,
 } from "date-fns";
 
-const PLATFORM_FEE_BPS = Number(process.env.PLATFORM_FEE_BPS ?? 500);
+type PlanMeta = {
+  principalCents: number;
+  downPaymentCents: number;
+  termMonths: number;
+  aprBps: number;
+  payments: { id: string; dueDate: Date }[];
+};
+
+const PLATFORM_FEE_BPS = Number(process.env.PLATFORM_FEE_BPS ?? 499);
 
 export const ownerOverview = Router();
 
@@ -228,214 +236,248 @@ ownerOverview.get("/api/owner/total-revenue/summary", async (_req, res) => {
   const now = new Date();
   const ytdStart = startOfYear(now);
   const prevStart = startOfYear(addYears(now, -1));
-  const prevEnd = addYears(now, -1);
+  const prevEndSameDay = addYears(now, -1);
 
-  const [allAgg, ytdAgg, prevAgg] = await Promise.all([
+  const [allPaid, allLate] = await Promise.all([
     prisma.payment.aggregate({
       where: { status: "PAID" },
       _sum: { amountCents: true },
     }),
     prisma.payment.aggregate({
+      where: { status: "PAID" },
+      _sum: { lateFeeCents: true },
+    }),
+  ]);
+  const allTimeRevenueCents =
+    (allPaid._sum.amountCents ?? 0) + (allLate._sum.lateFeeCents ?? 0);
+
+  const [ytdPaid, ytdLate] = await Promise.all([
+    prisma.payment.aggregate({
       where: { status: "PAID", paidAt: { gte: ytdStart, lte: now } },
       _sum: { amountCents: true },
     }),
     prisma.payment.aggregate({
-      where: { status: "PAID", paidAt: { gte: prevStart, lte: prevEnd } },
-      _sum: { amountCents: true },
+      where: { status: "PAID", paidAt: { gte: ytdStart, lte: now } },
+      _sum: { lateFeeCents: true },
     }),
   ]);
+  const ytdRevenueCents =
+    (ytdPaid._sum.amountCents ?? 0) + (ytdLate._sum.lateFeeCents ?? 0);
 
-  const allTimeRevenueCents = allAgg._sum.amountCents ?? 0;
-  const ytdRevenueCents = ytdAgg._sum.amountCents ?? 0;
-  const prevCents = prevAgg._sum.amountCents ?? 0;
+  const [prevPaid, prevLate] = await Promise.all([
+    prisma.payment.aggregate({
+      where: { status: "PAID", paidAt: { gte: prevStart, lte: prevEndSameDay } },
+      _sum: { amountCents: true },
+    }),
+    prisma.payment.aggregate({
+      where: { status: "PAID", paidAt: { gte: prevStart, lte: prevEndSameDay } },
+      _sum: { lateFeeCents: true },
+    }),
+  ]);
+  const prevRevenueCents =
+    (prevPaid._sum.amountCents ?? 0) + (prevLate._sum.lateFeeCents ?? 0);
 
-  const yoyDeltaPct = prevCents
-    ? ((ytdRevenueCents - prevCents) / prevCents) * 100
+  const paidYtd = await prisma.payment.findMany({
+    where: { status: "PAID", paidAt: { gte: ytdStart, lte: now } },
+    select: {
+      id: true,
+      amountCents: true,
+      lateFeeCents: true,
+      paidAt: true,
+      paymentPlan: {
+        select: {
+          principalCents: true,
+          downPaymentCents: true,
+          termMonths: true,
+          aprBps: true,
+          payments: { select: { id: true, dueDate: true } },
+        },
+      },
+    },
+  });
+
+  let interestYtdCents = 0;
+  let lateFeesYtdCents = 0;
+  let paidYtdCents = 0;
+  for (const p of paidYtd) {
+    interestYtdCents += interestForPayment(p.paymentPlan as PlanMeta, p.id);
+    lateFeesYtdCents += p.lateFeeCents ?? 0;
+    paidYtdCents += p.amountCents ?? 0;
+  }
+
+  const dueYtd = await prisma.payment.findMany({
+    where: { dueDate: { gte: ytdStart, lte: now } },
+    select: { amountCents: true, status: true, dueDate: true, paidAt: true },
+  });
+  let dueCents = 0;
+  let onTimeCents = 0;
+  for (const d of dueYtd) {
+    dueCents += d.amountCents;
+    if (d.status === "PAID" && onTime(d.paidAt ?? null, d.dueDate)) {
+      onTimeCents += d.amountCents;
+    }
+  }
+  const avgRepaymentRatePct = dueCents ? (onTimeCents / dueCents) * 100 : 0;
+
+  const yoyDeltaPct = prevRevenueCents
+    ? ((ytdRevenueCents - prevRevenueCents) / prevRevenueCents) * 100
     : 0;
-
-  const platformFeesYtdCents = Math.round(
-    (ytdRevenueCents * PLATFORM_FEE_BPS) / 10000,
-  );
 
   res.json({
     allTimeRevenueCents,
     ytdRevenueCents,
+    interestYtdCents,
+    lateFeesYtdCents,
     yoyDeltaPct,
     platformFeeBps: PLATFORM_FEE_BPS,
-    platformFeesYtdCents,
+    avgRepaymentRatePct,
   });
 });
 
-// GET /api/owner/total-revenue/monthly?range=3m|6m|12m|ltd&plan=ALL|SELF|KAYYA
-// GET /api/owner/total-revenue/monthly?months=12
+// GET /api/owner/total-revenue/monthly?range=ytd|12m|all&plan=ALL|SELF|KAYYA
 ownerOverview.get("/api/owner/total-revenue/monthly", async (req, res) => {
   type PlanKey = "ALL" | "SELF" | "KAYYA";
   const planParam = String(req.query.plan ?? "ALL").toUpperCase() as PlanKey;
   const plan: PlanKey =
     planParam === "SELF" || planParam === "KAYYA" ? planParam : "ALL";
+  const planFilter =
+    plan === "ALL" ? {} : { paymentPlan: { is: { planType: plan } } };
 
-  const range = req.query.range
-    ? String(req.query.range).toLowerCase()
-    : undefined;
-  const monthsFromRange =
-    range === "3m"
-      ? 3
-      : range === "6m"
-        ? 6
-        : range === "12m"
-          ? 12
-          : range === "ltd"
-            ? null
-            : undefined;
-
-  let explicitMonths: number | undefined;
-  if (req.query.months != null) {
-    const n = Number(req.query.months);
-    if (Number.isFinite(n)) {
-      explicitMonths = Math.max(1, Math.min(120, n));
-    }
-  }
+  const range = (req.query.range as string | undefined)?.toLowerCase();
+  const useAll = range === "all" || range === "ltd";
+  const useYtd = range === "ytd";
 
   const now = new Date();
   const endMonth = startOfMonth(now);
 
-  const planWhere = (p: PlanKey) =>
-    p === "ALL" ? {} : ({ paymentPlan: { is: { planType: p } } } as const);
-
   let firstMonth: Date;
-  if (monthsFromRange === null) {
-    const [minPaid, minDue, minStart] = await Promise.all([
-      prisma.payment.aggregate({
-        where: { status: "PAID", ...planWhere(plan) },
-        _min: { paidAt: true },
-      }),
-      prisma.payment.aggregate({
-        where: { ...planWhere(plan) },
-        _min: { dueDate: true },
-      }),
-      prisma.paymentPlan.aggregate({
-        where: plan === "ALL" ? {} : { planType: plan },
-        _min: { startDate: true },
-      }),
-    ]);
-
-    const candidates = [
-      minPaid._min.paidAt ?? undefined,
-      minDue._min.dueDate ?? undefined,
-      minStart._min.startDate ?? undefined,
-    ].filter(Boolean) as Date[];
-
-    const earliest = candidates.length
-      ? candidates.reduce((a, b) => (a < b ? a : b))
-      : endMonth;
-
-    firstMonth = startOfMonth(earliest);
+  if (useAll) {
+    const minStart = await prisma.paymentPlan.aggregate({
+      _min: { startDate: true },
+    });
+    firstMonth = startOfMonth(minStart._min.startDate ?? endMonth);
+  } else if (useYtd) {
+    firstMonth = startOfMonth(startOfYear(now));
   } else {
-    const m = explicitMonths ?? monthsFromRange ?? 12;
-    firstMonth = startOfMonth(addMonths(endMonth, -(m - 1)));
+    firstMonth = startOfMonth(addMonths(endMonth, -11));
   }
 
-  const monthsCount =
-    monthsFromRange === null
-      ? Math.max(
-          1,
-          (endMonth.getFullYear() - firstMonth.getFullYear()) * 12 +
-            (endMonth.getMonth() - firstMonth.getMonth()) +
-            1,
-        )
-      : (explicitMonths ?? monthsFromRange ?? 12);
-
   const nextAfterEnd = addMonths(endMonth, 1);
+  const paid = await prisma.payment.findMany({
+    where: {
+      status: "PAID",
+      paidAt: { gte: firstMonth, lt: nextAfterEnd },
+      ...planFilter,
+    },
+    select: {
+      id: true,
+      paidAt: true,
+      amountCents: true,
+      lateFeeCents: true,
+      paymentPlan: {
+        select: {
+          principalCents: true,
+          downPaymentCents: true,
+          termMonths: true,
+          aprBps: true,
+          payments: { select: { id: true, dueDate: true } },
+        },
+      },
+    },
+  });
 
-  const [paid, due, startedPlans] = await Promise.all([
-    prisma.payment.findMany({
-      where: {
-        status: "PAID",
-        paidAt: { gte: firstMonth, lt: nextAfterEnd },
-        ...planWhere(plan),
-      },
-      select: { amountCents: true, paidAt: true },
-      orderBy: { paidAt: "desc" },
-    }),
-    prisma.payment.findMany({
-      where: {
-        dueDate: { gte: firstMonth, lt: nextAfterEnd },
-        ...planWhere(plan),
-      },
-      select: { amountCents: true, dueDate: true },
-      orderBy: { dueDate: "desc" },
-    }),
-    prisma.paymentPlan.findMany({
-      where: {
-        startDate: { gte: firstMonth, lt: nextAfterEnd },
-        ...(plan === "ALL" ? {} : { planType: plan }),
-      },
-      select: { principalCents: true, startDate: true },
-      orderBy: { startDate: "desc" },
-    }),
-  ]);
+  const due = await prisma.payment.findMany({
+    where: { dueDate: { gte: firstMonth, lt: nextAfterEnd }, ...planFilter },
+    select: { amountCents: true, status: true, dueDate: true, paidAt: true },
+  });
 
-  const idxFromFirst = (d: Date) =>
-    (d.getFullYear() - firstMonth.getFullYear()) * 12 +
-    (d.getMonth() - firstMonth.getMonth());
+  const startedPlans = await prisma.paymentPlan.findMany({
+    where: {
+      startDate: { gte: firstMonth, lt: nextAfterEnd },
+      ...(plan === "ALL" ? {} : { planType: plan }),
+    },
+    select: { principalCents: true, startDate: true },
+    orderBy: { startDate: "desc" },
+  });
 
   type Row = {
     ym: string;
     label: string;
+    date: Date;
     revenueCents: number;
     loanVolumeCents: number;
     dueCents: number;
     paidCents: number;
+    onTimeCents: number;
     repaymentRatePct: number;
     platformFeesCents: number;
+    interestCents: number;
+    lateFeesCents: number;
   };
+
+  const monthsCount =
+    (endMonth.getFullYear() - firstMonth.getFullYear()) * 12 +
+    (endMonth.getMonth() - firstMonth.getMonth()) +
+    1;
 
   const rows: Row[] = [];
   for (let i = monthsCount - 1; i >= 0; i--) {
-    const mStart = startOfMonth(addMonths(firstMonth, i));
+    const d = startOfMonth(addMonths(firstMonth, i));
     rows.push({
-      ym: format(mStart, "yyyy-MM"),
-      label: format(mStart, "MMMM yyyy"),
+      ym: format(d, "yyyy-MM"),
+      label: format(d, "MMMM yyyy"),
+      date: d,
       revenueCents: 0,
       loanVolumeCents: 0,
       dueCents: 0,
       paidCents: 0,
+      onTimeCents: 0,
       repaymentRatePct: 0,
       platformFeesCents: 0,
+      interestCents: 0,
+      lateFeesCents: 0,
     });
   }
 
-  const writePos = (d: Date) => {
-    const idx = idxFromFirst(d);
-    return monthsCount - 1 - idx;
-  };
+  const idxFromFirst = (d: Date) =>
+    (d.getFullYear() - firstMonth.getFullYear()) * 12 +
+    (d.getMonth() - firstMonth.getMonth());
+  const indexForDate = (d: Date) => monthsCount - 1 - idxFromFirst(d);
 
   for (const p of paid) {
-    const pos = writePos(p.paidAt!);
-    if (pos >= 0 && pos < monthsCount) {
-      rows[pos].revenueCents += p.amountCents;
-      rows[pos].paidCents += p.amountCents;
+    const i = indexForDate(p.paidAt!);
+    if (i < 0 || i >= monthsCount) continue;
+    const interest = interestForPayment(p.paymentPlan as PlanMeta, p.id);
+    const fees = p.lateFeeCents ?? 0;
+    rows[i].interestCents += interest;
+    rows[i].lateFeesCents += fees;
+    rows[i].revenueCents += (p.amountCents ?? 0) + fees;
+  }
+
+  for (const d of due) {
+    const i = indexForDate(d.dueDate);
+    if (i < 0 || i >= monthsCount) continue;
+    rows[i].dueCents += d.amountCents;
+    if (d.status === "PAID" && onTime(d.paidAt ?? null, d.dueDate)) {
+      rows[i].onTimeCents += d.amountCents;
     }
   }
-  for (const p of due) {
-    const pos = writePos(p.dueDate);
-    if (pos >= 0 && pos < monthsCount) rows[pos].dueCents += p.amountCents;
-  }
+
   for (const pl of startedPlans) {
-    const pos = writePos(pl.startDate);
-    if (pos >= 0 && pos < monthsCount)
-      rows[pos].loanVolumeCents += pl.principalCents;
+    const i = indexForDate(pl.startDate);
+    if (i >= 0 && i < rows.length) rows[i].loanVolumeCents += pl.principalCents;
   }
 
   for (const r of rows) {
-    r.repaymentRatePct =
-      r.dueCents > 0 ? Math.min(100, (r.paidCents / r.dueCents) * 100) : 0;
+    r.repaymentRatePct = r.dueCents
+      ? Math.min(100, (r.onTimeCents / r.dueCents) * 100)
+      : 0;
     r.platformFeesCents = Math.round(
-      (r.revenueCents * PLATFORM_FEE_BPS) / 10000,
+      (r.interestCents * PLATFORM_FEE_BPS) / 10000,
     );
   }
 
-  res.json({ months: rows });
+  return res.json({ months: rows });
 });
 
 // GET /api/owner/active-plans?range=3m|6m|12m|ltd&status=ALL|ACTIVE|HOLD|DELINQUENT|PAID&plan=ALL|SELF|KAYYA
@@ -768,7 +810,7 @@ ownerOverview.get("/api/owner/applications", async (req, res) => {
 
   const planQ = String(req.query.plan ?? "ALL").toUpperCase() as PlanKey;
   const statusQ = String(req.query.status ?? "ALL").toUpperCase() as AppStatus;
-  const rangeQ = String(req.query.range ?? "all").toLowerCase(); // all|30d|90d|ytd
+  const rangeQ = String(req.query.range ?? "all").toLowerCase();
 
   const planWhere = planQ === "ALL" ? {} : { planType: planQ as any };
   const statusWhere = statusQ === "ALL" ? {} : { status: statusQ as any };
@@ -820,4 +862,51 @@ function riskFromDays(maxDays: number): "LOW" | "MEDIUM" | "HIGH" {
   if (maxDays >= 45) return "HIGH";
   if (maxDays >= 15) return "MEDIUM";
   return "LOW";
+}
+
+function interestPerPaymentCents(plan: {
+  principalCents: number;
+  downPaymentCents: number;
+  termMonths: number;
+  aprBps: number;
+}) {
+  const financed = Math.max(
+    0,
+    plan.principalCents - (plan.downPaymentCents ?? 0),
+  );
+  const totalInterest = Math.round((financed * (plan.aprBps ?? 0)) / 10000);
+  return plan.termMonths > 0 ? Math.round(totalInterest / plan.termMonths) : 0;
+}
+
+function platformFeePerPaymentCents(plan: {
+  principalCents: number;
+  downPaymentCents: number;
+  termMonths: number;
+  aprBps: number;
+}) {
+  const financed = Math.max(
+    0,
+    plan.principalCents - (plan.downPaymentCents ?? 0),
+  );
+  const platformBps = Math.min(plan.aprBps ?? 0, PLATFORM_FEE_BPS);
+  const totalPlatformInterest = Math.round((financed * platformBps) / 10000);
+  return plan.termMonths > 0
+    ? Math.round(totalPlatformInterest / plan.termMonths)
+    : 0;
+}
+
+function interestForPayment(plan: PlanMeta, paymentId: string) {
+  const financed = Math.max(0, plan.principalCents - plan.downPaymentCents);
+  const totalInterest = Math.round((financed * (plan.aprBps ?? 0)) / 10000);
+  const base = Math.floor(totalInterest / plan.termMonths);
+  const remainder = totalInterest - base * plan.termMonths;
+  const idx = plan.payments
+    .sort((a, b) => +a.dueDate - +b.dueDate)
+    .findIndex((p) => p.id === paymentId);
+  if (idx < 0) return 0;
+  return base + (idx === plan.termMonths - 1 ? remainder : 0);
+}
+
+function onTime(paidAt: Date | null, dueDate: Date) {
+  return !!paidAt && paidAt <= dueDate;
 }

@@ -1,3 +1,8 @@
+:root {
+  --fair-health-color: #f2efa6;
+  --poor-health-color: #ebadaf;
+}
+
 .ah-skel {
   opacity: 0.6;
   font-weight: 600;
@@ -88,13 +93,9 @@
 }
 
 .ah-knob.fair {
-  --fair-health-color: #f2efa6;
-
   color: var(--fair-health-color);
 }
 
 .ah-knob.poor {
-  --poor-health-color: #ebadaf;
-
   color: var(--poor-health-color);
 }

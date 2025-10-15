@@ -121,9 +121,13 @@ async function main() {
       const down = pick([0, 500, 750, 1_000, 1_500]) * 100;
       const term = pick([6, 9, 12, 18, 24]);
       const billingDay = pick([5, 9, 12, 16, 20, 23, 28]);
-      const startMonthsAgo = randInt(0, 14);
+
+      const startMonthsAgo =
+        Math.random() < 0.6 ? randInt(0, 11) : randInt(12, 23);
       const startDate = addMonths(anchor, -startMonthsAgo);
+
       const type: PlanType = Math.random() < 0.5 ? "SELF" : "KAYYA";
+      const aprBps = pick([999, 1299, 1499, 1799, 1999]);
 
       const plan = await createPlanWithSchedule(prisma, {
         patientId: pt.id,
@@ -143,15 +147,41 @@ async function main() {
           "POOR",
         ] as const),
         onHold: Math.random() < 0.08,
+        aprBps,
       });
 
       const past = plan.payments.filter((p) => isBefore(p.dueDate, anchor));
       for (const p of past) {
-        if (Math.random() < 0.88) {
-          const paidAt = addDays(p.dueDate, randInt(0, 6));
+        const roll = Math.random();
+        if (roll < 0.90) {
+          const paidAt = addDays(p.dueDate, randInt(-1, 0));
           await prisma.payment.update({
             where: { id: p.id },
-            data: { status: PaymentStatus.PAID, paidAt },
+            data: {
+              status: PaymentStatus.PAID,
+              paidAt,
+              lateFeeCents: 0,
+            },
+          });
+        } else if (roll < 0.98) {
+          const paidAt = addDays(p.dueDate, randInt(1, 3));
+          await prisma.payment.update({
+            where: { id: p.id },
+            data: {
+              status: PaymentStatus.PAID,
+              paidAt,
+              lateFeeCents: 0,
+            },
+          });
+        } else if (roll < 0.995) {
+          const paidAt = addDays(p.dueDate, randInt(5, 10));
+          await prisma.payment.update({
+            where: { id: p.id },
+            data: {
+              status: PaymentStatus.PAID,
+              paidAt,
+              lateFeeCents: 2500,
+            },
           });
         }
       }

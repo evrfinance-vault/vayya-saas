@@ -38,6 +38,7 @@ model Payment {
   dueDate       DateTime
   paidAt        DateTime?
   amountCents   Int
+  lateFeeCents  Int           @default(0)
   status        PaymentStatus @default(PENDING)
   methodLabel   String?
   holdReason    String?
@@ -82,6 +83,7 @@ model PaymentPlan {
   termMonths       Int          @default(12)
   startDate        DateTime     @default(now())
   billingDay       Int          @default(15)
+  aprBps           Int          @default(0)
   health           PlanHealth
   planType         PlanType     @default(SELF)
   payments         Payment[]

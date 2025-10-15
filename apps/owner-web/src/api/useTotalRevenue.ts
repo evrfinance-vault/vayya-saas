@@ -11,18 +11,23 @@ export type TRSummary = {
   yoyDeltaPct: number;
   platformFeeBps: number;
   platformFeesYtdCents: number;
+  interestYtdCents: number;
+  lateFeesYtdCents: number;
 };
 
 export type TRMonth = {
   ym: string;
   label: string;
-  date: string;
+  date?: string;
   revenueCents: number;
   loanVolumeCents: number;
   dueCents: number;
   paidCents: number;
+  onTimeCents?: number;
   repaymentRatePct: number;
   platformFeesCents: number;
+  interestCents: number;
+  lateFeesCents: number;
 };
 
 export function useTotalRevenueSummary() {
@@ -39,24 +44,16 @@ export function useTotalRevenueSummary() {
   return { data, loading };
 }
 
-export function useTotalRevenueMonthly(range = "12m", plan: PlanKey = "ALL") {
+export function useTotalRevenueMonthly(range: "ytd" | "12m" | "all" = "ytd", plan: PlanKey = "ALL") {
   const [data, setData] = useState<TRMonth[] | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const ctl = new AbortController();
-    setLoading(true);
-
-    fetch(
-      `${API}/api/owner/total-revenue/monthly?range=${range}&plan=${plan}`,
-      { signal: ctl.signal },
-    )
-      .then((r) => r.json())
-      .then((payload) => {
-        setData(payload.months ?? payload.rows ?? payload.points ?? payload);
-      })
+    fetch(`${API}/api/owner/total-revenue/monthly?range=${range}&plan=${plan}`, { signal: ctl.signal })
+      .then(r => r.json())
+      .then((payload) => setData(payload.months ?? payload.rows ?? payload))
       .finally(() => setLoading(false));
-
     return () => ctl.abort();
   }, [range, plan]);
 

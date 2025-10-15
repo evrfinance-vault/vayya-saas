@@ -1,11 +1,6 @@
 import { addMonths, startOfMonth } from "date-fns";
 import type { PrismaClient } from "@prisma/client";
 
-/**
- * Create a plan and its monthly Payment rows in one go.
- * First payment = baseInstallment + downPaymentCents
- * Last payment absorbs any rounding remainder.
- */
 export async function createPlanWithSchedule(
   prisma: PrismaClient,
   args: {
@@ -18,27 +13,30 @@ export async function createPlanWithSchedule(
     planType: "SELF" | "KAYYA";
     health: "EXCELLENT" | "GOOD" | "FAIR" | "POOR";
     onHold?: boolean;
+    aprBps?: number;
   },
 ) {
   const {
     patientId,
     principalCents,
-    downPaymentCents,
+    downPaymentCents = 0,
     termMonths,
     startDate,
     billingDay,
     planType,
     health,
     onHold,
+    aprBps = 0,
   } = args;
 
-  const financed = principalCents - (downPaymentCents || 0);
-  if (termMonths <= 0) throw new Error("termMonths must be >= 1");
-  if (financed < 0)
-    throw new Error("downPaymentCents cannot exceed principalCents");
+  const financed = Math.max(0, principalCents - downPaymentCents);
+  const totalInterest = Math.round(financed * aprBps / 10000);
+  const totalRepay = financed + totalInterest;
+  const base = Math.floor(totalRepay / termMonths);
+  const remainder = totalRepay - base * termMonths;
 
-  const base = Math.floor(financed / termMonths);
-  const remainder = financed - base * termMonths;
+  if (termMonths <= 0) throw new Error("termMonths must be >= 1");
+  if (financed < 0) throw new Error("downPaymentCents cannot exceed principalCents");
 
   const payments: Array<{
     amountCents: number;
@@ -46,6 +44,7 @@ export async function createPlanWithSchedule(
     dueDate: Date;
     paidAt: Date | null;
     patientId: string;
+    lateFeeCents: number;
   }> = [];
 
   for (let i = 0; i < termMonths; i++) {
@@ -57,8 +56,8 @@ export async function createPlanWithSchedule(
     );
     let amount = base;
 
-    if (i === 0) amount += downPaymentCents; // down-payment joins first installment
-    if (i === termMonths - 1) amount += remainder; // absorb rounding
+    if (i === 0) amount += downPaymentCents;
+    if (i === termMonths - 1) amount += remainder;
 
     payments.push({
       amountCents: amount,
@@ -66,6 +65,7 @@ export async function createPlanWithSchedule(
       dueDate,
       paidAt: null as Date | null,
       patientId,
+      lateFeeCents: 0,
     });
   }
 
@@ -80,6 +80,7 @@ export async function createPlanWithSchedule(
       planType,
       health,
       onHold: !!onHold,
+      aprBps,
       payments: {
         createMany: { data: payments },
       },
