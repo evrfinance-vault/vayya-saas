@@ -266,11 +266,17 @@ ownerOverview.get("/api/owner/total-revenue/summary", async (_req, res) => {
 
   const [prevPaid, prevLate] = await Promise.all([
     prisma.payment.aggregate({
-      where: { status: "PAID", paidAt: { gte: prevStart, lte: prevEndSameDay } },
+      where: {
+        status: "PAID",
+        paidAt: { gte: prevStart, lte: prevEndSameDay },
+      },
       _sum: { amountCents: true },
     }),
     prisma.payment.aggregate({
-      where: { status: "PAID", paidAt: { gte: prevStart, lte: prevEndSameDay } },
+      where: {
+        status: "PAID",
+        paidAt: { gte: prevStart, lte: prevEndSameDay },
+      },
       _sum: { lateFeeCents: true },
     }),
   ]);
@@ -298,11 +304,9 @@ ownerOverview.get("/api/owner/total-revenue/summary", async (_req, res) => {
 
   let interestYtdCents = 0;
   let lateFeesYtdCents = 0;
-  let paidYtdCents = 0;
   for (const p of paidYtd) {
     interestYtdCents += interestForPayment(p.paymentPlan as PlanMeta, p.id);
     lateFeesYtdCents += p.lateFeeCents ?? 0;
-    paidYtdCents += p.amountCents ?? 0;
   }
 
   const dueYtd = await prisma.payment.findMany({
@@ -704,15 +708,25 @@ ownerOverview.get("/api/owner/late-payments/list", async (req, res) => {
     orderBy: { startDate: "desc" },
   });
 
-  type PlanRow = (typeof plans)[number];
+  type LateRow = {
+    id: string;
+    client: string;
+    outstandingCents: number;
+    overdueCents: number;
+    daysOverdue: number;
+    missedPayments: number;
+    risk: "LOW" | "MEDIUM" | "HIGH";
+    status: "LATE" | "HOLD";
+    planType: "SELF" | "KAYYA";
+  };
 
-  const rows = plans.map((pl: PlanRow) => {
+  const rows: LateRow[] = plans.map((pl: any) => {
     const full = `${pl.patient.firstName} ${pl.patient.lastName}`.trim();
 
     let outstandingCents = 0;
     let overdueCents = 0;
     let missedCount = 0;
-    let hold = pl.onHold;
+    let hold = (pl as any).onHold as boolean;
     let maxDays = 0;
 
     for (const p of pl.payments) {
@@ -746,8 +760,8 @@ ownerOverview.get("/api/owner/late-payments/list", async (req, res) => {
     };
   });
 
-  const filtered = rows.filter(
-    (r: PlanRow) =>
+  const filtered: LateRow[] = rows.filter(
+    (r: LateRow) =>
       (statusParam === "ALL" ? true : r.status === statusParam) &&
       (riskParam === "ALL" ? true : r.risk === riskParam) &&
       r.daysOverdue >= daysMin,
@@ -862,37 +876,6 @@ function riskFromDays(maxDays: number): "LOW" | "MEDIUM" | "HIGH" {
   if (maxDays >= 45) return "HIGH";
   if (maxDays >= 15) return "MEDIUM";
   return "LOW";
-}
-
-function interestPerPaymentCents(plan: {
-  principalCents: number;
-  downPaymentCents: number;
-  termMonths: number;
-  aprBps: number;
-}) {
-  const financed = Math.max(
-    0,
-    plan.principalCents - (plan.downPaymentCents ?? 0),
-  );
-  const totalInterest = Math.round((financed * (plan.aprBps ?? 0)) / 10000);
-  return plan.termMonths > 0 ? Math.round(totalInterest / plan.termMonths) : 0;
-}
-
-function platformFeePerPaymentCents(plan: {
-  principalCents: number;
-  downPaymentCents: number;
-  termMonths: number;
-  aprBps: number;
-}) {
-  const financed = Math.max(
-    0,
-    plan.principalCents - (plan.downPaymentCents ?? 0),
-  );
-  const platformBps = Math.min(plan.aprBps ?? 0, PLATFORM_FEE_BPS);
-  const totalPlatformInterest = Math.round((financed * platformBps) / 10000);
-  return plan.termMonths > 0
-    ? Math.round(totalPlatformInterest / plan.termMonths)
-    : 0;
 }
 
 function interestForPayment(plan: PlanMeta, paymentId: string) {

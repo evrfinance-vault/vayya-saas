@@ -15,7 +15,7 @@ type Column<T> = {
   render?: (row: T) => React.ReactNode;
 };
 
-type RangeKey = "ytd" | "12m" | "all" | "ltd";
+type RangeKey = "ytd" | "12m" | "all" | "ltd" | string;
 
 type Props<T extends object> = {
   title: string;
@@ -58,7 +58,7 @@ export default function SpreadsheetCard<T extends object>({
   onPlanChange,
   rangeValue,
   onRangeChange,
-  rangeOptions = ["3m", "6m", "12m", "ltd"],
+  rangeOptions = ["ytd", "12m", "all", "ltd"],
   planOptions = ["ALL", "SELF", "KAYYA"],
   statusValue,
   onStatusChange,
@@ -66,7 +66,9 @@ export default function SpreadsheetCard<T extends object>({
   showStatusFilter = false,
   headerControls,
 }: Props<T>) {
-  const [internalRange, setInternalRange] = React.useState<RangeKey>(rangeValue ?? "ytd");
+  const [internalRange, setInternalRange] = React.useState<RangeKey>(
+    rangeValue ?? "ytd",
+  );
   const [internalPlan, setInternalPlan] = React.useState<PlanKey>(
     planValue ?? "ALL",
   );
@@ -87,10 +89,13 @@ export default function SpreadsheetCard<T extends object>({
 
   const rangeLabel = (r: RangeKey) => {
     switch (r) {
-      case "ytd": return "Year to date";
-      case "12m": return "Last 12 months";
+      case "ytd":
+        return "Year to date";
+      case "12m":
+        return "Last 12 months";
       case "all":
-      case "ltd": return "All time";
+      case "ltd":
+        return "All time";
     }
   };
 

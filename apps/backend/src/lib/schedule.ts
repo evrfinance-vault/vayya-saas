@@ -30,13 +30,14 @@ export async function createPlanWithSchedule(
   } = args;
 
   const financed = Math.max(0, principalCents - downPaymentCents);
-  const totalInterest = Math.round(financed * aprBps / 10000);
+  const totalInterest = Math.round((financed * aprBps) / 10000);
   const totalRepay = financed + totalInterest;
   const base = Math.floor(totalRepay / termMonths);
   const remainder = totalRepay - base * termMonths;
 
   if (termMonths <= 0) throw new Error("termMonths must be >= 1");
-  if (financed < 0) throw new Error("downPaymentCents cannot exceed principalCents");
+  if (financed < 0)
+    throw new Error("downPaymentCents cannot exceed principalCents");
 
   const payments: Array<{
     amountCents: number;

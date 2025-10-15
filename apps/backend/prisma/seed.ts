@@ -153,7 +153,7 @@ async function main() {
       const past = plan.payments.filter((p) => isBefore(p.dueDate, anchor));
       for (const p of past) {
         const roll = Math.random();
-        if (roll < 0.90) {
+        if (roll < 0.9) {
           const paidAt = addDays(p.dueDate, randInt(-1, 0));
           await prisma.payment.update({
             where: { id: p.id },

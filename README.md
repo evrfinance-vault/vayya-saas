@@ -84,7 +84,3 @@ npm run build
 ## Deploying to Production
 
 Deploys are handled automatically. Use Git Flow (or the `release.sh` script) to create a new release. This will automatically tag a new version and deploy to Netlify.
-
-
-
-

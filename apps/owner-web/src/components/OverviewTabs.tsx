@@ -68,6 +68,18 @@ export default function OverviewTabs({
     return () => window.removeEventListener("keydown", onKey);
   }, []);
 
+  const emitExport = React.useCallback(
+    (action: "csv" | "pdf" | "print") => {
+      window.dispatchEvent(
+        new CustomEvent("overview:export", {
+          detail: { tabKey: value, action },
+        }),
+      );
+      setOpenFor(null);
+    },
+    [value],
+  );
+
   return (
     <div className="wrapper">
       <div
@@ -146,13 +158,25 @@ export default function OverviewTabs({
                   className="overview-tab-menu"
                   onClick={(e) => e.stopPropagation()}
                 >
-                  <button role="menuitem" className="overview-tab-menu-item">
+                  <button
+                    role="menuitem"
+                    className="overview-tab-menu-item"
+                    onClick={() => emitExport("csv")}
+                  >
                     Export CSV
                   </button>
-                  <button role="menuitem" className="overview-tab-menu-item">
+                  <button
+                    role="menuitem"
+                    className="overview-tab-menu-item"
+                    onClick={() => emitExport("pdf")}
+                  >
                     Export PDF
                   </button>
-                  <button role="menuitem" className="overview-tab-menu-item">
+                  <button
+                    role="menuitem"
+                    className="overview-tab-menu-item"
+                    onClick={() => emitExport("print")}
+                  >
                     Print
                   </button>
                 </div>
