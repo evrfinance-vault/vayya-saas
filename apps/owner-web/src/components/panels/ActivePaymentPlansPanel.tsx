@@ -32,7 +32,7 @@ type TableRow = {
 };
 
 export default function ActivePaymentPlansPanel(): React.ReactElement {
-  const [range, setRange] = React.useState<RangeKey>("12m");
+  const [range, setRange] = React.useState<RangeKey>("ytd");
   const [plan, setPlan] = React.useState<PlanKey>("ALL");
   const [status, setStatus] = React.useState<StatusKey>("ALL");
 
@@ -166,6 +166,8 @@ export default function ActivePaymentPlansPanel(): React.ReactElement {
         statusValue={status}
         onStatusChange={(s) => setStatus(s as typeof status)}
         showStatusFilter
+        rangeOptions={["all", "12m", "ytd"]}
+        planOptions={["ALL", "KAYYA", "SELF"]}
       />
     </div>
   );
