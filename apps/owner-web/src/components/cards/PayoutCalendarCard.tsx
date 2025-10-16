@@ -31,29 +31,66 @@ export default function PayoutCalendarCard({
 
   const dayStart = startOfDay(focusDate);
   const dayEnd = addDays(dayStart, 1);
-  const { items: dayItems } = usePayoutsWindow(dayStart.toISOString().slice(0,10), dayEnd.toISOString().slice(0,10));
+  const { items: dayItems } = usePayoutsWindow(
+    dayStart.toISOString().slice(0, 10),
+    dayEnd.toISOString().slice(0, 10),
+  );
 
   const wkStart = startOfWeek(focusDate, { weekStartsOn: 0 });
   const wkEnd = addDays(wkStart, 7);
-  const { items: weekItems } = usePayoutsWindow(wkStart.toISOString().slice(0,10), wkEnd.toISOString().slice(0,10));
+  const { items: weekItems } = usePayoutsWindow(
+    wkStart.toISOString().slice(0, 10),
+    wkEnd.toISOString().slice(0, 10),
+  );
 
-  const monthOptions = React.useMemo(() => {
-    const start = new Date();
-    start.setDate(1);
-    const opts: { y: number; m: number; label: string; key: string }[] = [];
-    for (let i = 0; i < 12; i++) {
-      const d = new Date(start.getFullYear(), start.getMonth() + i, 1);
-      const y = d.getFullYear();
-      const m = d.getMonth() + 1;
+  type Opt = { value: string; label: string };
+  const selectOptions = React.useMemo<Opt[]>(() => {
+    const today = new Date();
+    if (mode === "month") {
+      const start = new Date(today.getFullYear(), today.getMonth(), 1);
+      const opts: Opt[] = [];
+      for (let i = 0; i < 12; i++) {
+        const d = new Date(start.getFullYear(), start.getMonth() + i, 1);
+        const y = d.getFullYear();
+        const m = d.getMonth() + 1;
+        opts.push({
+          value: `${y}-${m}`,
+          label: d.toLocaleString("en-US", { month: "short", year: "numeric" }),
+        });
+      }
+      return opts;
+    }
+    if (mode === "week") {
+      const start = startOfWeek(today, { weekStartsOn: 0 });
+      const opts: Opt[] = [];
+      for (let i = 0; i < 12; i++) {
+        const s = addDays(start, i * 7);
+        const e = addDays(s, 6);
+        const label = `${format(s, "MM/d/yy")} to ${format(e, "MM/d/yy")}`;
+        opts.push({ value: s.toISOString().slice(0, 10), label });
+      }
+      return opts;
+    }
+
+    const opts: Opt[] = [];
+    for (let i = 0; i < 30; i++) {
+      const d = addDays(today, i);
       opts.push({
-        y,
-        m,
-        label: d.toLocaleString("en-US", { month: "short" }),
-        key: `${y}-${m}`,
+        value: d.toISOString().slice(0, 10),
+        label: format(d, "MMM d yyyy"),
       });
     }
     return opts;
-  }, []);
+  }, [mode]);
+
+  const selectValue = React.useMemo(() => {
+    if (mode === "month") return `${view.y}-${view.m}`;
+    if (mode === "week")
+      return startOfWeek(focusDate, { weekStartsOn: 0 })
+        .toISOString()
+        .slice(0, 10);
+    return focusDate.toISOString().slice(0, 10);
+  }, [mode, view, focusDate]);
 
   const { data, loading } = useOwnerPayoutsByDay(view.y, view.m);
 
@@ -66,27 +103,37 @@ export default function PayoutCalendarCard({
   while (cells.length % 7 !== 0) cells.push({ day: null });
 
   const totals = data?.totals ?? {};
-  const fmtUSD = (cents: number) =>
+
+  const fmtMoney = (cents: number) =>
     new Intl.NumberFormat("en-US", {
       style: "currency",
       currency: "USD",
       minimumFractionDigits: 2,
-    }).format(cents / 100);
+    }).format((cents || 0) / 100);
 
   const header = (
     <div className="pc-head">
       <div className="pc-select-wrap">
         <select
           className="pc-month-select"
-          value={`${view.y}-${view.m}`}
-          aria-label="Select month"
+          value={selectValue}
+          aria-label="Select period"
           onChange={(e) => {
-            const [y, m] = e.target.value.split("-").map(Number);
-            setView({ y, m });
+            const v = e.target.value;
+            if (mode === "month") {
+              const [y, m] = v.split("-").map(Number);
+              setView({ y, m });
+              setFocusDate(new Date(y, (m ?? 1) - 1, 1));
+            } else if (mode === "week") {
+              const start = new Date(v);
+              setFocusDate(start);
+            } else {
+              setFocusDate(new Date(v));
+            }
           }}
         >
-          {monthOptions.map((o) => (
-            <option key={o.key} value={o.key}>
+          {selectOptions.map((o) => (
+            <option key={o.value} value={o.value}>
               {o.label}
             </option>
           ))}
@@ -211,7 +258,7 @@ export default function PayoutCalendarCard({
                       has ? (e) => enterCell(e, c.day!, cents) : undefined
                     }
                     onMouseLeave={has ? leaveCell : undefined}
-                    aria-label={has ? fmtUSD(cents) : undefined}
+                    aria-label={has ? fmtMoney(cents) : undefined}
                   >
                     {c.day}
                   </div>
@@ -237,7 +284,7 @@ export default function PayoutCalendarCard({
                   color="#f5c33b"
                 />
               </div>
-              {fmtUSD(hover.cents)}
+              {fmtMoney(hover.cents)}
             </div>
           )}
         </div>
