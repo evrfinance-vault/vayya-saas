@@ -98,8 +98,11 @@ export function useActivePlans(
       activeCount: inScope.length,
       totalFinancedCents: totalFinanced,
       interestEarnedYtdCents: rows.reduce((sum, r) => {
-        const totalInterest = Math.round((r.amountCents * (r.aprBps || 0)) / 10000);
-        const ytdFraction = Math.min(12, Math.max(1, r.termMonths)) / Math.max(1, r.termMonths);
+        const totalInterest = Math.round(
+          (r.amountCents * (r.aprBps || 0)) / 10000,
+        );
+        const ytdFraction =
+          Math.min(12, Math.max(1, r.termMonths)) / Math.max(1, r.termMonths);
         const paidFraction = (r.progressPct || 0) / 100;
         return sum + Math.round(totalInterest * ytdFraction * paidFraction);
       }, 0),

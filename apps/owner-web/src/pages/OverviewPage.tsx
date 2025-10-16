@@ -103,7 +103,7 @@ export default function OverviewPage(): React.ReactElement {
   const dotColor = health === null ? "#f2f2f2" : health ? "#90ee90" : "#edbf91";
 
   const { data: trSummary } = useTotalRevenueSummary();
-  const { rows: raw, summary, loading } = useActivePlans("ltd", "ALL", "ALL");
+  const { rows: _raw, summary, loading: _loading } = useActivePlans("ltd", "ALL", "ALL");
 
   const tabs = React.useMemo(
     () =>
@@ -114,11 +114,11 @@ export default function OverviewPage(): React.ReactElement {
               badge: fmtUSD(trSummary?.allTimeRevenueCents ?? 0),
             }
           : t.key === "active-payment-plans"
-          ? {
-              ...t,
-              badge: String(summary?.activeCount ?? 0),
-            }
-          : t,
+            ? {
+                ...t,
+                badge: String(summary?.activeCount ?? 0),
+              }
+            : t,
       ),
     [trSummary, summary],
   );

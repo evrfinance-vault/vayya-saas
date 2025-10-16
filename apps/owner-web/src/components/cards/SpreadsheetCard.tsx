@@ -159,7 +159,9 @@ export default function SpreadsheetCard<T extends object>({
                 typeof opt === "string" ? opt : (opt.label ?? opt.value);
               return (
                 <option key={val} value={val}>
-                  {lab === "ALL" ? "All statuses" : lab.charAt(0).toUpperCase() + lab.toLowerCase().slice(1)}
+                  {lab === "ALL"
+                    ? "All statuses"
+                    : lab.charAt(0).toUpperCase() + lab.toLowerCase().slice(1)}
                 </option>
               );
             })}

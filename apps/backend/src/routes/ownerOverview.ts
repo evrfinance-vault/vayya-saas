@@ -502,7 +502,12 @@ ownerOverview.get("/api/owner/active-plans/summary", async (req, res) => {
       termMonths: true,
       aprBps: true,
       payments: {
-        select: { amountCents: true, status: true, dueDate: true, paidAt: true },
+        select: {
+          amountCents: true,
+          status: true,
+          dueDate: true,
+          paidAt: true,
+        },
         orderBy: { dueDate: "asc" },
       },
     },
@@ -656,6 +661,7 @@ ownerOverview.get("/api/owner/active-plans", async (req, res) => {
     termMonths: number;
     planType: "SELF" | "KAYYA";
     onHold: boolean;
+    aprBps: number;
     patient: { firstName: string; lastName: string };
     payments: Array<{
       amountCents: number;

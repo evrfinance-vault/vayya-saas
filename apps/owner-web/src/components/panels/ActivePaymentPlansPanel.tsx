@@ -12,7 +12,6 @@ import {
   useActivePlans,
   type RangeKey,
   type PlanKey,
-  type ActivePlanRow,
   fmtUSD,
   fmtAPR,
 } from "../../api/useActivePlans";
@@ -25,8 +24,8 @@ type TableRow = {
   outstanding: string;
   apr: string;
   term: string;
-  progress: string;
-  status: string;
+  progress: number;
+  status: "ACTIVE" | "HOLD" | "DELINQUENT" | "PAID";
 };
 
 function centsToDollars(n: number) {
@@ -59,36 +58,45 @@ export default function ActivePaymentPlansPanel(): React.ReactElement {
     }));
   }, [raw]);
 
-  const shortId = (s: string) =>
-    s.length <= 12 ? s : `${s.slice(0, 6)}…${s.slice(-4)}`;
-
-  const progressRenderer = (row: { progressPct: number }) => {
-    const pct = Math.max(0, Math.min(100, Number(row.progress) || 0));
+  const progressRenderer = (row: TableRow) => {
+    const pct = Math.max(0, Math.min(100, row.progress || 0));
     const color =
-      pct >= 90 ? "var(--alt-theme-color)"
-      : pct >= 75 ? "var(--theme-color)"
-      : pct >= 50 ? "var(--fair-health-color)"
-      : "var(--poor-health-color)";
+      pct >= 90
+        ? "var(--alt-theme-color)"
+        : pct >= 75
+          ? "var(--theme-color)"
+          : pct >= 50
+            ? "var(--fair-health-color)"
+            : "var(--poor-health-color)";
 
     return (
-      <div className="ss-progress" style={{ ["--pct" as any]: `${pct}%`, ["--bar" as any]: color }}>
+      <div
+        className="ss-progress"
+        style={{ ["--pct" as any]: `${pct}%`, ["--bar" as any]: color }}
+      >
         <span />
         <div className="label">{pct.toFixed(1)}%</div>
       </div>
     );
   };
 
-  const statusRenderer = (row: { status: "ACTIVE" | "HOLD" | "DELINQUENT" | "PAID" }) => {
+  const statusRenderer = (row: {
+    status: "ACTIVE" | "HOLD" | "DELINQUENT" | "PAID";
+  }) => {
     const COLORS: Record<typeof row.status, string> = {
       PAID: "var(--alt-theme-color)",
       ACTIVE: "var(--theme-color)",
       HOLD: "var(--fair-health-color)",
-      DELINQUENT: "var(--poor-health-color)"
+      DELINQUENT: "var(--poor-health-color)",
     };
     const label =
-      row.status === "PAID" ? "Paid" :
-      row.status === "ACTIVE" ? "Active" :
-      row.status === "HOLD" ? "Hold" : "Delinquent";
+      row.status === "PAID"
+        ? "Paid"
+        : row.status === "ACTIVE"
+          ? "Active"
+          : row.status === "HOLD"
+            ? "Hold"
+            : "Delinquent";
 
     return (
       <span
@@ -101,47 +109,47 @@ export default function ActivePaymentPlansPanel(): React.ReactElement {
   };
 
   const doExportCSV = React.useCallback(() => {
-      const data = raw ?? [];
-      const header = [
-        "Borrower",
-        "Amount ($)",
-        "Outstanding ($)",
-        "APR (%)",
-        "Term",
-        "Progress (%)",
-        "Status",
-      ];
-      const lines = [header.join(",")];
-      for (const m of data) {
-        lines.push(
-          [
-            m.client,
-            centsToDollars(m.amountCents),
-            centsToDollars(m.outstandingCents),
-            fmtAPR(m.aprBps),
-            `${m.termMonths} mo`,
-            (m.progressPct ?? 0).toFixed(1),
-            m.status,
-          ].join(","),
-        );
-      }
-      const blob = new Blob(["\ufeff" + lines.join("\n")], {
-        type: "text/csv;charset=utf-8;",
-      });
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      const ts = new Date().toISOString().slice(0, 10);
-      a.href = url;
-      a.download = `active-payment-plans-${ts}.csv`;
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      URL.revokeObjectURL(url);
-    }, [raw]);
+    const data = raw ?? [];
+    const header = [
+      "Borrower",
+      "Amount ($)",
+      "Outstanding ($)",
+      "APR (%)",
+      "Term",
+      "Progress (%)",
+      "Status",
+    ];
+    const lines = [header.join(",")];
+    for (const m of data) {
+      lines.push(
+        [
+          m.client,
+          centsToDollars(m.amountCents),
+          centsToDollars(m.outstandingCents),
+          fmtAPR(m.aprBps),
+          `${m.termMonths} mo`,
+          (m.progressPct ?? 0).toFixed(1),
+          m.status,
+        ].join(","),
+      );
+    }
+    const blob = new Blob(["\ufeff" + lines.join("\n")], {
+      type: "text/csv;charset=utf-8;",
+    });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    const ts = new Date().toISOString().slice(0, 10);
+    a.href = url;
+    a.download = `active-payment-plans-${ts}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  }, [raw]);
 
-    const buildPrintableHtml = React.useCallback(() => {
-      const data = raw ?? [];
-      const styles = `
+  const buildPrintableHtml = React.useCallback(() => {
+    const data = raw ?? [];
+    const styles = `
         * { box-sizing: border-box; }
         body {
           font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, 'Apple Color Emoji','Segoe UI Emoji';
@@ -159,19 +167,19 @@ export default function ActivePaymentPlansPanel(): React.ReactElement {
         @media print { @page { margin: 14mm; } }
       `;
 
-      const rowsHtml = data.length
-        ? data
-            .map((m) => {
-              const pct = Math.max(0, Math.min(100, m.progressPct ?? 0));
-              const color =
-                pct >= 90
-                  ? "#22c55e"
-                  : pct >= 75
-                    ? "#3b82f6"
-                    : pct >= 50
-                      ? "#eab308"
-                      : "#ef4444";
-              return `
+    const rowsHtml = data.length
+      ? data
+          .map((m) => {
+            const pct = Math.max(0, Math.min(100, m.progressPct ?? 0));
+            const color =
+              pct >= 90
+                ? "#22c55e"
+                : pct >= 75
+                  ? "#3b82f6"
+                  : pct >= 50
+                    ? "#eab308"
+                    : "#ef4444";
+            return `
                 <tr>
                   <td>${m.client}</td>
                   <td class="right">${money(m.amountCents)}</td>
@@ -184,11 +192,11 @@ export default function ActivePaymentPlansPanel(): React.ReactElement {
                   <td class="center">${m.status}</td>
                 </tr>
               `;
-            })
-            .join("")
-        : `<tr><td colspan="7" class="center" style="padding:20px;">No data available.</td></tr>`;
+          })
+          .join("")
+      : `<tr><td colspan="7" class="center" style="padding:20px;">No data available.</td></tr>`;
 
-      return `<!doctype html>
+    return `<!doctype html>
   <html>
     <head>
       <meta charset="utf-8" />
@@ -214,69 +222,69 @@ export default function ActivePaymentPlansPanel(): React.ReactElement {
       </table>
     </body>
   </html>`;
-    }, [raw]);
+  }, [raw]);
 
-    const printHtmlViaIframe = React.useCallback((html: string) => {
-      const iframe = document.createElement("iframe");
-      iframe.style.position = "fixed";
-      iframe.style.right = "0";
-      iframe.style.bottom = "0";
-      iframe.style.width = "0";
-      iframe.style.height = "0";
-      iframe.style.border = "0";
-      document.body.appendChild(iframe);
+  const printHtmlViaIframe = React.useCallback((html: string) => {
+    const iframe = document.createElement("iframe");
+    iframe.style.position = "fixed";
+    iframe.style.right = "0";
+    iframe.style.bottom = "0";
+    iframe.style.width = "0";
+    iframe.style.height = "0";
+    iframe.style.border = "0";
+    document.body.appendChild(iframe);
 
-      const doc = iframe.contentDocument || iframe.contentWindow?.document;
-      if (!doc) {
-        iframe.remove();
-        return;
+    const doc = iframe.contentDocument || iframe.contentWindow?.document;
+    if (!doc) {
+      iframe.remove();
+      return;
+    }
+    doc.open();
+    doc.write(html);
+    doc.close();
+
+    setTimeout(() => {
+      try {
+        iframe.contentWindow?.focus();
+        iframe.contentWindow?.print();
+      } finally {
+        setTimeout(() => iframe.remove(), 500);
       }
-      doc.open();
-      doc.write(html);
-      doc.close();
+    }, 150);
+  }, []);
 
-      setTimeout(() => {
-        try {
-          iframe.contentWindow?.focus();
-          iframe.contentWindow?.print();
-        } finally {
-          setTimeout(() => iframe.remove(), 500);
-        }
-      }, 150);
-    }, []);
+  const doExportPDF = React.useCallback(() => {
+    printHtmlViaIframe(buildPrintableHtml());
+  }, [buildPrintableHtml, printHtmlViaIframe]);
 
-    const doExportPDF = React.useCallback(() => {
-      printHtmlViaIframe(buildPrintableHtml());
-    }, [buildPrintableHtml, printHtmlViaIframe]);
+  const doPrint = React.useCallback(() => {
+    printHtmlViaIframe(buildPrintableHtml());
+  }, [buildPrintableHtml, printHtmlViaIframe]);
 
-    const doPrint = React.useCallback(() => {
-      printHtmlViaIframe(buildPrintableHtml());
-    }, [buildPrintableHtml, printHtmlViaIframe]);
-
-    React.useEffect(() => {
-      const handler = (e: Event) => {
-        const ce = e as CustomEvent<{
-          tabKey?: string;
-          action?: "csv" | "pdf" | "print";
-        }>;
-        if (ce.detail?.tabKey !== "active-payment-plans") return;
-        switch (ce.detail.action) {
-          case "csv":
-            doExportCSV();
-            break;
-          case "pdf":
-            doExportPDF();
-            break;
-          case "print":
-            doPrint();
-            break;
-        }
-      };
-      window.addEventListener("overview:export" as any, handler as any);
-      return () => {
-        window.removeEventListener("overview:export" as any, handler as any);
-      };
-    }, [doExportCSV, doExportPDF, doPrint]);
+  React.useEffect(() => {
+    const handler = (e: Event) => {
+      const ce = e as CustomEvent<{
+        tabKey?: string;
+        action?: "csv" | "pdf" | "print";
+      }>;
+      if (ce.detail?.tabKey !== "active-payment-plans") return;
+      switch (ce.detail.action) {
+        case "csv":
+          doExportCSV();
+          break;
+        case "pdf":
+          doExportPDF();
+          break;
+        case "print":
+          doPrint();
+          break;
+      }
+    };
+    window.addEventListener("overview:export" as any, handler as any);
+    return () => {
+      window.removeEventListener("overview:export" as any, handler as any);
+    };
+  }, [doExportCSV, doExportPDF, doPrint]);
 
   return (
     <div className="overview-grid" aria-busy={loading}>
