@@ -8,9 +8,12 @@ import {
   faCircle,
   faStar,
 } from "@fortawesome/free-solid-svg-icons";
-import { useOwnerPayoutsByDay } from "../../api/useOwnerPayoutsByDay";
+import { useOwnerPayoutsByDay, usePayoutsWindow } from "../../api/useOwnerPayoutsByDay";
+import { startOfDay, addDays, startOfWeek, format } from "date-fns";
+import { fmtUSD } from "../../api/useTotalRevenue";
 
 type Props = { width?: CardSize; height?: CardSize };
+type ViewMode = "day" | "week" | "month";
 
 const DOW = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"];
 
@@ -23,7 +26,16 @@ export default function PayoutCalendarCard({
     return { y: d.getFullYear(), m: d.getMonth() + 1 };
   });
 
-  const [mode, setMode] = React.useState<"day" | "week" | "month">("month");
+  const [mode, setMode] = React.useState<ViewMode>("month");
+  const [focusDate, setFocusDate] = React.useState(new Date());
+
+  const dayStart = startOfDay(focusDate);
+  const dayEnd = addDays(dayStart, 1);
+  const { items: dayItems } = usePayoutsWindow(dayStart.toISOString().slice(0,10), dayEnd.toISOString().slice(0,10));
+
+  const wkStart = startOfWeek(focusDate, { weekStartsOn: 0 });
+  const wkEnd = addDays(wkStart, 7);
+  const { items: weekItems } = usePayoutsWindow(wkStart.toISOString().slice(0,10), wkEnd.toISOString().slice(0,10));
 
   const monthOptions = React.useMemo(() => {
     const start = new Date();
@@ -170,60 +182,66 @@ export default function PayoutCalendarCard({
       width={width}
       height={height}
     >
-      <div className="pc-wrap" ref={wrapRef}>
-        <div className="pc-dow">
-          {DOW.map((d) => (
-            <div key={d} className="pc-dow-cell">
-              {d}
-            </div>
-          ))}
-        </div>
+      {mode === "day"}
 
-        <div className="pc-grid" aria-busy={loading}>
-          {cells.map((c, i) => {
-            if (c.day == null) return <div key={i} className="pc-cell" />;
+      {mode === "week"}
 
-            const cents = totals[c.day] ?? 0;
-            const has = cents > 0;
-
-            return (
-              <div key={i} className="pc-cell">
-                <div
-                  className={`pc-dot ${has ? "has" : "none"}`}
-                  onMouseEnter={
-                    has ? (e) => enterCell(e, c.day!, cents) : undefined
-                  }
-                  onMouseLeave={has ? leaveCell : undefined}
-                  aria-label={has ? fmtUSD(cents) : undefined}
-                >
-                  {c.day}
-                </div>
+      {mode === "month" && (
+        <div className="pc-wrap" ref={wrapRef}>
+          <div className="pc-dow">
+            {DOW.map((d) => (
+              <div key={d} className="pc-dow-cell">
+                {d}
               </div>
-            );
-          })}
-        </div>
-
-        {hover && (
-          <div className="pc-tip" style={tipStyle()}>
-            <div
-              className="fa-stack"
-              style={{ fontSize: "8px", lineHeight: 1 }}
-            >
-              <FontAwesomeIcon
-                icon={faCircle}
-                className="fa-stack-2x"
-                color="#000000"
-              />
-              <FontAwesomeIcon
-                icon={faStar}
-                className="fa-stack-1x"
-                color="#f5c33b"
-              />
-            </div>
-            {fmtUSD(hover.cents)}
+            ))}
           </div>
-        )}
-      </div>
+
+          <div className="pc-grid" aria-busy={loading}>
+            {cells.map((c, i) => {
+              if (c.day == null) return <div key={i} className="pc-cell" />;
+
+              const cents = totals[c.day] ?? 0;
+              const has = cents > 0;
+
+              return (
+                <div key={i} className="pc-cell">
+                  <div
+                    className={`pc-dot ${has ? "has" : "none"}`}
+                    onMouseEnter={
+                      has ? (e) => enterCell(e, c.day!, cents) : undefined
+                    }
+                    onMouseLeave={has ? leaveCell : undefined}
+                    aria-label={has ? fmtUSD(cents) : undefined}
+                  >
+                    {c.day}
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+
+          {hover && (
+            <div className="pc-tip" style={tipStyle()}>
+              <div
+                className="fa-stack"
+                style={{ fontSize: "8px", lineHeight: 1 }}
+              >
+                <FontAwesomeIcon
+                  icon={faCircle}
+                  className="fa-stack-2x"
+                  color="#000000"
+                />
+                <FontAwesomeIcon
+                  icon={faStar}
+                  className="fa-stack-1x"
+                  color="#f5c33b"
+                />
+              </div>
+              {fmtUSD(hover.cents)}
+            </div>
+          )}
+        </div>
+      )}
     </Card>
   );
 }
