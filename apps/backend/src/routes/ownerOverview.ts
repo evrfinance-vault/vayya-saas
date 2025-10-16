@@ -484,6 +484,97 @@ ownerOverview.get("/api/owner/total-revenue/monthly", async (req, res) => {
   return res.json({ months: rows });
 });
 
+// GET /api/owner/active-plans/summary?plan=ALL|SELF|KAYYA
+ownerOverview.get("/api/owner/active-plans/summary", async (req, res) => {
+  type PlanKey = "ALL" | "SELF" | "KAYYA";
+  const planParam = String(req.query.plan ?? "ALL").toUpperCase() as PlanKey;
+  const plan: PlanKey =
+    planParam === "SELF" || planParam === "KAYYA" ? planParam : "ALL";
+  const planWhere = plan === "ALL" ? {} : { planType: plan };
+
+  const plans = await prisma.paymentPlan.findMany({
+    where: planWhere,
+    select: {
+      id: true,
+      onHold: true,
+      principalCents: true,
+      downPaymentCents: true,
+      termMonths: true,
+      aprBps: true,
+      payments: {
+        select: { amountCents: true, status: true, dueDate: true, paidAt: true },
+        orderBy: { dueDate: "asc" },
+      },
+    },
+  });
+
+  const active = plans.filter(
+    (pl) => !pl.onHold && pl.payments.some((p) => p.status !== "PAID"),
+  );
+  const activeIds = active.map((p) => p.id);
+  const activeCount = active.length;
+
+  const totalFinancedCents = active.reduce((s, p) => s + p.principalCents, 0);
+
+  const outstandingCents = active.reduce((s, p) => {
+    const remain = p.payments
+      .filter((pp) => pp.status !== "PAID" && pp.status !== "HOLD")
+      .reduce((x, y) => x + y.amountCents, 0);
+    return s + remain;
+  }, 0);
+
+  const now = new Date();
+  const ytdStart = startOfYear(now);
+
+  let interestEarnedYtdCents = 0;
+  if (activeIds.length) {
+    const paidYtd = await prisma.payment.findMany({
+      where: {
+        status: "PAID",
+        paidAt: { gte: ytdStart, lte: now },
+        paymentPlan: { id: { in: activeIds } },
+      },
+      select: {
+        id: true,
+        paymentPlan: {
+          select: {
+            principalCents: true,
+            downPaymentCents: true,
+            termMonths: true,
+            aprBps: true,
+            payments: { select: { id: true, dueDate: true } },
+          },
+        },
+      },
+    });
+
+    for (const p of paidYtd) {
+      interestEarnedYtdCents += interestForPayment(
+        p.paymentPlan as unknown as PlanMeta,
+        p.id,
+      );
+    }
+  }
+
+  const aprDen = active.reduce(
+    (s, p) => s + Math.max(0, p.principalCents - (p.downPaymentCents ?? 0)),
+    0,
+  );
+  const aprNum = active.reduce((s, p) => {
+    const financed = Math.max(0, p.principalCents - (p.downPaymentCents ?? 0));
+    return s + financed * (p.aprBps ?? 0);
+  }, 0);
+  const avgAprBps = aprDen ? Math.round(aprNum / aprDen) : 0;
+
+  res.json({
+    activeCount,
+    totalFinancedCents,
+    outstandingCents,
+    interestEarnedYtdCents,
+    avgAprBps,
+  });
+});
+
 // GET /api/owner/active-plans?range=3m|6m|12m|ltd&status=ALL|ACTIVE|HOLD|DELINQUENT|PAID&plan=ALL|SELF|KAYYA
 ownerOverview.get("/api/owner/active-plans", async (req, res) => {
   type PlanKey = "ALL" | "SELF" | "KAYYA";
