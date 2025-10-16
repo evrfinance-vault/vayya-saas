@@ -46,7 +46,7 @@ export default function ActivePaymentPlansPanel(): React.ReactElement {
       outstanding: fmtUSD(r.outstandingCents),
       apr: fmtAPR(r.aprBps),
       term: `${r.termMonths} mo`,
-      progress: `${Math.round(r.progressPct)}%`,
+      progress: r.progressPct,
       status: labelForStatus(r.status),
       planType: r.planType === "KAYYA" ? "Kayya-Backed" : "Self-Financed",
     }));
@@ -54,6 +54,22 @@ export default function ActivePaymentPlansPanel(): React.ReactElement {
 
   const shortId = (s: string) =>
     s.length <= 12 ? s : `${s.slice(0, 6)}…${s.slice(-4)}`;
+
+  const progressRenderer = (row: { progressPct: number }) => {
+    const pct = Math.max(0, Math.min(100, Number(row.progress) || 0));
+    const color =
+      pct >= 90 ? "var(--alt-theme-color)"
+      : pct >= 75 ? "var(--theme-color)"
+      : pct >= 50 ? "var(--fair-health-color)"
+      : "var(--poor-health-color)";
+
+    return (
+      <div className="ss-progress" style={{ ["--pct" as any]: `${pct}%`, ["--bar" as any]: color }}>
+        <span />
+        <div className="label">{pct.toFixed(1)}%</div>
+      </div>
+    );
+  };
 
   return (
     <div className="overview-grid" aria-busy={loading}>
@@ -111,7 +127,7 @@ export default function ActivePaymentPlansPanel(): React.ReactElement {
             width: "128px",
             render: (r) => <span title={r.id}>{shortId(r.id)}</span>,
           },
-          { key: "client", label: "Patient", width: "minmax(180px, 1.3fr)" },
+          { key: "client", label: "Borrower", width: "minmax(180px, 1.3fr)" },
           {
             key: "amount",
             label: "Amount",
@@ -141,6 +157,7 @@ export default function ActivePaymentPlansPanel(): React.ReactElement {
             label: "Progress",
             width: "110px",
             align: "center",
+            render: progressRenderer as any,
           },
           {
             key: "status",

@@ -18,7 +18,7 @@ export type ActivePlanRow = {
   planType: PlanKey;
 };
 
-export type RangeKey = "3m" | "6m" | "12m" | "ltd";
+export type RangeKey = "3m" | "6m" | "12m" | "ytd" | "ltd";
 
 export function useActivePlans(
   range: RangeKey,
@@ -95,8 +95,14 @@ export function useActivePlans(
       : 0;
 
     return {
+      activeCount: inScope.length,
       totalFinancedCents: totalFinanced,
-      interestEarnedYtdCents: 0,
+      interestEarnedYtdCents: rows.reduce((sum, r) => {
+        const totalInterest = Math.round((r.amountCents * (r.aprBps || 0)) / 10000);
+        const ytdFraction = Math.min(12, Math.max(1, r.termMonths)) / Math.max(1, r.termMonths);
+        const paidFraction = (r.progressPct || 0) / 100;
+        return sum + Math.round(totalInterest * ytdFraction * paidFraction);
+      }, 0),
       outstandingCents: outstanding,
       avgAprBps,
     };

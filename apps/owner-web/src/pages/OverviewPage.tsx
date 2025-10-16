@@ -20,7 +20,7 @@ import {
   BoardPanel,
 } from "../components/panels";
 import { useTotalRevenueSummary, fmtUSD } from "../api/useTotalRevenue";
-import { useActivePlansSummary } from "../api/useActivePlans";
+import { useActivePlans } from "../api/useActivePlans";
 
 const TABS: TabDef[] = [
   {
@@ -103,7 +103,7 @@ export default function OverviewPage(): React.ReactElement {
   const dotColor = health === null ? "#f2f2f2" : health ? "#90ee90" : "#edbf91";
 
   const { data: trSummary } = useTotalRevenueSummary();
-  const apSummary = useActivePlansSummary();
+  const { rows: raw, summary, loading } = useActivePlans("ltd", "ALL", "ALL");
 
   const tabs = React.useMemo(
     () =>
@@ -116,11 +116,11 @@ export default function OverviewPage(): React.ReactElement {
           : t.key === "active-payment-plans"
           ? {
               ...t,
-              badge: String(apSummary?.activeCount ?? 0),
+              badge: String(summary?.activeCount ?? 0),
             }
           : t,
       ),
-    [trSummary, apSummary],
+    [trSummary, summary],
   );
 
   return (

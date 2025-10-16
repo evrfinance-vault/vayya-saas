@@ -695,7 +695,7 @@ ownerOverview.get("/api/owner/active-plans", async (req, res) => {
         ? Math.round((paidCount / totalCount) * 100)
         : 0;
 
-      const aprBps = 0;
+      const aprBps = pl.aprBps ?? 0;
 
       return {
         id: pl.id,
