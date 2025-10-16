@@ -60,10 +60,10 @@ export default function ActivePaymentPlansPanel(): React.ReactElement {
       <InfoCard
         title="Total Financed"
         icon={faBuildingColumns}
-        iconColor="var(--theme-color)"
         value={(summary?.totalFinancedCents ?? 0) / 100}
         kind="money"
         subtext="Lifetime volume"
+        subColor="rgb(var(--dark-color-rgb) / 75%)"
         width="1x"
         height="05x"
       />
@@ -71,10 +71,10 @@ export default function ActivePaymentPlansPanel(): React.ReactElement {
       <InfoCard
         title="Interest Earned"
         icon={faPiggyBank}
-        iconColor="var(--theme-color)"
         value={(summary?.interestEarnedYtdCents ?? 0) / 100}
         kind="money"
-        subtext="Year to date"
+        subtext="Year-to-date"
+        subColor="rgb(var(--dark-color-rgb) / 75%)"
         width="1x"
         height="05x"
       />
@@ -82,10 +82,10 @@ export default function ActivePaymentPlansPanel(): React.ReactElement {
       <InfoCard
         title="Outstanding"
         icon={faClockRotateLeft}
-        iconColor="var(--theme-color)"
         value={(summary?.outstandingCents ?? 0) / 100}
         kind="money"
         subtext="Total balance"
+        subColor="rgb(var(--dark-color-rgb) / 75%)"
         width="1x"
         height="05x"
       />
@@ -93,10 +93,10 @@ export default function ActivePaymentPlansPanel(): React.ReactElement {
       <InfoCard
         title="Avg APR"
         icon={faPercent}
-        iconColor="var(--theme-color)"
         value={Number(((summary?.avgAprBps ?? 0) / 100).toFixed(2))}
         kind="percent"
         subtext="Weighted average"
+        subColor="rgb(var(--dark-color-rgb) / 75%)"
         width="1x"
         height="05x"
       />
@@ -104,7 +104,6 @@ export default function ActivePaymentPlansPanel(): React.ReactElement {
       <SpreadsheetCard<TableRow>
         title="Active Loans Overview"
         icon={faList}
-        iconColor="var(--theme-color)"
         columns={[
           {
             key: "id",
