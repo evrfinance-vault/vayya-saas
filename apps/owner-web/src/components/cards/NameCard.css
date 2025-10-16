@@ -119,6 +119,13 @@
   color: rgb(var(--pending-badge-color-rgb));
 }
 
+.namecard-badge.paying {
+  --paid-badge-color-rgb: 111 168 97;
+
+  background: rgb(var(--paid-badge-color-rgb) / 10%);
+  color: rgb(var(--paid-badge-color-rgb));
+}
+
 .namecard-badge.paid {
   --paid-badge-color-rgb: 111 168 97;
 

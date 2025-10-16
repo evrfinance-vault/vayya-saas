@@ -40,7 +40,16 @@ ownerOverview.get("/api/owner/overview/name", async (req, res) => {
     },
     include: {
       patient: true,
-      paymentPlan: { select: { planType: true, onHold: true } },
+      paymentPlan: {
+        select: {
+          planType: true,
+          onHold: true,
+          payments: {
+            select: { status: true, dueDate: true },
+            orderBy: { dueDate: "asc" },
+          },
+        },
+      },
     },
   });
 
@@ -51,10 +60,15 @@ ownerOverview.get("/api/owner/overview/name", async (req, res) => {
     const methodLabel =
       p.paymentPlan.planType === "KAYYA" ? "Kayya-Backed" : "Self-Financed";
 
-    let badge = "Pending";
+    const hadPriorPaid = (p.paymentPlan.payments ?? []).some(
+      (q) => q.dueDate < p.dueDate && q.status === "PAID",
+    );
+
+    let badge: "Hold" | "Paid" | "Due Today" | "Paying" | "Pending" = "Pending";
     if (p.paymentPlan.onHold) badge = "Hold";
     else if (p.status === "PAID") badge = "Paid";
     else if (isSameDay(p.dueDate, today)) badge = "Due Today";
+    else if (hadPriorPaid) badge = "Paying";
 
     return {
       id: p.id,

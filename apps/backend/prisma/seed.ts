@@ -141,12 +141,15 @@ async function main() {
           "EXCELLENT",
           "EXCELLENT",
           "EXCELLENT",
+          "EXCELLENT",
+          "GOOD",
           "GOOD",
           "GOOD",
           "FAIR",
+          "FAIR",
           "POOR",
         ] as const),
-        onHold: Math.random() < 0.08,
+        onHold: Math.random() < 0.01,
         aprBps,
       });
 
