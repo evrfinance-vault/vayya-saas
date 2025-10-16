@@ -245,6 +245,62 @@ ownerOverview.get("/api/owner/overview/payouts-by-day", async (req, res) => {
   });
 });
 
+// GET /api/owner/overview/payouts-window?start=YYYY-MM-DD&end=YYYY-MM-DD
+ownerOverview.get("/api/owner/overview/payouts-window", async (req, res) => {
+  const startStr = String(req.query.start ?? "");
+  const endStr = String(req.query.end ?? "");
+  const start = new Date(startStr);
+  const end = new Date(endStr);
+  if (isNaN(+start) || isNaN(+end) || !(start < end)) {
+    return res.status(400).json({ error: "Invalid start/end window" });
+  }
+
+  const [paid, scheduled] = await Promise.all([
+    prisma.payment.findMany({
+      where: { status: "PAID", paidAt: { gte: start, lt: end } },
+      select: {
+        id: true,
+        amountCents: true,
+        paidAt: true,
+        patient: { select: { firstName: true, lastName: true } },
+        paymentPlan: { select: { planType: true } },
+      },
+    }),
+    prisma.payment.findMany({
+      where: { NOT: { status: "PAID" }, dueDate: { gte: start, lt: end } },
+      select: {
+        id: true,
+        amountCents: true,
+        dueDate: true,
+        status: true,
+        patient: { select: { firstName: true, lastName: true } },
+        paymentPlan: { select: { planType: true } },
+      },
+    }),
+  ]);
+
+  const items = [
+    ...paid.map((p) => ({
+      id: p.id,
+      name: `${p.patient.firstName} ${p.patient.lastName}`.trim(),
+      amountCents: p.amountCents,
+      status: "PAID" as const,
+      effectiveAt: p.paidAt!,
+      planType: p.paymentPlan.planType,
+    })),
+    ...scheduled.map((s) => ({
+      id: s.id,
+      name: `${s.patient.firstName} ${s.patient.lastName}`.trim(),
+      amountCents: s.amountCents,
+      status: s.status,
+      effectiveAt: s.dueDate!,
+      planType: s.paymentPlan.planType,
+    })),
+  ].sort((a, b) => +a.effectiveAt - +b.effectiveAt);
+
+  res.json({ items });
+});
+
 // GET /api/owner/total-revenue/summary
 ownerOverview.get("/api/owner/total-revenue/summary", async (_req, res) => {
   const now = new Date();
