@@ -37,6 +37,7 @@ const fmtYoY = (pct: number) => {
 function centsToDollars(n: number) {
   return (n / 100).toFixed(2);
 }
+
 function money(nCents: number) {
   return Number(nCents / 100).toLocaleString(undefined, {
     minimumFractionDigits: 2,
