@@ -93,6 +93,10 @@ export default function SpreadsheetCard<T extends object>({
         return "Year to date";
       case "12m":
         return "Last 12 months";
+      case "6m":
+        return "Last 6 months";
+      case "3m":
+        return "Last 3 months";
       case "all":
       case "ltd":
         return "All time";
@@ -155,7 +159,7 @@ export default function SpreadsheetCard<T extends object>({
                 typeof opt === "string" ? opt : (opt.label ?? opt.value);
               return (
                 <option key={val} value={val}>
-                  {lab}
+                  {lab === "ALL" ? "All statuses" : lab.charAt(0).toUpperCase() + lab.toLowerCase().slice(1)}
                 </option>
               );
             })}

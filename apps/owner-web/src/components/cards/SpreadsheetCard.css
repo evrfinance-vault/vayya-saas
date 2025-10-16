@@ -119,3 +119,16 @@
   z-index: 1;
   color: var(--dark-color);
 }
+
+.status-pill {
+  display: inline-block;
+  width: calc(100% - (0.6rem * 2));
+  padding: 0.3rem 0.6rem;
+  border-radius: 999px;
+  font-weight: 600;
+  font-size: 11px;
+  line-height: 1;
+  background: var(--pill-bg);
+  color: var(--light-color);
+  white-space: nowrap;
+}

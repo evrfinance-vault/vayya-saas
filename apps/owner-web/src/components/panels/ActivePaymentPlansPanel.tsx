@@ -47,7 +47,7 @@ export default function ActivePaymentPlansPanel(): React.ReactElement {
       apr: fmtAPR(r.aprBps),
       term: `${r.termMonths} mo`,
       progress: r.progressPct,
-      status: labelForStatus(r.status),
+      status: r.status,
       planType: r.planType === "KAYYA" ? "Kayya-Backed" : "Self-Financed",
     }));
   }, [raw]);
@@ -68,6 +68,28 @@ export default function ActivePaymentPlansPanel(): React.ReactElement {
         <span />
         <div className="label">{pct.toFixed(1)}%</div>
       </div>
+    );
+  };
+
+  const statusRenderer = (row: { status: "ACTIVE" | "HOLD" | "DELINQUENT" | "PAID" }) => {
+    const COLORS: Record<typeof row.status, string> = {
+      PAID: "var(--alt-theme-color)",
+      ACTIVE: "var(--theme-color)",
+      HOLD: "var(--fair-health-color)",
+      DELINQUENT: "var(--poor-health-color)"
+    };
+    const label =
+      row.status === "PAID" ? "Paid" :
+      row.status === "ACTIVE" ? "Active" :
+      row.status === "HOLD" ? "Hold" : "Delinquent";
+
+    return (
+      <span
+        className="status-pill"
+        style={{ ["--pill-bg" as any]: COLORS[row.status] }}
+      >
+        {label}
+      </span>
     );
   };
 
@@ -164,6 +186,7 @@ export default function ActivePaymentPlansPanel(): React.ReactElement {
             label: "Status",
             width: "104px",
             align: "center",
+            render: statusRenderer as any,
           },
           {
             key: "planType",
@@ -183,24 +206,9 @@ export default function ActivePaymentPlansPanel(): React.ReactElement {
         statusValue={status}
         onStatusChange={(s) => setStatus(s as typeof status)}
         showStatusFilter
-        rangeOptions={["all", "12m", "ytd"]}
+        rangeOptions={["all", "ytd", "12m", "6m", "3m"]}
         planOptions={["ALL", "KAYYA", "SELF"]}
       />
     </div>
   );
-}
-
-function labelForStatus(s: ActivePlanRow["status"]): string {
-  switch (s) {
-    case "ACTIVE":
-      return "active";
-    case "HOLD":
-      return "on hold";
-    case "DELINQUENT":
-      return "delinquent";
-    case "PAID":
-      return "paid";
-    default:
-      return String(s).toLowerCase();
-  }
 }
