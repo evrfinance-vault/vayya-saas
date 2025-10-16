@@ -20,7 +20,6 @@ import {
 type StatusKey = "ALL" | "ACTIVE" | "HOLD" | "DELINQUENT" | "PAID";
 
 type TableRow = {
-  id: string;
   client: string;
   amount: string;
   outstanding: string;
@@ -28,7 +27,6 @@ type TableRow = {
   term: string;
   progress: string;
   status: string;
-  planType: string;
 };
 
 export default function ActivePaymentPlansPanel(): React.ReactElement {
@@ -40,7 +38,6 @@ export default function ActivePaymentPlansPanel(): React.ReactElement {
 
   const rows: TableRow[] = React.useMemo(() => {
     return raw.map((r) => ({
-      id: r.id,
       client: r.client,
       amount: fmtUSD(r.amountCents),
       outstanding: fmtUSD(r.outstandingCents),
@@ -48,7 +45,6 @@ export default function ActivePaymentPlansPanel(): React.ReactElement {
       term: `${r.termMonths} mo`,
       progress: r.progressPct,
       status: r.status,
-      planType: r.planType === "KAYYA" ? "Kayya-Backed" : "Self-Financed",
     }));
   }, [raw]);
 
@@ -143,57 +139,38 @@ export default function ActivePaymentPlansPanel(): React.ReactElement {
         title="Active Loans Overview"
         icon={faList}
         columns={[
-          {
-            key: "id",
-            label: "Loan ID",
-            width: "128px",
-            render: (r) => <span title={r.id}>{shortId(r.id)}</span>,
-          },
           { key: "client", label: "Borrower", width: "minmax(180px, 1.3fr)" },
           {
             key: "amount",
             label: "Amount",
-            width: "110px",
             align: "right",
           },
           {
             key: "outstanding",
             label: "Outstanding",
-            width: "120px",
             align: "right",
           },
           {
             key: "apr",
             label: "APR",
-            width: "72px",
             align: "right",
           },
           {
             key: "term",
             label: "Term",
-            width: "84px",
             align: "center",
           },
           {
             key: "progress",
             label: "Progress",
-            width: "110px",
             align: "center",
             render: progressRenderer as any,
           },
           {
             key: "status",
             label: "Status",
-            width: "104px",
             align: "center",
             render: statusRenderer as any,
-          },
-          {
-            key: "planType",
-            label: "Type",
-            width: "88px",
-            align: "center",
-            render: (r) => (r.planType === "Kayya-Backed" ? "Kayya" : "Self"),
           },
         ]}
         rows={rows}

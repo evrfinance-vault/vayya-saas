@@ -325,7 +325,7 @@ export default function TotalRevenuePanel() {
         title="Monthly Revenue Summary"
         icon={faList}
         columns={[
-          { key: "month", label: "Month", width: "180px" },
+          { key: "month", label: "Month", width: "minmax(180px, 1.3fr)" },
           { key: "interest", label: "Interest Earned", align: "right" },
           { key: "fees", label: "Fees Collected", align: "right" },
           { key: "total", label: "Total Revenue", align: "right" },
