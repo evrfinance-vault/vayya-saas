@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 
-const API = import.meta.env.VITE_API_URL?.replace(/\/$/, "") || "http://localhost:4000";
+const API =
+  import.meta.env.VITE_API_URL?.replace(/\/$/, "") || "http://localhost:4000";
 
 export type PayoutsResp = {
   year: number;
@@ -45,9 +46,12 @@ export function usePayoutsWindow(startISO: string, endISO: string) {
     if (!startISO || !endISO) return;
     const ctl = new AbortController();
     setLoading(true);
-    fetch(`${API}/api/owner/overview/payouts-window?start=${startISO}&end=${endISO}`, { signal: ctl.signal })
-      .then(r => (r.ok ? r.json() : Promise.reject()))
-      .then(payload => setItems(payload?.items ?? []))
+    fetch(
+      `${API}/api/owner/overview/payouts-window?start=${startISO}&end=${endISO}`,
+      { signal: ctl.signal },
+    )
+      .then((r) => (r.ok ? r.json() : Promise.reject()))
+      .then((payload) => setItems(payload?.items ?? []))
       .catch(() => setItems([]))
       .finally(() => setLoading(false));
     return () => ctl.abort();
