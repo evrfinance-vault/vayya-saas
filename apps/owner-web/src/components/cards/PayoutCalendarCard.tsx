@@ -66,7 +66,7 @@ export default function PayoutCalendarCard({
       for (let i = 0; i < 12; i++) {
         const s = addDays(start, i * 7);
         const e = addDays(s, 6);
-        const label = `${format(s, "MM/d/yy")} to ${format(e, "MM/d/yy")}`;
+        const label = `${format(s, "MMM d")} – ${format(e, "MMM d")}`;
         opts.push({ value: s.toISOString().slice(0, 10), label });
       }
       return opts;
@@ -77,7 +77,7 @@ export default function PayoutCalendarCard({
       const d = addDays(today, i);
       opts.push({
         value: d.toISOString().slice(0, 10),
-        label: format(d, "MMM d yyyy"),
+        label: format(d, "MMM d"),
       });
     }
     return opts;
