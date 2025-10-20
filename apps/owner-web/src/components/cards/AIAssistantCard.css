@@ -14,6 +14,22 @@
   pointer-events: none;
 }
 
+.coming-soon-banner {
+  width: 90%;
+  min-height: 35px;
+  margin: -65% auto 40%;
+  padding: 14px 0 0 0;
+  background-color: rgb(var(--alt-theme-color-rgb) / 75%);
+  border-radius: 8px;
+  color: var(--light-color);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  font-weight: 500;
+  font-size: 18px;
+  transform: rotate(-22.5deg);
+}
+
 .ai-suggest {
   list-style: none;
   margin: 20px 20px 0;

@@ -26,6 +26,10 @@ export default function AIAssistantCard({
           aria-hidden="true"
         />
 
+        <div className="coming-soon-banner">
+          <span>Coming Soon</span>
+        </div>
+
         <ul className="ai-suggest" role="list">
           <li>Prepare a report on my revenue</li>
           <li>Recommendation to increase revenue for next month</li>
