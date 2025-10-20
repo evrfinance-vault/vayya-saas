@@ -12,9 +12,9 @@
 
 .pc-dow {
   display: grid;
-  grid-template-columns: repeat(7, 1fr);
+  grid-template-columns: repeat(7, minmax(0, 1fr));
   gap: 16px;
-  padding: 0 4px;
+  padding: 0 8px 12px;
   color: rgb(var(--dark-color-rgb) / 65%);
   font-size: 12px;
 }
@@ -164,5 +164,140 @@
 }
 
 .pc-month-select:focus + .pc-caret {
+  color: var(--dark-color);
+}
+
+.pc-week {
+  padding: 0;
+}
+
+.pc-week-grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 16px;
+  padding: 12px 8px;
+  align-items: start;
+}
+
+.pc-week-col {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 0;
+}
+
+.pc-week-date {
+  text-align: center;
+  font-weight: 500;
+  font-size: 18px;
+  color: var(--dark-color);
+  margin-bottom: 8px;
+  background-color: var(--background-color);
+  border-radius: 999px;
+  width: 56px;
+  height: 56px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 2px 2px 2px 5px;
+}
+
+.pc-week-track {
+  width: 61px;
+  height: 315px;
+  max-width: 84px;
+  border-radius: 8px;
+  background: transparent;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 10px 0;
+  margin: 0 auto;
+  gap: 16px;
+}
+
+.pc-week-dot {
+  width: 56px;
+  height: 56px;
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 700;
+  font-size: 14px;
+  color: var(--light-color);
+  user-select: none;
+  margin: 0 0 0 3px;
+}
+
+.pc-week-dot:first-of-type {
+  margin: 4px 0 0 3px;
+}
+
+.pc-week-dot.self {
+  background: var(--alt-theme-color);
+}
+
+.pc-week-dot.kayya {
+  background: var(--theme-color);
+}
+
+.pc-day {
+  padding: 8px 12px 18px;
+}
+
+.pc-day-title {
+  font-weight: 600;
+  margin-bottom: 16px;
+  color: var(--dark-color);
+}
+
+.pc-day-list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  gap: 8px;
+}
+
+.pc-day-item {
+  display: grid;
+  grid-template-columns: 90px 1fr auto;
+  align-items: center;
+  background: var(--background-color);
+  color: var(--dark-color);
+  border-radius: 8px;
+  padding: 8px 10px;
+  font-size: 15px;
+  font-weight: 500;
+}
+
+.pc-day-item .badge {
+  width: calc(100% - 26px);
+  font-size: 12px;
+  font-weight: 700;
+  font-size: 11px;
+  padding: 4px 8px;
+  border-radius: 999px;
+  color: var(--light-color);
+  justify-self: start;
+  text-align: center;
+}
+
+.pc-day-item.self .badge {
+  background: var(--alt-theme-color);
+}
+
+.pc-day-item.kayya .badge {
+  background: var(--theme-color);
+}
+
+.pc-day-item .amt {
+  font-variant-numeric: tabular-nums;
+}
+
+.pc-day-empty {
+  margin: 16px auto;
   color: var(--dark-color);
 }
