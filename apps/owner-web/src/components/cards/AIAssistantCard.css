@@ -80,6 +80,14 @@
   color: white;
 }
 
+.ai-send[aria-disabled="true"] {
+  cursor: default;
+}
+
 .ai-send:hover {
   filter: brightness(1.03);
+}
+
+.ai-send:hover[aria-disabled="true"] {
+  filter: none;
 }
