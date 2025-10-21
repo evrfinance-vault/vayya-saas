@@ -58,7 +58,7 @@ ownerOverview.get("/api/owner/overview/name", async (req, res) => {
   const data = rows.map((p: Row) => {
     const full = `${p.patient.firstName} ${p.patient.lastName}`.trim();
     const methodLabel =
-      p.paymentPlan.planType === "KAYYA" ? "Kayya-Backed" : "Self-Financed";
+      p.paymentPlan.planType === "KAYYA" ? "Kayya-backed" : "Self-financed";
 
     const hadPriorPaid = (p.paymentPlan.payments ?? []).some(
       (q) => q.dueDate < p.dueDate && q.status === "PAID",
@@ -853,7 +853,7 @@ ownerOverview.get("/api/owner/late-payments/summary", async (_req, res) => {
     amountOverdueCents,
     atRiskCents,
     avgDaysOverdue,
-    missedPaymentsTotal
+    missedPaymentsTotal,
   });
 });
 
@@ -948,39 +948,62 @@ ownerOverview.get("/api/owner/late-payments/list", async (req, res) => {
 
 // GET /api/owner/applications/summary
 ownerOverview.get("/api/owner/applications/summary", async (_req, res) => {
-  const pendingStatuses = ["SENT", "PENDING", "CONTACTED"] as const;
-  const approvedStatuses = ["PAID", "DONE"] as const;
+  const pendingStatuses = ["SENT", "PENDING", "PAID", "CONTACTED"] as const;
+  const approvedStatuses = ["PENDING", "PAID", "CONTACTED", "DONE"] as const;
 
   const now = new Date();
+  const last7 = new Date(now);
+  last7.setDate(now.getDate() - 7);
   const last30 = new Date(now);
   last30.setDate(now.getDate() - 30);
 
-  const [total, pending, last30Totals, last30Approved, pendingSum] =
-    await Promise.all([
-      prisma.application.count(),
-      prisma.application.count({
-        where: { status: { in: pendingStatuses as any } },
-      }),
-      prisma.application.count({ where: { submittedAt: { gte: last30 } } }),
-      prisma.application.count({
-        where: {
-          submittedAt: { gte: last30 },
-          status: { in: approvedStatuses as any },
-        },
-      }),
-      prisma.application.aggregate({
-        where: { status: { in: pendingStatuses as any } },
-        _sum: { amountCents: true },
-      }),
-    ]);
+  const [
+    total,
+    weekly,
+    pending,
+    review,
+    last30Approved,
+    last30Rejected,
+    pendingSum,
+  ] = await Promise.all([
+    prisma.application.count(),
+    prisma.application.count({
+      where: { submittedAt: { gte: last7 } },
+    }),
+    prisma.application.count({
+      where: { status: { in: pendingStatuses as any } },
+    }),
+    prisma.application.count({
+      where: { status: "PENDING" },
+    }),
+    prisma.application.count({
+      where: {
+        submittedAt: { gte: last30 },
+        status: { in: approvedStatuses as any },
+      },
+    }),
+    prisma.application.count({
+      where: {
+        submittedAt: { gte: last30 },
+        status: "FAILED",
+      },
+    }),
+    prisma.application.aggregate({
+      where: { status: { in: pendingStatuses as any } },
+      _sum: { amountCents: true },
+    }),
+  ]);
 
+  const last30Totals = last30Approved + last30Rejected;
   const approvalRatePct = last30Totals
     ? (last30Approved / last30Totals) * 100
     : 0;
 
   res.json({
     totalApplications: total,
-    pendingReviewCount: pending,
+    weeklyApplications: weekly,
+    pendingCount: pending,
+    reviewCount: review,
     approvalRatePct,
     totalRequestedCents: pendingSum._sum.amountCents ?? 0,
   });
@@ -1032,6 +1055,7 @@ ownerOverview.get("/api/owner/applications", async (req, res) => {
     client: `${a.patient.firstName} ${a.patient.lastName}`.trim(),
     amountCents: a.amountCents,
     planType: a.planType,
+    creditScore: a.creditScore,
     status: a.status,
     submittedAt: a.submittedAt,
   }));

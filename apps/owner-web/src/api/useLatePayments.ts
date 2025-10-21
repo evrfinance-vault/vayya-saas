@@ -53,9 +53,9 @@ export function useLatePaymentsSummary() {
 }
 
 export function useLatePayments(filters?: {
-    status?: "ALL" | StatusKey;
-    risk?: "ALL" | RiskKey;
-    daysMin?: number;
+  status?: "ALL" | StatusKey;
+  risk?: "ALL" | RiskKey;
+  daysMin?: number;
 }) {
   const [rows, setRows] = useState<LateRow[]>([]);
   const [loading, setLoading] = useState(true);

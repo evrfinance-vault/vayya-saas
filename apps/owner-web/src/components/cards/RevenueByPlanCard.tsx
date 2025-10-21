@@ -28,8 +28,8 @@ export default function RevenueByPlanCard({
 
   const header = (
     <div className="rev-legend">
-      <span className="rev-key self" /> Self-Financed
-      <span className="rev-key legend kayya" /> Kayya-Backed
+      <span className="rev-key self" /> Self-financed
+      <span className="rev-key legend kayya" /> Kayya-backed
     </div>
   );
 

@@ -57,7 +57,7 @@ enum PlanHealth {
   POOR
 }
 
-// Self-Financed or Kayya-Backed
+// Self-financed or Kayya-backed
 enum PlanType {
   SELF
   KAYYA

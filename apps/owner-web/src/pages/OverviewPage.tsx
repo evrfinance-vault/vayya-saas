@@ -22,6 +22,7 @@ import {
 import { useTotalRevenueSummary, fmtUSD } from "../api/useTotalRevenue";
 import { useActivePlans } from "../api/useActivePlans";
 import { useLatePaymentsSummary } from "../api/useLatePayments";
+import { useApplicationsSummary } from "../api/useApplications";
 
 const TABS: TabDef[] = [
   {
@@ -105,6 +106,7 @@ export default function OverviewPage(): React.ReactElement {
 
   const { data: trSummary } = useTotalRevenueSummary();
   const { data: lpSummary } = useLatePaymentsSummary();
+  const { data: apSummary } = useApplicationsSummary();
 
   const {
     rows: _raw,
@@ -125,14 +127,19 @@ export default function OverviewPage(): React.ReactElement {
                 ...t,
                 badge: String(summary?.activeCount ?? 0),
               }
-          : t.key === "late-payments"
+            : t.key === "late-payments"
               ? {
                   ...t,
                   badge: String(lpSummary?.missedPaymentsTotal ?? 0),
                 }
-              : t,
+              : t.key === "pending-applications"
+                ? {
+                    ...t,
+                    badge: String(apSummary?.pendingCount ?? 0),
+                  }
+                : t,
       ),
-    [trSummary, summary],
+    [trSummary, summary, lpSummary, apSummary],
   );
 
   return (

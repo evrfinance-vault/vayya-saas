@@ -41,9 +41,14 @@ export default function AIAssistantCard({
             placeholder="Ask Something…"
             value={prompt}
             onChange={(e) => setPrompt(e.target.value)}
-            disabled="disabled"
+            disabled={true}
           />
-          <button type="submit" className="ai-send" aria-label="Send" aria-disabled="true">
+          <button
+            type="submit"
+            className="ai-send"
+            aria-label="Send"
+            aria-disabled="true"
+          >
             <FontAwesomeIcon icon={faArrowUp} />
           </button>
         </form>

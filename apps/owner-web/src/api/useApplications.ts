@@ -17,18 +17,18 @@ export type AppRange = "all" | "30d" | "90d" | "ytd";
 
 export type AppSummary = {
   totalApplications: number;
-  pendingReviewCount: number;
+  weeklyApplications: number;
+  pendingCount: number;
+  reviewCount: number;
   approvalRatePct: number;
   totalRequestedCents: number;
 };
 
 export type AppRow = {
   id: string;
-  shortId: string;
-  clientFirst: string;
-  clientLast: string;
+  client: string;
   amountCents: number;
-  type: "SELF" | "KAYYA";
+  planType: "SELF" | "KAYYA";
   creditScore: number | null;
   completionPct: number;
   status: string;

@@ -30,23 +30,6 @@ type Row = {
   type: string;
 };
 
-function titleCase(s: string) {
-  return s ? s.slice(0, 1).toUpperCase() + s.slice(1).toLowerCase() : s;
-}
-
-function riskClass(risk: string) {
-  switch (risk) {
-    case "LOW":
-      return "good";
-    case "MEDIUM":
-      return "warn";
-    case "HIGH":
-      return "danger";
-    default:
-      return "";
-  }
-}
-
 function centsToDollars(n: number) {
   return (n / 100).toFixed(2);
 }
@@ -89,33 +72,14 @@ export default function LatePaymentsPanel() {
     }));
   }, [raw]);
 
-  function riskClass(risk: string) {
-    switch (risk) {
-      case "LOW":
-        return "good";
-      case "MEDIUM":
-        return "warn";
-      case "HIGH":
-        return "danger";
-      default:
-        return "";
-    }
-  }
-
-  const riskRenderer = (row: {
-    risk: "LOW" | "MEDIUM" | "HIGH";
-  }) => {
+  const riskRenderer = (row: { risk: "LOW" | "MEDIUM" | "HIGH" }) => {
     const COLORS: Record<typeof row.risk, string> = {
       LOW: "var(--theme-color)",
       MEDIUM: "var(--fair-health-color)",
       HIGH: "var(--poor-health-color)",
     };
     const label =
-      row.risk === "HIGH"
-        ? "High"
-        : row.risk === "MEDIUM"
-          ? "Medium"
-          : "Low";
+      row.risk === "HIGH" ? "High" : row.risk === "MEDIUM" ? "Medium" : "Low";
 
     return (
       <span

@@ -207,6 +207,10 @@ async function main() {
       const aType: PlanType = Math.random() < 0.5 ? "SELF" : "KAYYA";
       const aStatus = pick([
         ApplicationStatus.PENDING,
+        ApplicationStatus.PENDING,
+        ApplicationStatus.PAID,
+        ApplicationStatus.PAID,
+        ApplicationStatus.SENT,
         ApplicationStatus.SENT,
         ApplicationStatus.CONTACTED,
         ApplicationStatus.FAILED,
@@ -218,7 +222,7 @@ async function main() {
           amountCents: randInt(6_000, 25_000) * 100,
           planType: aType,
           status: aStatus,
-          creditScore: Math.random() < 0.85 ? randInt(610, 790) : null,
+          creditScore: aStatus === "SENT" ? null : randInt(610, 790),
           submittedAt: subDays(today, randInt(0, 45)),
         },
       });
