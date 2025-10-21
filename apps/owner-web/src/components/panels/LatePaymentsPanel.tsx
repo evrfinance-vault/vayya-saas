@@ -47,6 +47,17 @@ function riskClass(risk: string) {
   }
 }
 
+function centsToDollars(n: number) {
+  return (n / 100).toFixed(2);
+}
+
+function money(nCents: number) {
+  return Number(nCents / 100).toLocaleString(undefined, {
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  });
+}
+
 export default function LatePaymentsPanel() {
   const { data: summary, loading } = useLatePaymentsSummary();
 
@@ -78,7 +89,7 @@ export default function LatePaymentsPanel() {
     }));
   }, [raw]);
 
-function riskClass(risk: string) {
+  function riskClass(risk: string) {
     switch (risk) {
       case "LOW":
         return "good";
@@ -115,116 +126,6 @@ function riskClass(risk: string) {
       </span>
     );
   };
-
-  React.useEffect(() => {
-    function handleExport(e: Event) {
-      const ce = e as CustomEvent<{ key: string; type: "csv" | "pdf" | "print" }>;
-      if (!ce.detail || ce.detail.key !== "late-payments") return;
-
-      if (ce.detail.type === "csv") {
-        const headers = [
-          "Account",
-          "Client",
-          "Outstanding",
-          "Amount Overdue",
-          "Days Overdue",
-          "Missed Payments",
-          "Risk",
-          "Status",
-          "Type",
-        ];
-        const lines = rows.map((r) =>
-          [
-            r.acct,
-            r.client,
-            r.outstanding,
-            r.overdue,
-            r.days,
-            r.missed,
-            r.risk,
-            titleCase(r.status),
-            r.type,
-          ]
-            .map((v) => `"${String(v).replace(/"/g, '""')}"`)
-            .join(","),
-        );
-        const csv = [headers.join(","), ...lines].join("\n");
-        const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement("a");
-        a.href = url;
-        a.download = "late-payments.csv";
-        document.body.appendChild(a);
-        a.click();
-        a.remove();
-        URL.revokeObjectURL(url);
-        return;
-      }
-
-      const html = `
-<!doctype html>
-<html>
-<head>
-  <meta charset="utf-8" />
-  <title>Missed / Late Payments</title>
-  <style>
-    body { font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial; color:#111; padding:24px; }
-    h1 { font-size:20px; margin:0 0 16px 0; }
-    table { border-collapse: collapse; width:100%; font-size:12px; }
-    th, td { border:1px solid #e5e7eb; padding:8px 10px; text-align:left; }
-    th { background:#f9fafb; }
-  </style>
-</head>
-<body>
-  <h1>Missed / Late Payments</h1>
-  <table>
-    <thead>
-      <tr>
-        <th>Account</th>
-        <th>Client</th>
-        <th>Outstanding</th>
-        <th>Amount Overdue</th>
-        <th>Days Overdue</th>
-        <th>Missed</th>
-        <th>Risk</th>
-        <th>Status</th>
-        <th>Type</th>
-      </tr>
-    </thead>
-    <tbody>
-      ${rows
-        .map(
-          (r) => `<tr>
-          <td>${r.acct}</td>
-          <td>${r.client}</td>
-          <td>${r.outstanding}</td>
-          <td>${r.overdue}</td>
-          <td>${r.days}</td>
-          <td>${r.missed}</td>
-          <td>${r.risk}</td>
-          <td>${titleCase(r.status)}</td>
-          <td>${r.type}</td>
-        </tr>`,
-        )
-        .join("")}
-    </tbody>
-  </table>
-  <script>
-    setTimeout(() => { window.print(); }, 50);
-  </script>
-</body>
-</html>`;
-      const w = window.open("", "_blank");
-      if (!w) return;
-      w.document.open();
-      w.document.write(html);
-      w.document.close();
-    }
-
-    document.addEventListener("overview:export", handleExport as EventListener);
-    return () =>
-      document.removeEventListener("overview:export", handleExport as EventListener);
-  }, [rows]);
 
   const headerControls = (
     <div className="ss-controls">
@@ -271,6 +172,173 @@ function riskClass(risk: string) {
       </div>
     </div>
   );
+
+  const doExportCSV = React.useCallback(() => {
+    const data = raw ?? [];
+    const header = [
+      "Borrower",
+      "Outstanding ($)",
+      "Amount Overdue ($)",
+      "Days Overdue",
+      "Missed Payments",
+      "Risk Level",
+      "Type",
+    ];
+    const lines = [header.join(",")];
+    for (const m of data) {
+      lines.push(
+        [
+          m.client,
+          centsToDollars(m.outstandingCents),
+          centsToDollars(m.overdueCents),
+          `${m.daysOverdue} days`,
+          String(m.missedPayments),
+          m.risk,
+          m.planType === "KAYYA" ? "Kayya-backed" : "Self-financed",
+        ].join(","),
+      );
+    }
+    const blob = new Blob(["\ufeff" + lines.join("\n")], {
+      type: "text/csv;charset=utf-8;",
+    });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    const ts = new Date().toISOString().slice(0, 10);
+    a.href = url;
+    a.download = `missed-late-payments-${ts}.csv`;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
+  }, [raw]);
+
+  const buildPrintableHtml = React.useCallback(() => {
+    const data = raw ?? [];
+    const styles = `
+        * { box-sizing: border-box; }
+        body {
+          font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, 'Apple Color Emoji','Segoe UI Emoji';
+          color: #0f172a; padding: 24px;
+        }
+        h1 { font-size: 18px; margin: 0 0 12px; }
+        table { width: 100%; border-collapse: collapse; font-size: 12px; }
+        thead th { text-align: left; font-weight: 600; border-bottom: 1px solid #e5e7eb; padding: 8px 10px; }
+        tbody td { border-bottom: 1px solid #f1f5f9; padding: 8px 10px; vertical-align: middle; }
+        td.right, th.right { text-align: right; }
+        td.center, th.center { text-align: center; }
+        .bar { position: relative; background: #f3f4f6; height: 16px; border-radius: 9999px; overflow: hidden; }
+        .bar > span { position: absolute; inset: 0; width: var(--w,0%); background: var(--c,#3b82f6); }
+        .bar .label { position: relative; z-index: 1; text-align: center; font-size: 10px; line-height: 16px; color: #fff; }
+        @media print { @page { margin: 14mm; } }
+      `;
+
+    const rowsHtml = data.length
+      ? data
+          .map((m) => {
+            return `
+              <tr>
+                <td>${m.client}</td>
+                <td class="right">${money(m.outstandingCents)}</td>
+                <td class="right">${money(m.overdueCents)}</td>
+                <td class="center">${m.daysOverdue} days</td>
+                <td class="center">${String(m.missedPayments)} mo</td>
+                <td class="center">${m.risk}</td>
+                <td class="center">${m.planType === "KAYYA" ? "Kayya-backed" : "Self-financed"}</td>
+              </tr>
+            `;
+          })
+          .join("")
+      : `<tr><td colspan="7" class="center" style="padding:20px;">No data available.</td></tr>`;
+
+    return `<!doctype html>
+  <html>
+    <head>
+      <meta charset="utf-8" />
+      <meta name="color-scheme" content="light">
+      <title>Missed/Late Payments</title>
+      <style>${styles}</style>
+    </head>
+    <body>
+      <h1>Active Payment Plans</h1>
+      <table>
+        <thead>
+          <tr>
+            <th>Borrower</th>
+            <th class="right">Outstanding ($)</th>
+            <th class="right">Amount Overdue ($)</th>
+            <th class="center">Days Overdue</th>
+            <th class="center">Missed Payments</th>
+            <th class="center">Risk Level</th>
+            <th class="center">Type</th>
+          </tr>
+        </thead>
+        <tbody>${rowsHtml}</tbody>
+      </table>
+    </body>
+  </html>`;
+  }, [raw]);
+
+  const printHtmlViaIframe = React.useCallback((html: string) => {
+    const iframe = document.createElement("iframe");
+    iframe.style.position = "fixed";
+    iframe.style.right = "0";
+    iframe.style.bottom = "0";
+    iframe.style.width = "0";
+    iframe.style.height = "0";
+    iframe.style.border = "0";
+    document.body.appendChild(iframe);
+
+    const doc = iframe.contentDocument || iframe.contentWindow?.document;
+    if (!doc) {
+      iframe.remove();
+      return;
+    }
+    doc.open();
+    doc.write(html);
+    doc.close();
+
+    setTimeout(() => {
+      try {
+        iframe.contentWindow?.focus();
+        iframe.contentWindow?.print();
+      } finally {
+        setTimeout(() => iframe.remove(), 500);
+      }
+    }, 150);
+  }, []);
+
+  const doExportPDF = React.useCallback(() => {
+    printHtmlViaIframe(buildPrintableHtml());
+  }, [buildPrintableHtml, printHtmlViaIframe]);
+
+  const doPrint = React.useCallback(() => {
+    printHtmlViaIframe(buildPrintableHtml());
+  }, [buildPrintableHtml, printHtmlViaIframe]);
+
+  React.useEffect(() => {
+    const handler = (e: Event) => {
+      const ce = e as CustomEvent<{
+        tabKey?: string;
+        action?: "csv" | "pdf" | "print";
+      }>;
+      if (ce.detail?.tabKey !== "late-payments") return;
+      switch (ce.detail.action) {
+        case "csv":
+          doExportCSV();
+          break;
+        case "pdf":
+          doExportPDF();
+          break;
+        case "print":
+          doPrint();
+          break;
+      }
+    };
+    window.addEventListener("overview:export" as any, handler as any);
+    return () => {
+      window.removeEventListener("overview:export" as any, handler as any);
+    };
+  }, [doExportCSV, doExportPDF, doPrint]);
 
   return (
     <div className="overview-grid" aria-busy={loading}>
