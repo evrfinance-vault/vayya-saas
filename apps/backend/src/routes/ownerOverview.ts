@@ -808,6 +808,7 @@ ownerOverview.get("/api/owner/late-payments/summary", async (_req, res) => {
   });
 
   let delinquentAccounts = 0;
+  let newDelinquentAccounts = 0;
   let amountOverdueCents = 0;
   let atRiskCents = 0;
   let sumDays = 0;
@@ -832,6 +833,9 @@ ownerOverview.get("/api/owner/late-payments/summary", async (_req, res) => {
           0,
           Math.floor((+now - +p.dueDate) / (1000 * 60 * 60 * 24)),
         );
+        if (days < 7) {
+          newDelinquentAccounts += 1;
+        }
         sumDays += days;
         cntDays += 1;
       }
@@ -842,6 +846,7 @@ ownerOverview.get("/api/owner/late-payments/summary", async (_req, res) => {
 
   res.json({
     delinquentAccounts,
+    newDelinquentAccounts,
     amountOverdueCents,
     atRiskCents,
     avgDaysOverdue,
@@ -859,7 +864,7 @@ ownerOverview.get("/api/owner/late-payments/list", async (req, res) => {
     | "LOW"
     | "MEDIUM"
     | "HIGH";
-  const daysMin = Math.max(0, Number(req.query.daysMin ?? 0));
+  const daysMin = Math.max(1, Number(req.query.daysMin ?? 1));
 
   const now = new Date();
 
