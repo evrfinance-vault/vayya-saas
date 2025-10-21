@@ -61,7 +61,7 @@ ownerOverview.get("/api/owner/overview/name", async (req, res) => {
       p.paymentPlan.planType === "KAYYA" ? "Kayya-backed" : "Self-financed";
 
     const hadPriorPaid = (p.paymentPlan.payments ?? []).some(
-      (q) => q.dueDate < p.dueDate && q.status === "PAID",
+      (q: any) => q.dueDate < p.dueDate && q.status === "PAID",
     );
 
     let badge: "Hold" | "Paid" | "Due Today" | "Paying" | "Pending" = "Pending";
@@ -280,7 +280,7 @@ ownerOverview.get("/api/owner/overview/payouts-window", async (req, res) => {
   ]);
 
   const items = [
-    ...paid.map((p) => ({
+    ...paid.map((p: any) => ({
       id: p.id,
       name: `${p.patient.firstName} ${p.patient.lastName}`.trim(),
       amountCents: p.amountCents,
@@ -288,7 +288,7 @@ ownerOverview.get("/api/owner/overview/payouts-window", async (req, res) => {
       effectiveAt: p.paidAt!,
       planType: p.paymentPlan.planType,
     })),
-    ...scheduled.map((s) => ({
+    ...scheduled.map((s: any) => ({
       id: s.id,
       name: `${s.patient.firstName} ${s.patient.lastName}`.trim(),
       amountCents: s.amountCents,
@@ -584,17 +584,21 @@ ownerOverview.get("/api/owner/active-plans/summary", async (req, res) => {
   });
 
   const active = plans.filter(
-    (pl) => !pl.onHold && pl.payments.some((p) => p.status !== "PAID"),
+    (pl: any) =>
+      !pl.onHold && pl.payments.some((p: any) => p.status !== "PAID"),
   );
-  const activeIds = active.map((p) => p.id);
+  const activeIds = active.map((p: any) => p.id);
   const activeCount = active.length;
 
-  const totalFinancedCents = active.reduce((s, p) => s + p.principalCents, 0);
+  const totalFinancedCents = active.reduce(
+    (s: any, p: any) => s + p.principalCents,
+    0,
+  );
 
-  const outstandingCents = active.reduce((s, p) => {
+  const outstandingCents = active.reduce((s: any, p: any) => {
     const remain = p.payments
-      .filter((pp) => pp.status !== "PAID" && pp.status !== "HOLD")
-      .reduce((x, y) => x + y.amountCents, 0);
+      .filter((pp: any) => pp.status !== "PAID" && pp.status !== "HOLD")
+      .reduce((x: any, y: any) => x + y.amountCents, 0);
     return s + remain;
   }, 0);
 
@@ -632,10 +636,11 @@ ownerOverview.get("/api/owner/active-plans/summary", async (req, res) => {
   }
 
   const aprDen = active.reduce(
-    (s, p) => s + Math.max(0, p.principalCents - (p.downPaymentCents ?? 0)),
+    (s: any, p: any) =>
+      s + Math.max(0, p.principalCents - (p.downPaymentCents ?? 0)),
     0,
   );
-  const aprNum = active.reduce((s, p) => {
+  const aprNum = active.reduce((s: any, p: any) => {
     const financed = Math.max(0, p.principalCents - (p.downPaymentCents ?? 0));
     return s + financed * (p.aprBps ?? 0);
   }, 0);
