@@ -31,3 +31,15 @@ root.render(
     </Auth0ProviderWithConfig>
   </React.StrictMode>,
 );
+
+if (import.meta.env.DEV) {
+  window.addEventListener("unhandledrejection", (ev) => {
+    const r: any = ev.reason;
+    if (r?.name === "AbortError" || r?.code === 20) {
+      console.debug("[global] AbortError (suppressed):", ev);
+      ev.preventDefault();
+      return;
+    }
+    console.error("[global] Unhandled rejection:", r);
+  });
+}

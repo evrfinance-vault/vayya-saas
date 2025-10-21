@@ -1,18 +1,19 @@
 .overview-tabs {
   display: flex;
-  gap: 12px;
+  gap: 8px;
   align-items: center;
-  margin: 60px 0 -39px;
+  margin: 60px 50px -39px;
+  position: relative;
+  overflow: visible;
 }
 
 .overview-tab {
-  --tab-bg-selected: #f8fcff;
-
   position: relative;
+  z-index: 1;
   border: 0;
   border-top-left-radius: 20px;
   border-top-right-radius: 20px;
-  padding: 14px;
+  padding: 14px 14px 14px 15px;
   background: color-mix(in srgb, var(--theme-color), var(--light-color));
   color: var(--dark-color);
   cursor: pointer;
@@ -21,27 +22,29 @@
   min-height: 70px;
   transition:
     transform 140ms ease,
-    box-shadow 140ms ease,
-    background-color 140ms ease,
     color 140ms ease,
-    padding 140ms ease;
-  will-change: transform, box-shadow;
+    opacity 140ms ease,
+    padding 140ms ease,
+    z-index 140ms ease;
+  will-change: transform;
   backdrop-filter: saturate(140%) blur(4px);
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  opacity: 0.9;
 }
 
 .overview-tab .overview-tab-options {
   display: none;
 }
 
-.overview-tab:hover {
-  transform: translateY(-16px);
-  box-shadow: 0 10px 24px -12px rgba(0, 0, 0, 0.25);
-}
-
 .overview-tab[aria-selected="true"] {
-  background: var(--tab-bg-selected);
-  box-shadow: 0 8px 24px -10px rgba(0, 0, 0, 0.25);
+  --cap-w: 64px;
+  --cap-h: 52px;
+
+  background: var(--menu-item-color);
   transform: translateY(-36px);
+  z-index: 3;
+  opacity: 1;
 }
 
 .overview-tab[aria-selected="true"] .overview-tab-box {
@@ -82,6 +85,7 @@
 
 .overview-tab[aria-selected="true"] .overview-tab-options {
   display: inline-flex;
+  z-index: 4;
   animation: ovPopIn 140ms ease-out both;
 }
 
@@ -111,12 +115,12 @@
 }
 
 .overview-tab-label {
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 600;
   white-space: normal;
   text-align: left;
   line-height: 1.3;
-  color: #667085;
+  color: rgb(var(--dark-color-rgb) / 75%);
   margin-top: 3px;
   width: 100%;
   grid-area: label;
@@ -152,12 +156,13 @@
   will-change: transform, opacity;
   transform: translateY(0);
   opacity: 0.95;
+  min-height: 24px;
 }
 
 .overview-tab-options {
   position: absolute;
-  top: 18px;
-  right: 8px;
+  top: 15px;
+  right: 15px;
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -166,25 +171,79 @@
   border: 0;
   border-radius: 8px;
   background: transparent;
-  color: inherit;
+  color: rgb(var(--dark-color-rgb) / 75%);
   cursor: pointer;
 }
 
 .overview-tab-options:hover {
-  background: rgba(15, 23, 42, 0.06);
-}
-
-.overview-tab-options:focus-visible {
-  outline: 3px solid rgba(59, 130, 246, 0.45);
-  outline-offset: 2px;
+  background-color: rgb(var(--dark-color-rgb) / 5%);
+  color: var(--dark-color);
 }
 
 .overview-tab-background {
   position: absolute;
   left: 0;
   width: 100%;
-  height: calc(100% + 200px);
-  background-color: #f8fcff;
+  height: calc(100% + 425px);
+  background-color: var(--menu-item-color);
   border-top-left-radius: 40px;
   border-top-right-radius: 40px;
+  z-index: 2;
+  pointer-events: none;
+}
+
+.tab-cap {
+  position: absolute;
+  bottom: 0;
+  width: var(--cap-w);
+  height: var(--cap-h);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 120ms ease;
+}
+
+.overview-tab[aria-selected="true"] .tab-cap {
+  opacity: 1;
+}
+
+.tab-cap-left {
+  left: 0;
+  transform: translateX(calc(-1 * var(--cap-w)));
+}
+
+.tab-cap-right {
+  right: 0;
+  transform: translateX(var(--cap-w));
+}
+
+.overview-tab-menu {
+  position: absolute;
+  top: 46px;
+  right: calc(-160px + 28px - 3px);
+  background: var(--light-color);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  max-width: 160px;
+  padding: 8px;
+  box-shadow:
+    0 10px 15px -3px rgba(0, 0, 0, 0.1),
+    0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  z-index: 100;
+  animation: ovPopIn 140ms ease-out both;
+}
+
+.overview-tab-menu-item {
+  width: 100%;
+  text-align: left;
+  background: transparent;
+  border: 0;
+  padding: 8px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 13px;
+  color: var(--dark-color);
+}
+
+.overview-tab-menu-item:hover {
+  background: var(--menu-item-color);
 }
