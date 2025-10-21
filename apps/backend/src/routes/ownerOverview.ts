@@ -813,6 +813,7 @@ ownerOverview.get("/api/owner/late-payments/summary", async (_req, res) => {
   let atRiskCents = 0;
   let sumDays = 0;
   let cntDays = 0;
+  let missedPaymentsTotal = 0;
 
   for (const pl of plans) {
     const outstanding = (pl.payments as Array<{ amountCents: number }>).reduce(
@@ -827,6 +828,8 @@ ownerOverview.get("/api/owner/late-payments/summary", async (_req, res) => {
     if (overdue.length) {
       delinquentAccounts += 1;
       atRiskCents += outstanding;
+      missedPaymentsTotal += overdue.length;
+
       for (const p of overdue) {
         amountOverdueCents += p.amountCents;
         const days = Math.max(
@@ -850,6 +853,7 @@ ownerOverview.get("/api/owner/late-payments/summary", async (_req, res) => {
     amountOverdueCents,
     atRiskCents,
     avgDaysOverdue,
+    missedPaymentsTotal
   });
 });
 

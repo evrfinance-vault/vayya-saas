@@ -21,6 +21,7 @@ import {
 } from "../components/panels";
 import { useTotalRevenueSummary, fmtUSD } from "../api/useTotalRevenue";
 import { useActivePlans } from "../api/useActivePlans";
+import { useLatePaymentsSummary } from "../api/useLatePayments";
 
 const TABS: TabDef[] = [
   {
@@ -103,6 +104,8 @@ export default function OverviewPage(): React.ReactElement {
   const dotColor = health === null ? "#f2f2f2" : health ? "#90ee90" : "#edbf91";
 
   const { data: trSummary } = useTotalRevenueSummary();
+  const { data: lpSummary } = useLatePaymentsSummary();
+
   const {
     rows: _raw,
     summary,
@@ -122,7 +125,12 @@ export default function OverviewPage(): React.ReactElement {
                 ...t,
                 badge: String(summary?.activeCount ?? 0),
               }
-            : t,
+          : t.key === "late-payments"
+              ? {
+                  ...t,
+                  badge: String(lpSummary?.missedPaymentsTotal ?? 0),
+                }
+              : t,
       ),
     [trSummary, summary],
   );

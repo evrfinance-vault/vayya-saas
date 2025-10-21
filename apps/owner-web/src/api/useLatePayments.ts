@@ -14,6 +14,7 @@ export type LPSummary = {
   amountOverdueCents: number;
   atRiskCents: number;
   avgDaysOverdue: number;
+  missedPaymentsTotal: number;
 };
 
 export type LateRow = {
