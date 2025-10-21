@@ -1,0 +1,22 @@
+.ic-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 8px 2px;
+}
+.ic-value {
+  font-weight: 700;
+  font-size: 28px;
+  line-height: 1.05;
+  letter-spacing: 0.2px;
+}
+.ic-sub {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 14px;
+  font-weight: 400;
+}
+.ic-sub-ico {
+  opacity: 0.9;
+}

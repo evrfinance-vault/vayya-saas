@@ -1,7 +1,7 @@
 import React from "react";
 import "./OverviewTabs.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { IconProp } from "@fortawesome/fontawesome-svg-core";
+import type { IconProp } from "@fortawesome/fontawesome-svg-core";
 import { faEllipsisVertical } from "@fortawesome/free-solid-svg-icons";
 
 export type TabKey =
@@ -33,6 +33,53 @@ export default function OverviewTabs({
 }: Props) {
   const listRef = React.useRef<HTMLDivElement>(null);
 
+  const [openFor, setOpenFor] = React.useState<TabKey | null>(null);
+
+  const toggleMenu = React.useCallback(
+    (key: TabKey) => {
+      setOpenFor((cur) => (cur === key ? null : key));
+      onOptions?.(key);
+    },
+    [onOptions],
+  );
+
+  React.useEffect(() => {
+    const onDocClick = (e: MouseEvent) => {
+      const root = listRef.current;
+      if (!root) return;
+      const target = e.target as Node;
+
+      const menu = root.querySelector(".overview-tab-menu");
+      const btn = root.querySelector(".overview-tab-options");
+      const clickedInside =
+        (!!menu && menu.contains(target)) || (!!btn && btn.contains(target));
+
+      if (!clickedInside) setOpenFor(null);
+    };
+    document.addEventListener("click", onDocClick);
+    return () => document.removeEventListener("click", onDocClick);
+  }, []);
+
+  React.useEffect(() => {
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setOpenFor(null);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, []);
+
+  const emitExport = React.useCallback(
+    (action: "csv" | "pdf" | "print") => {
+      window.dispatchEvent(
+        new CustomEvent("overview:export", {
+          detail: { tabKey: value, action },
+        }),
+      );
+      setOpenFor(null);
+    },
+    [value],
+  );
+
   return (
     <div className="wrapper">
       <div
@@ -43,6 +90,14 @@ export default function OverviewTabs({
       >
         {tabs.map((tab) => {
           const selected = tab.key === value;
+          const showOptions =
+            selected &&
+            (tab.key === "total-revenue" ||
+              tab.key === "active-payment-plans" ||
+              tab.key === "late-payments" ||
+              tab.key === "pending-applications");
+          const menuOpen = openFor === tab.key;
+
           return (
             <div
               key={tab.key}
@@ -61,23 +116,70 @@ export default function OverviewTabs({
                   </span>
                 )}
                 <span className="overview-tab-label">{tab.label}</span>
-                {tab.badge && (
-                  <span className="overview-tab-badge">{tab.badge}</span>
-                )}
+                <span className="overview-tab-badge">{tab.badge}</span>
               </div>
 
-              {selected && (
+              {showOptions && (
                 <button
                   type="button"
                   className="overview-tab-options"
                   aria-label={`${tab.label} options`}
+                  aria-haspopup="menu"
+                  aria-expanded={menuOpen}
                   onClick={(event) => {
                     event.stopPropagation();
-                    onOptions?.(tab.key);
+                    toggleMenu(tab.key);
                   }}
                 >
                   <FontAwesomeIcon icon={faEllipsisVertical} size="lg" />
                 </button>
+              )}
+
+              {selected && (
+                <>
+                  <img
+                    className="tab-cap tab-cap-left"
+                    src="/assets/tab-curved-left.svg"
+                    alt=""
+                    aria-hidden="true"
+                  />
+                  <img
+                    className="tab-cap tab-cap-right"
+                    src="/assets/tab-curved-right.svg"
+                    alt=""
+                    aria-hidden="true"
+                  />
+                </>
+              )}
+
+              {menuOpen && (
+                <div
+                  role="menu"
+                  className="overview-tab-menu"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  <button
+                    role="menuitem"
+                    className="overview-tab-menu-item"
+                    onClick={() => emitExport("csv")}
+                  >
+                    Export CSV
+                  </button>
+                  <button
+                    role="menuitem"
+                    className="overview-tab-menu-item"
+                    onClick={() => emitExport("pdf")}
+                  >
+                    Export PDF
+                  </button>
+                  <button
+                    role="menuitem"
+                    className="overview-tab-menu-item"
+                    onClick={() => emitExport("print")}
+                  >
+                    Print
+                  </button>
+                </div>
               )}
             </div>
           );

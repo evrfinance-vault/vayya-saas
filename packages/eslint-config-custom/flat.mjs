@@ -19,12 +19,19 @@ export default [
     ignores: [
       "**/node_modules/**",
       "**/dist/**",
+      "**/build/**",
+      "**/.next/**",
+      "**/.prisma/**",
       "**/coverage/**",
       "**/.*/**",
       "**/eslint.config.*",
       "**/*.config.*",
       "**/vite.config.*",
       "**/vitest.config.*",
+      "apps/**/src/generated/**",
+      "apps/**/prisma/**",
+      "src/generated/**",
+      "prisma/**",
     ],
   },
 
@@ -73,6 +80,7 @@ export default [
     rules: {
       "no-empty": ["error", { allowEmptyCatch: true }],
       "no-unused-vars": "off",
+      "no-undef": "off",
       "@typescript-eslint/no-unused-vars": [
         "error",
         {

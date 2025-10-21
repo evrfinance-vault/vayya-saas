@@ -1,26 +1,15 @@
-/* ======= Tweak these to match your header ======= */
-:root {
-  --vu-pop-bg: var(--light-color);
-  --vu-pop-fg: var(--dark-color);
-  --vu-pop-border: #e5e7eb;
-  --vu-pop-shadow:
-    0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-  --vu-note-hover: #f8fafc;
-  --vu-unread-dot: var(--alt-theme-color);
-  --vu-link: var(--alt-theme-color);
-}
-/* ================================================ */
-
 .vu-popover {
   position: absolute;
   top: calc(100% + 8px);
   right: 0;
   width: 360px;
-  background: var(--vu-pop-bg);
-  color: var(--vu-pop-fg);
-  border: 1px solid var(--vu-pop-border);
+  background: var(--light-color);
+  color: var(--dark-color);
+  border: 1px solid var(--border-color);
   border-radius: 12px;
-  box-shadow: var(--vu-pop-shadow);
+  box-shadow:
+    0 10px 15px -3px rgb(var(--dark-color-rgb) / 10%),
+    0 4px 6px -2px rgb(var(--dark-color-rgb) / 5%);
   padding: 8px;
   z-index: 100;
 }
@@ -39,13 +28,13 @@
 .vu-link-btn {
   background: transparent;
   border: 0;
-  color: var(--vu-link);
+  color: var(--alt-theme-color);
   cursor: pointer;
   padding: 6px;
   border-radius: 8px;
 }
 .vu-link-btn:hover {
-  background: #f1f5f9;
+  background: var(--menu-item-color);
 }
 
 .vu-popover-list {
@@ -70,7 +59,7 @@
   border-radius: 10px;
 }
 .vu-note:hover {
-  background: var(--vu-note-hover);
+  background: var(--menu-item-color);
 }
 
 .vu-dot {
@@ -81,7 +70,7 @@
   margin-top: 7px;
 }
 .vu-note.unread .vu-dot {
-  background: var(--vu-unread-dot);
+  background: var(--unread-color);
 }
 
 .vu-note-content {
@@ -101,7 +90,6 @@
   margin-top: 3px;
 }
 
-/* Make whole item clickable when href is provided */
 .vu-note-cover {
   position: absolute;
   inset: 0;
