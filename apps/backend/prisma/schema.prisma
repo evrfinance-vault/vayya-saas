@@ -115,3 +115,15 @@ model Application {
 
   @@index([submittedAt, status, planType])
 }
+
+model BusinessProfile {
+  id               Int      @id
+  name             String?
+  address          String?
+  hours            String?
+  website          String?
+  services         Json?    // string[]
+  financingOptions Json?    // string[]
+  testimonials     Json?    // [{ author: string, quote: string }]
+  updatedAt        DateTime @updatedAt
+}
