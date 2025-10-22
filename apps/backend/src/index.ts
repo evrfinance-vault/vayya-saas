@@ -15,7 +15,6 @@ app.use(morgan("dev"));
 app.get("/health", healthHandler);
 app.get("/", (_req, res) => res.send("Back-end is alive and healthy."));
 
-// protect all API routes
 app.use("/api", requireAuth);
 app.get("/api/ping", ping);
 

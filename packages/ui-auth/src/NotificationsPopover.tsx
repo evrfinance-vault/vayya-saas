@@ -15,7 +15,7 @@ type Props = {
   items: NotificationItem[];
   onClose: () => void;
   onViewAll?: () => void;
-  anchorRef?: React.RefObject<HTMLElement>; // 👈 NEW
+  anchorRef?: React.RefObject<HTMLElement>;
 };
 
 export function NotificationsPopover(props: Props): React.ReactElement | null {

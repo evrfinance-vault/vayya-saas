@@ -11,7 +11,6 @@ export async function healthHandler(req: Request, res: Response) {
       const result = await pool.query("SELECT 1 as ok");
       dbOk = result?.rows?.[0]?.ok === 1;
     } catch {
-      // database might be unreachable in dev; mark as false and continue
       dbOk = false;
     }
 

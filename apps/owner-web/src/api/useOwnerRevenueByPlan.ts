@@ -1,14 +1,14 @@
 import { useEffect, useState } from "react";
 
 export type RevenuePoint = {
-  date: string; // YYYY-MM-DD (week start)
-  self: number; // dollars
-  kayya: number; // dollars
+  date: string;
+  self: number;
+  kayya: number;
 };
 
 export type RevenuePayload = {
   points: RevenuePoint[];
-  max: number; // max dollars across series
+  max: number;
 };
 
 type Options =
