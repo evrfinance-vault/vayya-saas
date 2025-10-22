@@ -14,33 +14,6 @@ import ApplicationsPage from "./pages/ApplicationsPage";
 import ReportsPage from "./pages/ReportsPage";
 import NotFoundPage from "./pages/NotFoundPage";
 
-const demoNotifications = [
-  {
-    id: "n1",
-    title: "Loan Application Submitted",
-    body: "by Alexander Toothman",
-    unread: true,
-    createdAt: "2h ago",
-    href: "#",
-  },
-  {
-    id: "n2",
-    title: "Payout Received",
-    body: "from Michelle Dentistova",
-    unread: false,
-    createdAt: "Yesterday",
-    href: "#",
-  },
-  {
-    id: "n3",
-    title: "Billing Details Updated",
-    body: "for Katherine Meyers",
-    unread: false,
-    createdAt: "Last week",
-    href: "#",
-  },
-];
-
 type Nav = { label: string; key: string; href: string };
 
 function TitleSetter({
@@ -89,7 +62,8 @@ export default function App(): React.ReactElement {
             <small>{l.label}</small>
           </NavLink>
         )}
-        notifications={demoNotifications}
+        showSearch={false}
+        showNotifications={false}
       />
 
       <Routes>
