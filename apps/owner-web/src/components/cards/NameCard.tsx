@@ -1,5 +1,5 @@
 import React from "react";
-import Card, { type CardSize } from "../Card";
+import Card, { type CardSize } from "./Card";
 import "./NameCard.css";
 import { useOwnerOverviewName } from "../../api/useOwnerOverviewName";
 import { faCircleUser } from "@fortawesome/free-solid-svg-icons";

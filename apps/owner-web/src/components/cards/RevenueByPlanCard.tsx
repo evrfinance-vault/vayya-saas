@@ -1,5 +1,5 @@
 import React from "react";
-import Card, { type CardSize } from "../Card";
+import Card, { type CardSize } from "./Card";
 import "./RevenueByPlanCard.css";
 import { faDollarSign } from "@fortawesome/free-solid-svg-icons";
 import { useOwnerRevenueByPlan } from "../../api/useOwnerRevenueByPlan";

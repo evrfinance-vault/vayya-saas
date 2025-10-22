@@ -1,5 +1,5 @@
 import React from "react";
-import Card, { type CardSize } from "../Card";
+import Card, { type CardSize } from "./Card";
 import "./AccountHealthCard.css";
 import { faHeartPulse } from "@fortawesome/free-solid-svg-icons";
 import { useOwnerAccountHealth } from "../../api/useOwnerAccountHealth";

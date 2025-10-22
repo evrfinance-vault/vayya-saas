@@ -1,5 +1,5 @@
 import React from "react";
-import Card, { type CardSize } from "../Card";
+import Card, { type CardSize } from "./Card";
 import "./PayoutCalendarCard.css";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
