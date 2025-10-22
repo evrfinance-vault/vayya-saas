@@ -44,7 +44,7 @@
   justify-content: center;
   flex-flow: row wrap;
   gap: 0;
-  background-color: rgb(var(--light-color) / 25%);
+  background-color: rgb(var(--light-color-rgb) / 25%);
   border-radius: 12px;
 }
 
