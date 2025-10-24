@@ -1,8 +1,5 @@
 import { useEffect, useState } from "react";
-
-const API =
-  (import.meta as any).env?.VITE_API_URL?.replace(/\/$/, "") ||
-  "http://localhost:4000";
+import { useApiFetch } from "./http";
 
 export type AppPlan = "ALL" | "SELF" | "KAYYA";
 export type AppStatus =
@@ -36,16 +33,17 @@ export type AppRow = {
 };
 
 export function useApplicationsSummary() {
+  const apiFetch = useApiFetch();
   const [data, setData] = useState<AppSummary | null>(null);
   const [loading, setLoading] = useState(true);
   useEffect(() => {
     const ctl = new AbortController();
-    fetch(`${API}/api/owner/applications/summary`, { signal: ctl.signal })
+    apiFetch("/api/owner/applications/summary", { signal: ctl.signal })
       .then((r) => r.json())
       .then(setData)
       .finally(() => setLoading(false));
     return () => ctl.abort();
-  }, []);
+  }, [apiFetch]);
   return { data, loading };
 }
 
@@ -54,19 +52,21 @@ export function useApplications(
   status: AppStatus,
   plan: AppPlan,
 ) {
+  const apiFetch = useApiFetch();
   const [rows, setRows] = useState<AppRow[] | null>(null);
   const [loading, setLoading] = useState(true);
+
   useEffect(() => {
     const ctl = new AbortController();
     const qs = new URLSearchParams({ range, status, plan });
-    fetch(`${API}/api/owner/applications?${qs.toString()}`, {
+    apiFetch(`/api/owner/applications?${qs.toString()}`, {
       signal: ctl.signal,
     })
       .then((r) => r.json())
       .then((payload) => setRows(payload.rows ?? []))
       .finally(() => setLoading(false));
     return () => ctl.abort();
-  }, [range, status, plan]);
+  }, [range, status, plan, apiFetch]);
   return { rows, loading };
 }
 

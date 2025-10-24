@@ -20,6 +20,11 @@ app.get("/api/ping", ping);
 
 app.use(ownerOverview);
 
+app.use((err, _req, res, _next) => {
+  console.error("Auth error:", err.name, err.message);
+  res.status(err.status || 401).send(err.message || "Unauthorized");
+});
+
 app.listen(config.port, () => {
   console.log(`[Back-end] Listening on http://localhost:${config.port}`);
 });
