@@ -78,5 +78,5 @@
     "@fortawesome/react-fontawesome": "^3.0.2",
     "react-gravatar": "^2.6.3"
   },
-  "version": "0.5.0"
+  "version": "0.6.0"
 }
