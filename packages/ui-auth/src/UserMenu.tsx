@@ -3,6 +3,7 @@ import "./UserMenu.css";
 import { useAuth0 } from "@auth0/auth0-react";
 import { useRole } from "./useRole";
 import Gravatar from "react-gravatar";
+import { NavLink } from "react-router-dom";
 
 export function UserMenu(): React.ReactElement {
   const { user, logout } = useAuth0();
@@ -47,16 +48,16 @@ export function UserMenu(): React.ReactElement {
             {role && <div className="vu-menu-role">{role}</div>}
           </div>
           <div className="vu-sep" />
-          <button type="button" className="vu-item" disabled={true}>
+          <NavLink key="discovery" to="/settings?tab=discovery" end={false} className="vu-item-link" onClick={() => setOpen(false)}>
             Discovery Profile
-          </button>
-          <button type="button" className="vu-item" disabled={true}>
+          </NavLink>
+          <NavLink key="settings" to="/settings?tab=settings" end={false} className="vu-item-link" onClick={() => setOpen(false)}>
             Settings
-          </button>
+          </NavLink>
           <div className="vu-sep" />
           <button
             type="button"
-            className="vu-item"
+            className="vu-item-button"
             onClick={() =>
               logout({ logoutParams: { returnTo: window.location.origin } })
             }

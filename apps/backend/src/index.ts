@@ -6,6 +6,7 @@ import { healthHandler } from "./routes/health.js";
 import { requireAuth } from "./auth.js";
 import { ping } from "./routes/secure.js";
 import { ownerOverview } from "./routes/ownerOverview";
+import { settingsRouter } from "./routes/settings";
 
 const app = express();
 app.use(cors());
@@ -19,6 +20,7 @@ app.use("/api", requireAuth);
 app.get("/api/ping", ping);
 
 app.use(ownerOverview);
+app.use(settingsRouter);
 
 app.use((err, _req, res, _next) => {
   console.error("Auth error:", err.name, err.message);

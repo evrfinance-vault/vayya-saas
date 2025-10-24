@@ -3,3 +3,5 @@ export { default as LatePaymentsPanel } from "./LatePaymentsPanel";
 export { default as PendingApplicationsPanel } from "./PendingApplicationsPanel";
 export { default as TotalRevenuePanel } from "./TotalRevenuePanel";
 export { default as BoardPanel } from "./BoardPanel";
+export { default as SettingsAccountPanel } from "./SettingsAccountPanel";
+export { default as DiscoveryProfilePanel } from "./DiscoveryProfilePanel";
