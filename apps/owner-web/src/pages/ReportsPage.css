@@ -1,0 +1,38 @@
+.reports-page {
+}
+
+.reports-panels {
+  position: relative;
+  margin: 40px auto 0;
+  z-index: 2;
+}
+
+.reports-tab-change {
+  animation: reportsFadeUp 200ms ease-out both;
+}
+
+@keyframes reportsFadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.reports-wrapper {
+}
+
+.reports-wrapper button {
+  background-color: var(--alt-theme-color);
+  color: var(--light-color);
+  border: none;
+  padding: 10px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  width: 100%;
+  margin: 16px 0 0;
+}
