@@ -12,51 +12,34 @@ import PaymentPlansPage from "./pages/PaymentPlansPage";
 import CustomersPage from "./pages/CustomersPage";
 import ApplicationsPage from "./pages/ApplicationsPage";
 import ReportsPage from "./pages/ReportsPage";
+import SettingsPage from "./pages/SettingsPage";
 import NotFoundPage from "./pages/NotFoundPage";
-
-const demoNotifications = [
-  {
-    id: "n1",
-    title: "Loan Application Submitted",
-    body: "by Alexander Toothman",
-    unread: true,
-    createdAt: "2h ago",
-    href: "#",
-  },
-  {
-    id: "n2",
-    title: "Payout Received",
-    body: "from Michelle Dentistova",
-    unread: false,
-    createdAt: "Yesterday",
-    href: "#",
-  },
-  {
-    id: "n3",
-    title: "Billing Details Updated",
-    body: "for Katherine Meyers",
-    unread: false,
-    createdAt: "Last week",
-    href: "#",
-  },
-];
 
 type Nav = { label: string; key: string; href: string };
 
 function TitleSetter({
   brand,
   navLinks,
+  hiddenNavLinks,
 }: {
   brand: string;
   navLinks: Nav[];
+  hiddenNavLinks: Nav[];
 }): React.ReactElement {
   const { pathname } = useLocation();
   const match = navLinks.find((l) =>
     l.href === "/" ? pathname === "/" : pathname.startsWith(l.href),
   );
+  const matchHidden = hiddenNavLinks.find((l) =>
+    l.href === "/" ? pathname === "/" : pathname.startsWith(l.href),
+  );
 
   useDocumentTitle(
-    match ? `${brand} » ${match.label}` : `${brand} » Page Not Found`,
+    match
+      ? `${brand} » ${match.label}`
+      : matchHidden
+        ? `${brand} » ${matchHidden.label}`
+        : `${brand} » Page Not Found`,
   );
   return <></>;
 }
@@ -70,11 +53,19 @@ export default function App(): React.ReactElement {
     { label: "Reports", key: "reports", href: "/reports" },
   ];
 
+  const hiddenNavLinks = [
+    { label: "Settings", key: "settings", href: "/settings" },
+  ];
+
   return (
     <BrowserRouter
       future={{ v7_startTransition: true, v7_relativeSplatPath: true }}
     >
-      <TitleSetter brand="Kayya" navLinks={navLinks} />
+      <TitleSetter
+        brand="Kayya"
+        navLinks={navLinks}
+        hiddenNavLinks={hiddenNavLinks}
+      />
 
       <Header
         title="kayya"
@@ -89,7 +80,8 @@ export default function App(): React.ReactElement {
             <small>{l.label}</small>
           </NavLink>
         )}
-        notifications={demoNotifications}
+        showSearch={false}
+        showNotifications={false}
       />
 
       <Routes>
@@ -98,6 +90,7 @@ export default function App(): React.ReactElement {
         <Route path="/customers" element={<CustomersPage />} />
         <Route path="/applications" element={<ApplicationsPage />} />
         <Route path="/reports" element={<ReportsPage />} />
+        <Route path="/settings" element={<SettingsPage />} />
         <Route path="*" element={<NotFoundPage />} />
       </Routes>
     </BrowserRouter>

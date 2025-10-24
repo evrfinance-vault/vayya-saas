@@ -1,5 +1,5 @@
 import React from "react";
-import Card, { type CardSize } from "../Card";
+import Card, { type CardSize } from "./Card";
 import "./RevenueByPlanCard.css";
 import { faDollarSign } from "@fortawesome/free-solid-svg-icons";
 import { useOwnerRevenueByPlan } from "../../api/useOwnerRevenueByPlan";
@@ -112,12 +112,10 @@ export default function RevenueByPlanCard({
   function onMove(e: React.MouseEvent<SVGRectElement, MouseEvent>) {
     if (points.length < 2 || !wrapRef.current) return;
 
-    // bounds for the invisible SVG hit-rect
     const rectBounds = e.currentTarget.getBoundingClientRect();
-    // bounds for the wrapping container (to compute tooltip px)
     const wrapBounds = wrapRef.current.getBoundingClientRect();
 
-    const relX = e.clientX - rectBounds.left; // px within chart-area rect
+    const relX = e.clientX - rectBounds.left;
     const stepPX = rectBounds.width / (points.length - 1);
 
     let idx = Math.floor((relX + stepPX / 2) / stepPX);
@@ -142,26 +140,24 @@ export default function RevenueByPlanCard({
     return `$${k.toFixed(0)}k`;
   }
 
-  // Horizontal placement (above mouse X), with edge clamping
   let tipLeftPx: number | undefined;
   let tipTransformX = "translateX(-50%)";
   if (hover && wrapRef.current) {
     tipLeftPx = hover.mouseX;
     const wrapW = wrapRef.current.clientWidth;
-    const EDGE = 90; // px guard
+    const EDGE = 90;
     if (tipLeftPx < EDGE) tipTransformX = "translateX(0)";
     else if (wrapW - tipLeftPx < EDGE) tipTransformX = "translateX(-100%)";
     else tipTransformX = "translateX(-50%)";
   }
 
-  // Vertical placement: just above the mouse Y (not the data dots)
   let tipTopPx: number | undefined;
   if (hover && wrapRef.current) {
     const GAP = 10;
     const tipH = tipRef.current?.offsetHeight ?? 34;
-    let yPx = hover.mouseY - GAP; // position tooltip bottom just above cursor
+    let yPx = hover.mouseY - GAP;
     const EDGE_TOP = 6;
-    if (yPx - tipH < EDGE_TOP) yPx = EDGE_TOP + tipH; // keep on-screen
+    if (yPx - tipH < EDGE_TOP) yPx = EDGE_TOP + tipH;
     tipTopPx = yPx;
   }
 
@@ -279,7 +275,6 @@ export default function RevenueByPlanCard({
 
               {h !== null && (
                 <g>
-                  {/* translucent hover band */}
                   {(() => {
                     const xh = x(h);
                     const left = Math.max(P.l, xh - BAND / 2);
@@ -299,7 +294,6 @@ export default function RevenueByPlanCard({
                     );
                   })()}
 
-                  {/* vertical cursor line */}
                   <line
                     x1={x(h)}
                     y1={P.t}
@@ -309,7 +303,6 @@ export default function RevenueByPlanCard({
                     pointerEvents="none"
                   />
 
-                  {/* dots at the two values */}
                   <circle
                     cx={x(h)}
                     cy={y(points[h].self)}
@@ -327,7 +320,6 @@ export default function RevenueByPlanCard({
                 </g>
               )}
 
-              {/* hit area */}
               <rect
                 x={P.l}
                 y={P.t}

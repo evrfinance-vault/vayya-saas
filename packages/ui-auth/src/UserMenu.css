@@ -96,7 +96,22 @@
   margin: 6px 0;
 }
 
-.vu-item {
+.vu-item-link {
+  display: block;
+  width: calc(100% - 20px);
+  text-align: left;
+  text-decoration: none;
+  border-radius: 8px;
+  padding: 8px 10px;
+  color: var(--dark-color);
+}
+
+.vu-item-link:hover,
+.vu-item-link:focus {
+  background: var(--menu-item-color);
+}
+
+.vu-item-button {
   display: block;
   width: 100%;
   text-align: left;
@@ -108,8 +123,8 @@
   font: inherit;
 }
 
-.vu-item:hover,
-.vu-item:focus {
+.vu-item-button:hover,
+.vu-item-button:focus {
   background: var(--menu-item-color);
   outline: none;
 }

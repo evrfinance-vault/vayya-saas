@@ -21,9 +21,6 @@
   --menu-item-color: rgb(var(--menu-item-color-rgb));
   --theme-color: rgb(var(--theme-color-rgb));
   --unread-color: rgb(var(--unread-color-rgb));
-
-  /* how to use with partial opacity */
-  /* --translucent-theme-color: rgb(var(--theme-color-rgb) / 75%); */
 }
 
 html,
@@ -85,6 +82,48 @@ body {
 .heading {
   font-weight: 300;
   margin-top: 0;
+}
+
+.form-label {
+  display: block;
+  margin: 14px 0 6px;
+  color: rgb(var(--dark-color-rgb) / 75%);
+  font-size: 14px;
+}
+
+.form-input {
+  width: calc(100% - 30px);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 12px 14px;
+  background: var(--light-color);
+  color: var(--dark-color);
+  outline: none;
+  font-size: 12px;
+}
+
+.btn-wrapper {
+  margin-top: 32px;
+}
+
+.btn {
+  border: none;
+  background: var(--alt-theme-color);
+  color: var(--light-color);
+  padding: 10px 16px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+}
+
+textarea.form-input {
+  resize: vertical;
 }
 
 /* <weight>: Use a value from 100 to 900 */

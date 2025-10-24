@@ -63,6 +63,13 @@ enum PlanType {
   KAYYA
 }
 
+// Loan application statuses:
+// SENT: Payment plan sent to borrower (waiting for user to apply)
+// FAILED: Payment plan not approved (auto or owner-rejected)
+// PENDING: Payment plan approved (waiting for user to pay/signup)
+// PAID: Payment plan paid + user signed up (waiting to schedule appointment)
+// CONTACTED: Followup from small business
+// DONE: Scheduled appointment
 enum ApplicationStatus {
   SENT
   FAILED
@@ -107,4 +114,16 @@ model Application {
   status        ApplicationStatus @default(SENT)
 
   @@index([submittedAt, status, planType])
+}
+
+model BusinessProfile {
+  id               Int      @id
+  name             String?
+  address          String?
+  hours            String?
+  website          String?
+  services         Json?    // string[]
+  financingOptions Json?    // string[]
+  testimonials     Json?    // [{ author: string, quote: string }]
+  updatedAt        DateTime @updatedAt
 }

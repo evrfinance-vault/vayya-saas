@@ -10,6 +10,22 @@ We use [git-flow](https://github.com/nvie/gitflow) around these parts. It's a sc
 
 [Read more about it here.](https://jeffkreeftmeijer.com/git-flow/)
 
+### Developing New Features
+
+Use git-flow to start working on a new feature:
+
+```bash
+git flow feature start FEATURE_NAME
+```
+
+When you're done, use git-flow to indicate that you're finished:
+
+```bash
+git flow feature finish FEATURE_NAME
+```
+
+Continue in this manner until you're ready to deploy! See [Deploying to Production](#deploying-to-production) below for deploy instructions.
+
 ## Getting Started
 
 1. Install Node 24+
@@ -83,4 +99,16 @@ npm run build
 
 ## Deploying to Production
 
-Deploys are handled automatically. Use Git Flow (or the `release.sh` script) to create a new release. This will automatically tag a new version and deploy to Netlify.
+Deploys are handled automatically. Use git-flow (or the `release.sh` script) to create a new release. This will automatically tag a new version and deploy to Netlify.
+
+### Using the Release Script
+
+When you're ready to deploy a new release, you can run `release.sh` in the project root:
+
+```bash
+# see what will happen without doing anything
+DRY_RUN=1 npm run release -- 1.0.0
+
+# actually do the release
+npm run release -- 1.0.0
+```

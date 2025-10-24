@@ -1,5 +1,5 @@
 import React from "react";
-import Card, { type CardSize } from "../Card";
+import Card, { type CardSize } from "./Card";
 import "./NoticeCard.css";
 import type { IconProp } from "@fortawesome/fontawesome-svg-core";
 

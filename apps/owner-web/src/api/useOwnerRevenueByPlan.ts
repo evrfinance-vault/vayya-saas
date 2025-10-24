@@ -1,14 +1,15 @@
 import { useEffect, useState } from "react";
+import { useApiFetch } from "./http";
 
 export type RevenuePoint = {
-  date: string; // YYYY-MM-DD (week start)
-  self: number; // dollars
-  kayya: number; // dollars
+  date: string;
+  self: number;
+  kayya: number;
 };
 
 export type RevenuePayload = {
   points: RevenuePoint[];
-  max: number; // max dollars across series
+  max: number;
 };
 
 type Options =
@@ -20,6 +21,7 @@ export function useOwnerRevenueByPlan(opts?: Options) {
   const weeks = bucket === "week" ? ((opts as any)?.weeks ?? 52) : undefined;
   const months = bucket === "month" ? ((opts as any)?.months ?? 12) : undefined;
 
+  const apiFetch = useApiFetch();
   const [data, setData] = useState<RevenuePayload | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -31,16 +33,15 @@ export function useOwnerRevenueByPlan(opts?: Options) {
     if (bucket === "month" && months) params.set("months", String(months));
 
     setLoading(true);
-    fetch(
-      `http://localhost:4000/api/owner/overview/revenue-by-plan?${params.toString()}`,
-      { signal: ctl.signal },
-    )
+    apiFetch(`/api/owner/overview/revenue-by-plan?${params.toString()}`, {
+      signal: ctl.signal,
+    })
       .then((r) => r.json())
       .then(setData)
       .finally(() => setLoading(false));
 
     return () => ctl.abort();
-  }, [bucket, weeks, months]);
+  }, [bucket, weeks, months, apiFetch]);
 
   return { data, loading };
 }

@@ -9,7 +9,8 @@ export type TabKey =
   | "active-payment-plans"
   | "kayya-board"
   | "late-payments"
-  | "pending-applications";
+  | "pending-applications"
+  | string;
 
 export type TabDef = {
   key: TabKey;

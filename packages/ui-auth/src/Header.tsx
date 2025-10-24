@@ -17,57 +17,18 @@ type Props = {
   showNotifications?: boolean;
 };
 
-const left: React.CSSProperties = {
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "left",
-  width: "15%",
-  gap: 12,
-};
-const center: React.CSSProperties = {
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "center",
-  width: "70%",
-  gap: 12,
-};
-const right: React.CSSProperties = {
-  display: "flex",
-  alignItems: "center",
-  justifyContent: "right",
-  width: "15%",
-  gap: 12,
-  marginRight: 16,
-};
-const brand: React.CSSProperties = {
-  fontWeight: 700,
-  marginLeft: 16,
-};
-const nav: React.CSSProperties = {
-  display: "flex",
-  justifyContent: "center",
-  flexFlow: "row wrap",
-  gap: 0,
-  backgroundColor: "rgba(255,255,255,0.25)",
-  borderRadius: "12px",
-};
-
 export function Header(props: Props): React.ReactElement {
   const { title = "Kayya", navLinks, renderLink, ...actions } = props;
 
   return (
     <header className="header-bar">
-      <div style={left}>
-        {
-          <h2 className="site-title" style={brand}>
-            {title}
-          </h2>
-        }
+      <div className="header-bar-left">
+        {<h2 className="site-title">{title}</h2>}
       </div>
 
-      <div style={center}>
+      <div className="header-bar-center">
         {navLinks && navLinks.length > 0 && (
-          <nav style={nav}>
+          <nav className="header-nav">
             {navLinks.map(
               (l) =>
                 renderLink?.(l) ?? (
@@ -85,7 +46,7 @@ export function Header(props: Props): React.ReactElement {
         )}
       </div>
 
-      <div style={right}>
+      <div className="header-bar-right">
         <HeaderActions {...actions} />
         <UserMenu />
       </div>

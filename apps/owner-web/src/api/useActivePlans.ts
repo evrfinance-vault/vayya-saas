@@ -1,7 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-
-const API =
-  import.meta.env.VITE_API_URL?.replace(/\/$/, "") || "http://localhost:4000";
+import { useApiFetch } from "./http";
 
 export type PlanKey = "ALL" | "SELF" | "KAYYA";
 export type PlanStatus = "ACTIVE" | "HOLD" | "DELINQUENT" | "PAID";
@@ -25,19 +23,20 @@ export function useActivePlans(
   status: PlanStatus | "ALL",
   plan: PlanKey,
 ) {
+  const apiFetch = useApiFetch();
   const [rows, setRows] = useState<ActivePlanRow[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const ctl = new AbortController();
-    setLoading(true);
     const qs = new URLSearchParams({
       range,
       plan,
       status,
     }).toString();
 
-    fetch(`${API}/api/owner/active-plans?${qs}`, { signal: ctl.signal })
+    setLoading(true);
+    apiFetch(`/api/owner/active-plans?${qs}`, { signal: ctl.signal })
       .then((r) => (r.ok ? r.json() : Promise.reject()))
       .then((payload) => {
         const arr = payload?.rows ?? (Array.isArray(payload) ? payload : []);
@@ -84,7 +83,7 @@ export function useActivePlans(
       .finally(() => setLoading(false));
 
     return () => ctl.abort();
-  }, [range, status, plan]);
+  }, [range, status, plan, apiFetch]);
 
   const summary = useMemo(() => {
     const inScope = rows.filter((r) => r.status !== "PAID");

@@ -1,6 +1,6 @@
 import React from "react";
 import "./OverviewPage.css";
-import { useGreeting, useDateStamp, UserBadge, ENV } from "@packages/ui-auth";
+import { useGreeting, useDateStamp, UserBadge } from "@packages/ui-auth";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faCircle,
@@ -53,11 +53,7 @@ const TABS: TabDef[] = [
 ];
 
 function useBackendHealth(pollingTimeInMS = 30000) {
-  const apiBase =
-    (ENV as any)?.VITE_API_URL ||
-    (ENV as any)?.API_BASE_URL ||
-    "http://localhost:4000";
-
+  const apiBase = import.meta.env.VITE_BACKEND_URL || "http://localhost:4000";
   const url = `${apiBase.replace(/\/$/, "")}/health`;
   const [ok, setOk] = React.useState<boolean | null>(null);
 
