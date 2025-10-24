@@ -5,3 +5,4 @@ export { default as TotalRevenuePanel } from "./TotalRevenuePanel";
 export { default as BoardPanel } from "./BoardPanel";
 export { default as SettingsAccountPanel } from "./SettingsAccountPanel";
 export { default as DiscoveryProfilePanel } from "./DiscoveryProfilePanel";
+export { default as PaymentPlansPanel } from "./PaymentPlansPanel";
