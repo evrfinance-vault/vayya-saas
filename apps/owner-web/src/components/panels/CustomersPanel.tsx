@@ -22,7 +22,11 @@ export default function CustomersPanel(): React.ReactElement {
   const [plan, setPlan] = React.useState<PlanKey>("ALL");
   const [status, setStatus] = React.useState<StatusKey>("ALL");
 
-  const { rows: raw, summary: _summary, loading } = useActivePlans(range, status, plan);
+  const {
+    rows: raw,
+    summary: _summary,
+    loading,
+  } = useActivePlans(range, status, plan);
 
   const rows: TableRow[] = React.useMemo(() => {
     return raw.map((r) => ({
@@ -89,7 +93,7 @@ export default function CustomersPanel(): React.ReactElement {
         title="Borrowers with Payment Plans"
         icon={faList}
         columns={[
-          { key: "client", label: "Borrower", width: "minmax(180px, 1.3fr)" },
+          { key: "client", label: "Borrower" },
           {
             key: "amount",
             label: "Amount",
