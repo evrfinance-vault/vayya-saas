@@ -400,10 +400,7 @@ export default function PayoutCalendarCard({
 
           {hover && (
             <div className="pc-tip" style={tipStyle()}>
-              <div
-                className="fa-stack"
-                style={{ fontSize: "8px", lineHeight: 1 }}
-              >
+              <div className="fa-stack">
                 <FontAwesomeIcon
                   icon={faCircle}
                   className="fa-stack-2x"
