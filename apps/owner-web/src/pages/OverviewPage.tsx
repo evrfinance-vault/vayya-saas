@@ -1,6 +1,6 @@
 import React from "react";
 import "./OverviewPage.css";
-import { useGreeting, useDateStamp, UserBadge, ENV } from "@packages/ui-auth";
+import { useGreeting, useDateStamp, UserBadge } from "@packages/ui-auth";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import {
   faCircle,

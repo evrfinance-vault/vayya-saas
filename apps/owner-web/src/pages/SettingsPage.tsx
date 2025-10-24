@@ -35,14 +35,19 @@ export default function SettingsPage() {
   React.useEffect(() => {
     const next = (searchParams.get("tab") as SettingsTabKey) || "discovery";
     if (next !== tab) setTab(next);
-  }, [searchParams]);
+  }, [setTab, searchParams]);
 
   return (
     <div className="page-content">
       <div className="overview-hero">
-        <div className="preheading" style={{ fontSize: "small" }}>Business Info & Login Details</div>
+        <div className="preheading" style={{ fontSize: "small" }}>
+          Business Info & Login Details
+        </div>
         <h1 className="heading">Settings</h1>
-        <p className="hero-blurb">Fill out your Discovery Profile with information about your small business, or change your login name and email address.</p>
+        <p className="hero-blurb">
+          Fill out your Discovery Profile with information about your small
+          business, or change your login name and email address.
+        </p>
       </div>
       <div className="settings-page">
         <OverviewTabs

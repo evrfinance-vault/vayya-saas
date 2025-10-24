@@ -22,7 +22,7 @@ app.get("/api/ping", ping);
 app.use(ownerOverview);
 app.use(settingsRouter);
 
-app.use((err, _req, res, _next) => {
+app.use((err: any, _req: any, res: any, _next: any) => {
   console.error("Auth error:", err.name, err.message);
   res.status(err.status || 401).send(err.message || "Unauthorized");
 });

@@ -41,6 +41,6 @@ export function useApiFetch() {
 
       return fetch(url, { ...init, headers });
     },
-    [getAccessTokenSilently, isAuthenticated],
+    [getAccessTokenSilently, isAuthenticated, audience, skipAuthOnDev],
   );
 }

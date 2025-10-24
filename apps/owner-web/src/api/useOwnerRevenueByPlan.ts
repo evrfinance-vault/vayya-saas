@@ -33,10 +33,9 @@ export function useOwnerRevenueByPlan(opts?: Options) {
     if (bucket === "month" && months) params.set("months", String(months));
 
     setLoading(true);
-    apiFetch(
-      `/api/owner/overview/revenue-by-plan?${params.toString()}`,
-      { signal: ctl.signal },
-    )
+    apiFetch(`/api/owner/overview/revenue-by-plan?${params.toString()}`, {
+      signal: ctl.signal,
+    })
       .then((r) => r.json())
       .then(setData)
       .finally(() => setLoading(false));

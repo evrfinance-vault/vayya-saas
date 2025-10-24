@@ -23,11 +23,7 @@ export function Header(props: Props): React.ReactElement {
   return (
     <header className="header-bar">
       <div className="header-bar-left">
-        {
-          <h2 className="site-title">
-            {title}
-          </h2>
-        }
+        {<h2 className="site-title">{title}</h2>}
       </div>
 
       <div className="header-bar-center">

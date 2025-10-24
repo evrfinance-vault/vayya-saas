@@ -6,7 +6,8 @@ export const settingsRouter = Router();
 const AUTH0_DOMAIN = process.env.AUTH0_DOMAIN!;
 const AUTH0_CLIENT_ID = process.env.AUTH0_CLIENT_ID!;
 const AUTH0_CLIENT_SECRET = process.env.AUTH0_CLIENT_SECRET!;
-const AUTH0_AUDIENCE = process.env.AUTH0_AUDIENCE || `https://${AUTH0_DOMAIN}/api/v2/`;
+const AUTH0_AUDIENCE =
+  process.env.AUTH0_AUDIENCE || `https://${AUTH0_DOMAIN}/api/v2/`;
 
 async function getManagementToken(): Promise<string> {
   const resp = await fetch(`https://${AUTH0_DOMAIN}/oauth/token`, {
@@ -28,15 +29,20 @@ async function getManagementToken(): Promise<string> {
 }
 
 settingsRouter.get("/api/settings/account", async (req, res) => {
-  const userId = (req.headers["x-user-id"] as string) || (req.query.userId as string);
+  const userId =
+    (req.headers["x-user-id"] as string) || (req.query.userId as string);
   if (!userId) return res.status(400).json({ error: "Missing userId" });
 
   try {
     const token = await getManagementToken();
-    const resp = await fetch(`https://${AUTH0_DOMAIN}/api/v2/users/${encodeURIComponent(userId)}`, {
-      headers: { authorization: `Bearer ${token}` },
-    });
-    if (!resp.ok) return res.status(resp.status).json({ error: await resp.text() });
+    const resp = await fetch(
+      `https://${AUTH0_DOMAIN}/api/v2/users/${encodeURIComponent(userId)}`,
+      {
+        headers: { authorization: `Bearer ${token}` },
+      },
+    );
+    if (!resp.ok)
+      return res.status(resp.status).json({ error: await resp.text() });
     const u: any = await resp.json();
     res.json({ userId, name: u.name ?? "", email: u.email ?? "" });
   } catch (err: any) {
@@ -50,15 +56,19 @@ settingsRouter.post("/api/settings/account", async (req, res) => {
 
   try {
     const token = await getManagementToken();
-    const resp = await fetch(`https://${AUTH0_DOMAIN}/api/v2/users/${encodeURIComponent(userId)}`, {
-      method: "PATCH",
-      headers: {
-        authorization: `Bearer ${token}`,
-        "content-type": "application/json",
+    const resp = await fetch(
+      `https://${AUTH0_DOMAIN}/api/v2/users/${encodeURIComponent(userId)}`,
+      {
+        method: "PATCH",
+        headers: {
+          authorization: `Bearer ${token}`,
+          "content-type": "application/json",
+        },
+        body: JSON.stringify({ name, email }),
       },
-      body: JSON.stringify({ name, email }),
-    });
-    if (!resp.ok) return res.status(resp.status).json({ error: await resp.text() });
+    );
+    if (!resp.ok)
+      return res.status(resp.status).json({ error: await resp.text() });
     const u: any = await resp.json();
     res.json({ ok: true, userId, name: u.name, email: u.email });
   } catch (err: any) {

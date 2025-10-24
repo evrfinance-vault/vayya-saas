@@ -55,10 +55,9 @@ export function useTotalRevenueMonthly(
 
   useEffect(() => {
     const ctl = new AbortController();
-    apiFetch(
-      `/api/owner/total-revenue/monthly?range=${range}&plan=${plan}`,
-      { signal: ctl.signal },
-    )
+    apiFetch(`/api/owner/total-revenue/monthly?range=${range}&plan=${plan}`, {
+      signal: ctl.signal,
+    })
       .then((r) => r.json())
       .then((payload) => setData(payload.months ?? payload.rows ?? payload))
       .finally(() => setLoading(false));

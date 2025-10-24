@@ -35,7 +35,11 @@ function TitleSetter({
   );
 
   useDocumentTitle(
-    match ? `${brand} » ${match.label}` : matchHidden ? `${brand} » ${matchHidden.label}` : `${brand} » Page Not Found`,
+    match
+      ? `${brand} » ${match.label}`
+      : matchHidden
+        ? `${brand} » ${matchHidden.label}`
+        : `${brand} » Page Not Found`,
   );
   return <></>;
 }
@@ -57,7 +61,11 @@ export default function App(): React.ReactElement {
     <BrowserRouter
       future={{ v7_startTransition: true, v7_relativeSplatPath: true }}
     >
-      <TitleSetter brand="Kayya" navLinks={navLinks} hiddenNavLinks={hiddenNavLinks} />
+      <TitleSetter
+        brand="Kayya"
+        navLinks={navLinks}
+        hiddenNavLinks={hiddenNavLinks}
+      />
 
       <Header
         title="kayya"

@@ -4,14 +4,14 @@
     Arial, "Noto Sans", "Liberation Sans", sans-serif;
 
   /* app color palette */
-  --alt-theme-color-rgb: 157 218 143;  /* soft green */
+  --alt-theme-color-rgb: 157 218 143; /* soft green */
   --background-color-rgb: 238 242 246; /* soft(er) grey */
-  --border-color-rgb: 229 231 235;     /* soft grey */
-  --dark-color-rgb: 067 073 082;       /* black */
-  --light-color-rgb: 255 255 255;      /* white */
-  --menu-item-color-rgb: 241 245 249;  /* soft(est) grey */
-  --theme-color-rgb: 172 205 234;      /* soft blue */
-  --unread-color-rgb: 016 019 245;     /* deep blue */
+  --border-color-rgb: 229 231 235; /* soft grey */
+  --dark-color-rgb: 067 073 082; /* black */
+  --light-color-rgb: 255 255 255; /* white */
+  --menu-item-color-rgb: 241 245 249; /* soft(est) grey */
+  --theme-color-rgb: 172 205 234; /* soft blue */
+  --unread-color-rgb: 016 019 245; /* deep blue */
 
   --alt-theme-color: rgb(var(--alt-theme-color-rgb));
   --background-color: rgb(var(--background-color-rgb));
@@ -98,7 +98,7 @@ body {
   padding: 12px 14px;
   background: var(--light-color);
   color: var(--dark-color);
-  outline:none;
+  outline: none;
   font-size: 12px;
 }
 

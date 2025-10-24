@@ -1,7 +1,6 @@
 import React from "react";
 import Card from "../cards/Card";
 import { useAuth0 } from "@auth0/auth0-react";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faUsersGear } from "@fortawesome/free-solid-svg-icons";
 import { useApiFetch } from "../../api/http";
 
@@ -17,14 +16,16 @@ export default function SettingsAccountPanel() {
   React.useEffect(() => {
     if (!userId || loaded) return;
     apiFetch(`/api/settings/account?userId=${encodeURIComponent(userId)}`)
-      .then(r => r.ok ? r.json() : Promise.reject(r))
+      .then((r) => (r.ok ? r.json() : Promise.reject(r)))
       .then((j) => {
         setName(j?.name ?? "");
         setEmail(j?.email ?? "");
       })
-      .catch(() => {/* noop */})
+      .catch(() => {
+        /* noop */
+      })
       .finally(() => setLoaded(true));
-  }, [userId, loaded]);
+  }, [userId, loaded, apiFetch]);
 
   const onSave = async () => {
     if (!userId) return;
@@ -46,13 +47,8 @@ export default function SettingsAccountPanel() {
 
   return (
     <div className="overview-grid">
-      <Card backgroundColor="var(--background-color)" />
-      <Card
-        title="Login Details"
-        icon={faUsersGear}
-        width="2x"
-        height="1x"
-      >
+      <Card backgroundColor="var(--background-color)" title="" />
+      <Card title="Login Details" icon={faUsersGear} width="2x" height="1x">
         <div>
           <label className="form-label">Full name</label>
           <input
@@ -73,7 +69,11 @@ export default function SettingsAccountPanel() {
           />
 
           <div className="btn-wrapper">
-            <button className="btn" onClick={onSave} disabled={saving || !userId}>
+            <button
+              className="btn"
+              onClick={onSave}
+              disabled={saving || !userId}
+            >
               {saving ? "Saving..." : "Save"}
             </button>
           </div>

@@ -80,8 +80,8 @@ header nav > a.header-link:last-of-type[aria-current="page"],
 }
 
 .site-title {
-  fontWeight: 700;
-  marginLeft: 16px;
+  font-weight: 700;
+  margin-left: 16px;
   cursor: default;
   display: inline-block;
   user-select: none;
