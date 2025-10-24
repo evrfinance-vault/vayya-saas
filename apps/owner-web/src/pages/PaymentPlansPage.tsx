@@ -30,8 +30,8 @@ export default function PaymentPlansPage(): React.ReactElement {
 
   React.useEffect(() => {
     const next = (searchParams.get("tab") as PaymentPlansTabKey) || "plans";
-    if (next !== tab) setTab(next);
-  }, [tab, searchParams]);
+    setTab(next);
+  }, [setTab, searchParams]);
 
   return (
     <div className="page-content">

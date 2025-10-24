@@ -34,7 +34,7 @@ export default function SettingsPage() {
 
   React.useEffect(() => {
     const next = (searchParams.get("tab") as SettingsTabKey) || "discovery";
-    if (next !== tab) setTab(next);
+    setTab(next);
   }, [setTab, searchParams]);
 
   return (
