@@ -1,7 +1,5 @@
 import { useEffect, useState } from "react";
-
-const API =
-  import.meta.env.VITE_API_URL?.replace(/\/$/, "") || "http://localhost:4000";
+import { useApiFetch } from "./http";
 
 export type PayoutsResp = {
   year: number;
@@ -19,26 +17,28 @@ export type PayoutItem = {
 };
 
 export function useOwnerPayoutsByDay(year: number, month1: number) {
+  const apiFetch = useApiFetch();
   const [data, setData] = useState<PayoutsResp | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const ctl = new AbortController();
     setLoading(true);
-    fetch(
-      `${API}/api/owner/overview/payouts-by-day?year=${year}&month=${month1}`,
+    apiFetch(
+      `/api/owner/overview/payouts-by-day?year=${year}&month=${month1}`,
       { signal: ctl.signal },
     )
       .then((r) => r.json())
       .then(setData)
       .finally(() => setLoading(false));
     return () => ctl.abort();
-  }, [year, month1]);
+  }, [year, month1, apiFetch]);
 
   return { data, loading };
 }
 
 export function usePayoutsWindow(startISO: string, endISO: string) {
+  const apiFetch = useApiFetch();
   const [items, setItems] = useState<PayoutItem[]>([]);
   const [loading, setLoading] = useState(false);
 
@@ -46,8 +46,8 @@ export function usePayoutsWindow(startISO: string, endISO: string) {
     if (!startISO || !endISO) return;
     const ctl = new AbortController();
     setLoading(true);
-    fetch(
-      `${API}/api/owner/overview/payouts-window?start=${startISO}&end=${endISO}`,
+    apiFetch(
+      `/api/owner/overview/payouts-window?start=${startISO}&end=${endISO}`,
       { signal: ctl.signal },
     )
       .then((r) => (r.ok ? r.json() : Promise.reject()))
@@ -55,7 +55,7 @@ export function usePayoutsWindow(startISO: string, endISO: string) {
       .catch(() => setItems([]))
       .finally(() => setLoading(false));
     return () => ctl.abort();
-  }, [startISO, endISO]);
+  }, [startISO, endISO, apiFetch]);
 
   return { items, loading };
 }

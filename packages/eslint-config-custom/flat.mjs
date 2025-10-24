@@ -8,13 +8,11 @@ import prettier from "eslint-config-prettier";
 import { FlatCompat } from "@eslint/eslintrc";
 import globals from "globals";
 
-// Convert legacy presets (plugin:xxx/recommended) to flat config
 const compat = new FlatCompat({
   baseDirectory: new URL(".", import.meta.url).pathname,
 });
 
 export default [
-  // 0) Ignore configs, build, caches
   {
     ignores: [
       "**/node_modules/**",
@@ -34,25 +32,17 @@ export default [
       "prisma/**",
     ],
   },
-
-  // 1) Base ESLint recs
   js.configs.recommended,
-
-  // 2) Legacy plugin presets (converted)
   ...compat.extends(
     "plugin:react/recommended",
     "plugin:react-hooks/recommended",
     "plugin:import/recommended",
   ),
-
-  // 3) Global settings (applies everywhere)
   {
     settings: {
       react: { version: "detect" },
     },
   },
-
-  // 4) Project files (TS/JS) — enable TS project and set globals
   {
     files: ["**/*.{ts,tsx,js,jsx}"],
     languageOptions: {
@@ -95,8 +85,6 @@ export default [
       semi: ["error", "always"],
     },
   },
-
-  // 5) Test files — don't require TS project; keep nice globals
   {
     files: [
       "**/*.test.*",
@@ -113,7 +101,5 @@ export default [
       },
     },
   },
-
-  // 6) Keep last to disable conflicting stylistic rules
   prettier,
 ];

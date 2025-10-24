@@ -1,0 +1,23 @@
+.applications-page {
+}
+
+.applications-panels {
+  position: relative;
+  margin: 40px auto 0;
+  z-index: 2;
+}
+
+.applications-tab-change {
+  animation: applicationsFadeUp 200ms ease-out both;
+}
+
+@keyframes applicationsFadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

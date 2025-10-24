@@ -58,7 +58,7 @@ export function HeaderActions(props: {
             aria-expanded={open}
             onClick={() => {
               if (onNotifications) onNotifications();
-              setOpen((v) => !v); // toggle
+              setOpen((v) => !v);
             }}
           >
             <FontAwesomeIcon icon={faBell} size="2x" />
@@ -74,7 +74,7 @@ export function HeaderActions(props: {
             items={notifications}
             onClose={() => setOpen(false)}
             onViewAll={onViewAllNotifications}
-            anchorRef={anchorRef} // 👈 tells the popover this button is “inside”
+            anchorRef={anchorRef}
           />
         </div>
       )}

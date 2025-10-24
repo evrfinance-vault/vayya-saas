@@ -228,6 +228,24 @@ async function main() {
       });
     }
   }
+
+  await prisma.businessProfile.upsert({
+    where: { id: 1 },
+    create: {
+      id: 1,
+      name: "Acme Dental Studio",
+      address: "123 Main St, Springfield, USA",
+      hours: "Mon–Fri 8am–6pm",
+      website: "https://acmedental.example",
+      services: ["Implants", "Whitening", "Aligners"],
+      financingOptions: ["Self-financed plans", "Kayya-backed plans"],
+      testimonials: [
+        { author: "Maria G.", quote: "Payment plan made it possible." },
+        { author: "D. Patel", quote: "Fast approval, fair terms." },
+      ],
+    },
+    update: {},
+  });
 }
 
 main()

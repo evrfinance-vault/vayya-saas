@@ -1,0 +1,23 @@
+.customers-page {
+}
+
+.customers-panels {
+  position: relative;
+  margin: 40px auto 0;
+  z-index: 2;
+}
+
+.customers-tab-change {
+  animation: customersFadeUp 200ms ease-out both;
+}
+
+@keyframes customersFadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

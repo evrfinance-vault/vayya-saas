@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useApiFetch } from "./http";
 
 export type AccountHealthData = {
   totalPlans: number;
@@ -7,19 +8,20 @@ export type AccountHealthData = {
 };
 
 export function useOwnerAccountHealth() {
+  const apiFetch = useApiFetch();
   const [data, setData] = useState<AccountHealthData | null>(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const ctl = new AbortController();
-    fetch("http://localhost:4000/api/owner/overview/account-health", {
+    apiFetch("/api/owner/overview/account-health", {
       signal: ctl.signal,
     })
       .then((r) => r.json())
       .then((d) => setData(d))
       .finally(() => setLoading(false));
     return () => ctl.abort();
-  }, []);
+  }, [apiFetch]);
 
   return { data, loading };
 }

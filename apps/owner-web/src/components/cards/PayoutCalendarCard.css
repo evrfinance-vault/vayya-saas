@@ -83,6 +83,11 @@
   white-space: nowrap;
 }
 
+.pc-tip .fa-stack {
+  font-size: 8px;
+  line-height: 1;
+}
+
 .ah-tip {
   transform: translate(-50%, -100%);
 }

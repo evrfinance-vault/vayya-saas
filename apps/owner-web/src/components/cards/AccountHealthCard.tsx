@@ -1,5 +1,5 @@
 import React from "react";
-import Card, { type CardSize } from "../Card";
+import Card, { type CardSize } from "./Card";
 import "./AccountHealthCard.css";
 import { faHeartPulse } from "@fortawesome/free-solid-svg-icons";
 import { useOwnerAccountHealth } from "../../api/useOwnerAccountHealth";
@@ -96,7 +96,6 @@ export default function AccountHealthCard({
   }
   function onDotMove(e: React.MouseEvent<SVGElement>) {
     if (!hover) return;
-    // keep x/y updated while moving along the same knob
     if (!wrapRef.current) return;
     const wb = wrapRef.current.getBoundingClientRect();
     const cb = (e.currentTarget as SVGElement).getBoundingClientRect();
@@ -108,7 +107,6 @@ export default function AccountHealthCard({
     setHover(null);
   }
 
-  // Edge-aware tooltip (clamp horizontally, flip below if not enough room above)
   function tipStyle(): React.CSSProperties {
     if (!hover || !wrapRef.current) return {};
     const wrap = wrapRef.current;
@@ -118,18 +116,15 @@ export default function AccountHealthCard({
     const GAP = 10;
     const EDGE = 8;
 
-    // measure current tooltip box
     const tw = tipRef.current?.offsetWidth ?? 180;
     const th = tipRef.current?.offsetHeight ?? 34;
 
-    // clamp x so tooltip never overflows
     const minX = EDGE + tw / 2;
     const maxX = w - EDGE - tw / 2;
     let x = hover.x;
     if (x < minX) x = minX;
     if (x > maxX) x = maxX;
 
-    // decide above vs below using actual available space
     const haveSpaceAbove = hover.y - th - GAP >= EDGE;
     const haveSpaceBelow = h - (hover.y + GAP + th) >= EDGE;
     const placeBelow = !haveSpaceAbove && haveSpaceBelow;

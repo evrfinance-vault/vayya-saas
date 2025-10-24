@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useApiFetch } from "./http";
 
 export type NameItem = {
   id: string;
@@ -11,19 +12,20 @@ export type NameItem = {
 };
 
 export function useOwnerOverviewName(limit = 8) {
+  const apiFetch = useApiFetch();
   const [items, setItems] = useState<NameItem[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const ctl = new AbortController();
-    fetch(`http://localhost:4000/api/owner/overview/name?limit=${limit}`, {
+    apiFetch(`/api/owner/overview/name?limit=${limit}`, {
       signal: ctl.signal,
     })
       .then((r) => r.json())
       .then((d) => setItems(d.items ?? []))
       .finally(() => setLoading(false));
     return () => ctl.abort();
-  }, [limit]);
+  }, [limit, apiFetch]);
 
   return { items, loading };
 }

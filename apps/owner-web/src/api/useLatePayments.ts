@@ -1,8 +1,5 @@
 import { useEffect, useState } from "react";
-
-const API =
-  (import.meta as any).env?.VITE_API_URL?.replace(/\/$/, "") ||
-  "http://localhost:4000";
+import { useApiFetch } from "./http";
 
 export type RiskKey = "LOW" | "MEDIUM" | "HIGH";
 export type PlanKey = "SELF" | "KAYYA";
@@ -35,19 +32,20 @@ export const fmtUSD = (cents: number) =>
   );
 
 export function useLatePaymentsSummary() {
+  const apiFetch = useApiFetch();
   const [data, setData] = useState<LPSummary | null>(null);
   const [loading, setLoading] = useState(true);
   useEffect(() => {
     const ctl = new AbortController();
     setLoading(true);
 
-    fetch(`${API}/api/owner/late-payments/summary`, { signal: ctl.signal })
+    apiFetch("/api/owner/late-payments/summary", { signal: ctl.signal })
       .then((r) => (r.ok ? r.json() : Promise.reject()))
       .then((json) => setData(json))
       .catch(() => setData(null))
       .finally(() => setLoading(false));
     return () => ctl.abort();
-  }, []);
+  }, [apiFetch]);
 
   return { data, loading };
 }
@@ -57,6 +55,7 @@ export function useLatePayments(filters?: {
   risk?: "ALL" | RiskKey;
   daysMin?: number;
 }) {
+  const apiFetch = useApiFetch();
   const [rows, setRows] = useState<LateRow[]>([]);
   const [loading, setLoading] = useState(true);
 
@@ -74,13 +73,13 @@ export function useLatePayments(filters?: {
       daysMin: String(daysMin),
     }).toString();
 
-    fetch(`${API}/api/owner/late-payments/list?${qs}`, { signal: ctl.signal })
+    apiFetch(`/api/owner/late-payments/list?${qs}`, { signal: ctl.signal })
       .then((r) => (r.ok ? r.json() : Promise.reject()))
       .then((payload) => setRows(payload?.rows ?? []))
       .catch(() => setRows([]))
       .finally(() => setLoading(false));
     return () => ctl.abort();
-  }, [status, risk, daysMin]);
+  }, [status, risk, daysMin, apiFetch]);
 
   return { rows, loading };
 }
