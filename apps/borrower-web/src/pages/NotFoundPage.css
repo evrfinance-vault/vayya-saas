@@ -1,0 +1,10 @@
+.not-found-page {
+  padding: 24px;
+  margin: 24px 0 0 12px;
+  display: grid;
+  gap: 0;
+}
+
+.not-found-page .preheading {
+  font-size: small;
+}
