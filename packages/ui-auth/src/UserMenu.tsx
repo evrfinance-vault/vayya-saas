@@ -48,15 +48,19 @@ export function UserMenu(): React.ReactElement {
             {role && <div className="vu-menu-role">{role}</div>}
           </div>
           <div className="vu-sep" />
-          <NavLink
-            key="discovery"
-            to="/settings?tab=discovery"
-            end={false}
-            className="vu-item-link"
-            onClick={() => setOpen(false)}
-          >
-            Discovery Profile
-          </NavLink>
+
+          {role === "owner" && (
+            <NavLink
+              key="discovery"
+              to="/settings?tab=discovery"
+              end={false}
+              className="vu-item-link"
+              onClick={() => setOpen(false)}
+            >
+              Discovery Profile
+            </NavLink>
+          )}
+
           <NavLink
             key="settings"
             to="/settings?tab=settings"
