@@ -1,0 +1,71 @@
+.page-panels {
+  position: relative;
+  margin: 40px auto 0;
+  z-index: 2;
+}
+
+.page-tab-change {
+  animation: pageFadeUp 200ms ease-out both;
+}
+
+@keyframes pageFadeUp {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.hero-content {
+  display: grid;
+  grid-template-columns: 1fr minmax(300px, 520px);
+  grid-template-rows: auto auto;
+  column-gap: 32px;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.hero-content .preheading {
+  grid-column: 1 / 2;
+  grid-row: 1;
+  font-weight: 500;
+  gap: 4px;
+  font-size: small;
+}
+
+.hero-content .heading {
+  grid-column: 1 / 2;
+  grid-row: 2;
+  margin: 6px 0 0 0;
+}
+
+.hero-blurb {
+  grid-column: 2 / 3;
+  grid-row: 1 / span 2;
+  justify-self: end;
+  align-self: center;
+  max-width: 320px;
+  line-height: 1.5;
+  font-weight: 500;
+  font-size: clamp(14px, 1.05vw, 16px);
+  color: var(--light-color);
+  margin: 0;
+}
+
+@media (max-width: 1100px) {
+  .hero-content {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto auto auto;
+    row-gap: 8px;
+  }
+
+  .hero-blurb {
+    grid-column: 1 / 2;
+    grid-row: 3;
+    justify-self: start;
+    max-width: 60ch;
+  }
+}
